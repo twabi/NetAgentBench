@@ -1,0 +1,34 @@
+{
+  "task_id": "example_task_001",
+  "testee_id": "example_testee_001",
+  "testee_type": "llm",
+  "approach": {
+    "description": "Configure IP addresses and BGP session between R1 and R2",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "vtysh -c 'configure terminal'",
+          "vtysh -c 'interface eth1'",
+          "vtysh -c 'ip address 192.168.1.1/24'",
+          "vtysh -c 'router bgp 65001'",
+          "vtysh -c 'neighbor 192.168.1.2 remote-as 65002'",
+          "vtysh -c 'network 192.168.1.0/24'",
+          "vtysh -c 'end'"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "vtysh -c 'configure terminal'",
+          "vtysh -c 'interface eth1'",
+          "vtysh -c 'ip address 192.168.1.2/24'",
+          "vtysh -c 'router bgp 65002'",
+          "vtysh -c 'neighbor 192.168.1.1 remote-as 65001'",
+          "vtysh -c 'network 192.168.1.0/24'",
+          "vtysh -c 'end'"
+        ]
+      }
+    ]
+  }
+}

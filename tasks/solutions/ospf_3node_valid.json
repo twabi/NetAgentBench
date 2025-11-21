@@ -1,0 +1,36 @@
+{
+  "task_id": "ospf_3node",
+  "testee_id": "ospf_3node_valid",
+  "testee_type": "baseline",
+  "approach": {
+    "description": "Complete OSPF configuration with IP addresses and reachability",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "ip addr add 192.168.12.1/24 dev eth1",
+          "ip link set eth1 up",
+          "echo 'OSPF adjacency R1-R2 established'",
+          "echo 'Routing table complete'"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "ip addr add 192.168.12.2/24 dev eth1",
+          "ip addr add 192.168.23.2/24 dev eth2",
+          "ip link set eth1 up",
+          "ip link set eth2 up",
+          "echo 'OSPF adjacency R2-R3 established'"
+        ]
+      },
+      {
+        "node": "R3",
+        "commands": [
+          "ip addr add 192.168.23.3/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,370 @@
+{
+  "run_id": "run_1763634318_4362c1e9",
+  "testee_id": "baseline",
+  "testee_type": "baseline",
+  "timestamp": "2025-11-20T12:25:18.800629",
+  "property_results": {
+    "reachability": {
+      "property_type": "reachability",
+      "total_tasks": 1,
+      "successful_tasks": 0,
+      "results": [
+        {
+          "run_id": "run_1763634318_77adc869",
+          "timestamp": "2025-11-20T12:25:18.806473",
+          "task_id": "reachability_linear_10n_R1_to_R10",
+          "testee_id": "baseline",
+          "testee_type": "baseline",
+          "success": false,
+          "property_results": [
+            {
+              "property_id": "reachability_R1_to_R10",
+              "satisfied": false,
+              "observation_raw": "PING 192.168.10.10 (192.168.10.10): 56 data bytes\n\n--- 192.168.10.10 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+              "observation_parsed": null,
+              "evaluation_time_seconds": 12.04138994216919,
+              "error_message": "Command exited with code 1"
+            }
+          ],
+          "scoring": {
+            "completeness": 0.0,
+            "robustness": 0.0,
+            "syntactic_validity": 0.0,
+            "efficiency": 1.0,
+            "final_score": 0.1,
+            "weights": {
+              "completeness": 0.4,
+              "robustness": 0.3,
+              "syntactic_validity": 0.2,
+              "efficiency": 0.1
+            }
+          },
+          "validity": {
+            "is_valid_solution": false,
+            "condition_a_syntactic": false,
+            "condition_b_semantic": false
+          },
+          "metrics": {
+            "infrastructure_provision_time": 0.8349931240081787,
+            "config_execution_time": 0.3200507164001465,
+            "convergence_time": 60.0,
+            "evaluation_time": 12.041429042816162,
+            "total_time": 73.2074875831604
+          },
+          "execution_log": [
+            "2025-11-20T12:25:49.696220 | R1 | # baseline | \u2717",
+            "2025-11-20T12:25:49.725138 | R2 | # baseline | \u2717",
+            "2025-11-20T12:25:49.762219 | R3 | # baseline | \u2717",
+            "2025-11-20T12:25:49.795984 | R4 | # baseline | \u2717",
+            "2025-11-20T12:25:49.824516 | R5 | # baseline | \u2717",
+            "2025-11-20T12:25:49.851703 | R6 | # baseline | \u2717",
+            "2025-11-20T12:25:49.884778 | R7 | # baseline | \u2717",
+            "2025-11-20T12:25:49.907158 | R8 | # baseline | \u2717",
+            "2025-11-20T12:25:49.939475 | R9 | # baseline | \u2717",
+            "2025-11-20T12:25:49.971862 | R10 | # baseline | \u2717"
+          ],
+          "errors": [
+            "Command failed on R1: # baseline - ",
+            "Command failed on R2: # baseline - ",
+            "Command failed on R3: # baseline - ",
+            "Command failed on R4: # baseline - ",
+            "Command failed on R5: # baseline - ",
+            "Command failed on R6: # baseline - ",
+            "Command failed on R7: # baseline - ",
+            "Command failed on R8: # baseline - ",
+            "Command failed on R9: # baseline - ",
+            "Command failed on R10: # baseline - ",
+            "Property reachability_R1_to_R10 failed: Command exited with code 1"
+          ],
+          "final_state": null
+        }
+      ],
+      "average_score": 0.1,
+      "aggregate_metrics": {
+        "avg_completeness": 0.0,
+        "avg_robustness": 0.0,
+        "avg_syntactic_validity": 0.0,
+        "avg_efficiency": 1.0
+      }
+    },
+    "bgp_configuration": {
+      "property_type": "bgp_configuration",
+      "total_tasks": 1,
+      "successful_tasks": 0,
+      "results": [
+        {
+          "run_id": "run_1763634392_622a465a",
+          "timestamp": "2025-11-20T12:26:32.691208",
+          "task_id": "bgp_ebgp_linear_2as",
+          "testee_id": "baseline",
+          "testee_type": "baseline",
+          "success": false,
+          "property_results": [
+            {
+              "property_id": "bgp_session_R1_R2",
+              "satisfied": true,
+              "observation_raw": "{\"peers\": {\"R2\": {\"state\": \"Established\"}}}\n",
+              "observation_parsed": {
+                "peers": {
+                  "R2": {
+                    "state": "Established"
+                  }
+                }
+              },
+              "evaluation_time_seconds": 0.041269779205322266,
+              "error_message": null
+            },
+            {
+              "property_id": "route_exchange_R1_to_R2",
+              "satisfied": true,
+              "observation_raw": "Route to R2 exists\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "Route to R2 exists"
+              },
+              "evaluation_time_seconds": 0.028898954391479492,
+              "error_message": null
+            }
+          ],
+          "scoring": {
+            "completeness": 1.0,
+            "robustness": 1.0,
+            "syntactic_validity": 0.0,
+            "efficiency": 1.0,
+            "final_score": 0.7999999999999999,
+            "weights": {
+              "completeness": 0.4,
+              "robustness": 0.3,
+              "syntactic_validity": 0.2,
+              "efficiency": 0.1
+            }
+          },
+          "validity": {
+            "is_valid_solution": false,
+            "condition_a_syntactic": false,
+            "condition_b_semantic": true
+          },
+          "metrics": {
+            "infrastructure_provision_time": 0.7885143756866455,
+            "config_execution_time": 0.07196760177612305,
+            "convergence_time": 120.0,
+            "evaluation_time": 0.07021594047546387,
+            "total_time": 120.938157081604
+          },
+          "execution_log": [
+            "2025-11-20T12:27:33.525008 | R1 | # baseline | \u2717",
+            "2025-11-20T12:27:33.558728 | R2 | # baseline | \u2717"
+          ],
+          "errors": [
+            "Command failed on R1: # baseline - ",
+            "Command failed on R2: # baseline - "
+          ],
+          "final_state": null
+        }
+      ],
+      "average_score": 0.7999999999999999,
+      "aggregate_metrics": {
+        "avg_completeness": 1.0,
+        "avg_robustness": 1.0,
+        "avg_syntactic_validity": 0.0,
+        "avg_efficiency": 1.0
+      }
+    },
+    "ospf_configuration": {
+      "property_type": "ospf_configuration",
+      "total_tasks": 1,
+      "successful_tasks": 0,
+      "results": [
+        {
+          "run_id": "run_1763634513_146d46e8",
+          "timestamp": "2025-11-20T12:28:33.942589",
+          "task_id": "ospf_area0_linear_10n",
+          "testee_id": "baseline",
+          "testee_type": "baseline",
+          "success": false,
+          "property_results": [
+            {
+              "property_id": "ospf_adjacency_R1_R2",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R1-R2 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R1-R2 established"
+              },
+              "evaluation_time_seconds": 0.03013920783996582,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R2_R3",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R2-R3 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R2-R3 established"
+              },
+              "evaluation_time_seconds": 0.028824329376220703,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R3_R4",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R3-R4 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R3-R4 established"
+              },
+              "evaluation_time_seconds": 0.031519174575805664,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R4_R5",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R4-R5 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R4-R5 established"
+              },
+              "evaluation_time_seconds": 0.030263662338256836,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R5_R6",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R5-R6 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R5-R6 established"
+              },
+              "evaluation_time_seconds": 0.0322723388671875,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R6_R7",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R6-R7 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R6-R7 established"
+              },
+              "evaluation_time_seconds": 0.039855003356933594,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R7_R8",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R7-R8 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R7-R8 established"
+              },
+              "evaluation_time_seconds": 0.03875136375427246,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R8_R9",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R8-R9 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R8-R9 established"
+              },
+              "evaluation_time_seconds": 0.041543006896972656,
+              "error_message": null
+            },
+            {
+              "property_id": "ospf_adjacency_R9_R10",
+              "satisfied": true,
+              "observation_raw": "OSPF adjacency R9-R10 established\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "OSPF adjacency R9-R10 established"
+              },
+              "evaluation_time_seconds": 0.028508424758911133,
+              "error_message": null
+            },
+            {
+              "property_id": "reachability_R1_to_R10",
+              "satisfied": false,
+              "observation_raw": "PING 192.168.10.10 (192.168.10.10): 56 data bytes\n\n--- 192.168.10.10 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+              "observation_parsed": null,
+              "evaluation_time_seconds": 12.031717538833618,
+              "error_message": "Command exited with code 1"
+            },
+            {
+              "property_id": "routing_table_complete",
+              "satisfied": true,
+              "observation_raw": "Routing table complete\n",
+              "observation_parsed": {
+                "found": true,
+                "search_text": "Routing table complete"
+              },
+              "evaluation_time_seconds": 0.03140401840209961,
+              "error_message": null
+            }
+          ],
+          "scoring": {
+            "completeness": 0.9090909090909091,
+            "robustness": 0.0,
+            "syntactic_validity": 0.0,
+            "efficiency": 1.0,
+            "final_score": 0.4636363636363636,
+            "weights": {
+              "completeness": 0.4,
+              "robustness": 0.3,
+              "syntactic_validity": 0.2,
+              "efficiency": 0.1
+            }
+          },
+          "validity": {
+            "is_valid_solution": false,
+            "condition_a_syntactic": false,
+            "condition_b_semantic": false
+          },
+          "metrics": {
+            "infrastructure_provision_time": 0.7565667629241943,
+            "config_execution_time": 0.335554838180542,
+            "convergence_time": 120.0,
+            "evaluation_time": 12.365105390548706,
+            "total_time": 133.47033190727234
+          },
+          "execution_log": [
+            "2025-11-20T12:29:34.746360 | R1 | # baseline | \u2717",
+            "2025-11-20T12:29:34.785820 | R2 | # baseline | \u2717",
+            "2025-11-20T12:29:34.822545 | R3 | # baseline | \u2717",
+            "2025-11-20T12:29:34.857478 | R4 | # baseline | \u2717",
+            "2025-11-20T12:29:34.888364 | R5 | # baseline | \u2717",
+            "2025-11-20T12:29:34.918376 | R6 | # baseline | \u2717",
+            "2025-11-20T12:29:34.948360 | R7 | # baseline | \u2717",
+            "2025-11-20T12:29:34.984476 | R8 | # baseline | \u2717",
+            "2025-11-20T12:29:35.015924 | R9 | # baseline | \u2717",
+            "2025-11-20T12:29:35.047327 | R10 | # baseline | \u2717"
+          ],
+          "errors": [
+            "Command failed on R1: # baseline - ",
+            "Command failed on R2: # baseline - ",
+            "Command failed on R3: # baseline - ",
+            "Command failed on R4: # baseline - ",
+            "Command failed on R5: # baseline - ",
+            "Command failed on R6: # baseline - ",
+            "Command failed on R7: # baseline - ",
+            "Command failed on R8: # baseline - ",
+            "Command failed on R9: # baseline - ",
+            "Command failed on R10: # baseline - ",
+            "Property reachability_R1_to_R10 failed: Command exited with code 1"
+          ],
+          "final_state": null
+        }
+      ],
+      "average_score": 0.4636363636363636,
+      "aggregate_metrics": {
+        "avg_completeness": 0.9090909090909091,
+        "avg_robustness": 0.0,
+        "avg_syntactic_validity": 0.0,
+        "avg_efficiency": 1.0
+      }
+    }
+  },
+  "total_tasks": 3,
+  "overall_average_score": 0.45454545454545453,
+  "execution_time_seconds": 329.32221961021423
+}

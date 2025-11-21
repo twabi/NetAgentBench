@@ -1,0 +1,127 @@
+{
+  "property_type": "reachability",
+  "total_tasks": 1,
+  "successful_tasks": 1,
+  "results": [
+    {
+      "run_id": "run_1763635506_5304c309",
+      "timestamp": "2025-11-20T12:45:06.236379",
+      "task_id": "reachability_linear_10n_R1_to_R10",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": true,
+      "property_results": [
+        {
+          "property_id": "reachability_R1_to_R10",
+          "satisfied": true,
+          "observation_raw": "PING 192.168.10.10 (192.168.10.10): 56 data bytes\n64 bytes from 192.168.10.10: seq=0 ttl=56 time=0.255 ms\n64 bytes from 192.168.10.10: seq=1 ttl=56 time=0.102 ms\n64 bytes from 192.168.10.10: seq=2 ttl=56 time=0.100 ms\n\n--- 192.168.10.10 ping statistics ---\n3 packets transmitted, 3 packets received, 0% packet loss\nround-trip min/avg/max = 0.100/0.152/0.255 ms\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "3 packets transmitted, 3 packets received"
+          },
+          "evaluation_time_seconds": 2.039487361907959,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 1.0,
+        "robustness": 1.0,
+        "syntactic_validity": 1.0,
+        "efficiency": 0.31746031746031744,
+        "final_score": 0.9317460317460317,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": true,
+        "condition_a_syntactic": true,
+        "condition_b_semantic": true
+      },
+      "metrics": {
+        "infrastructure_provision_time": 1.0155398845672607,
+        "config_execution_time": 1.9139537811279297,
+        "convergence_time": 60.0,
+        "evaluation_time": 2.039519786834717,
+        "total_time": 64.98505711555481
+      },
+      "execution_log": [
+        "2025-11-20T12:45:37.309602 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:37.346382 | R1 | ip addr add 10.0.1.1/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:37.372310 | R1 | ip route add 192.168.10.10/32 via 10.0.1.2 | \u2713",
+        "2025-11-20T12:45:37.399576 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:37.433463 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:37.457239 | R2 | ip addr add 10.0.1.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:37.492789 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T12:45:37.520933 | R2 | ip addr add 10.0.2.1/30 dev eth2 | \u2713",
+        "2025-11-20T12:45:37.550869 | R2 | ip route add 192.168.10.10/32 via 10.0.2.2 | \u2713",
+        "2025-11-20T12:45:37.578997 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:37.618220 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:37.648734 | R3 | ip addr add 10.0.2.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:37.687358 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T12:45:37.715568 | R3 | ip addr add 10.0.3.1/30 dev eth3 | \u2713",
+        "2025-11-20T12:45:37.741055 | R3 | ip route add 192.168.10.10/32 via 10.0.3.2 | \u2713",
+        "2025-11-20T12:45:37.757669 | R3 | ip route add 10.0.1.0/30 via 10.0.2.1 | \u2713",
+        "2025-11-20T12:45:37.798692 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:37.823646 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:37.853174 | R4 | ip addr add 10.0.3.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:37.892086 | R4 | ip link set dev eth4 up | \u2713",
+        "2025-11-20T12:45:37.922710 | R4 | ip addr add 10.0.4.1/30 dev eth4 | \u2713",
+        "2025-11-20T12:45:37.948269 | R4 | ip route add 192.168.10.10/32 via 10.0.4.2 | \u2713",
+        "2025-11-20T12:45:37.979207 | R4 | ip route add 10.0.1.0/30 via 10.0.3.1 | \u2713",
+        "2025-11-20T12:45:38.005177 | R5 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:38.033605 | R5 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:38.064956 | R5 | ip addr add 10.0.4.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:38.098762 | R5 | ip link set dev eth5 up | \u2713",
+        "2025-11-20T12:45:38.118036 | R5 | ip addr add 10.0.5.1/30 dev eth5 | \u2713",
+        "2025-11-20T12:45:38.143850 | R5 | ip route add 192.168.10.10/32 via 10.0.5.2 | \u2713",
+        "2025-11-20T12:45:38.174912 | R5 | ip route add 10.0.1.0/30 via 10.0.4.1 | \u2713",
+        "2025-11-20T12:45:38.216445 | R6 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:38.248023 | R6 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:38.270494 | R6 | ip addr add 10.0.5.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:38.288585 | R6 | ip link set dev eth6 up | \u2713",
+        "2025-11-20T12:45:38.316824 | R6 | ip addr add 10.0.6.1/30 dev eth6 | \u2713",
+        "2025-11-20T12:45:38.351472 | R6 | ip route add 192.168.10.10/32 via 10.0.6.2 | \u2713",
+        "2025-11-20T12:45:38.385175 | R6 | ip route add 10.0.1.0/30 via 10.0.5.1 | \u2713",
+        "2025-11-20T12:45:38.413165 | R7 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:38.441220 | R7 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:38.477643 | R7 | ip addr add 10.0.6.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:38.503966 | R7 | ip link set dev eth7 up | \u2713",
+        "2025-11-20T12:45:38.528302 | R7 | ip addr add 10.0.7.1/30 dev eth7 | \u2713",
+        "2025-11-20T12:45:38.559954 | R7 | ip route add 192.168.10.10/32 via 10.0.7.2 | \u2713",
+        "2025-11-20T12:45:38.593690 | R7 | ip route add 10.0.1.0/30 via 10.0.6.1 | \u2713",
+        "2025-11-20T12:45:38.622734 | R8 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:38.654145 | R8 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:38.692948 | R8 | ip addr add 10.0.7.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:38.723436 | R8 | ip link set dev eth8 up | \u2713",
+        "2025-11-20T12:45:38.754180 | R8 | ip addr add 10.0.8.1/30 dev eth8 | \u2713",
+        "2025-11-20T12:45:38.787093 | R8 | ip route add 192.168.10.10/32 via 10.0.8.2 | \u2713",
+        "2025-11-20T12:45:38.808458 | R8 | ip route add 10.0.1.0/30 via 10.0.7.1 | \u2713",
+        "2025-11-20T12:45:38.838511 | R9 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T12:45:38.869070 | R9 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:38.899599 | R9 | ip addr add 10.0.8.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:38.931566 | R9 | ip link set dev eth9 up | \u2713",
+        "2025-11-20T12:45:38.972364 | R9 | ip addr add 10.0.9.1/30 dev eth9 | \u2713",
+        "2025-11-20T12:45:39.009012 | R9 | ip route add 192.168.10.10/32 via 10.0.9.2 | \u2713",
+        "2025-11-20T12:45:39.037543 | R9 | ip route add 10.0.1.0/30 via 10.0.8.1 | \u2713",
+        "2025-11-20T12:45:39.071417 | R10 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T12:45:39.094341 | R10 | ip addr add 10.0.9.2/30 dev eth1 | \u2713",
+        "2025-11-20T12:45:39.122387 | R10 | ip addr add 192.168.10.10/32 dev lo | \u2713",
+        "2025-11-20T12:45:39.151639 | R10 | ip route add 10.0.1.0/30 via 10.0.9.1 | \u2713",
+        "2025-11-20T12:45:39.181197 | R10 | sysctl -w net.ipv4.ip_forward=1 | \u2713"
+      ],
+      "errors": [],
+      "final_state": null
+    }
+  ],
+  "average_score": 0.9317460317460317,
+  "aggregate_metrics": {
+    "avg_completeness": 1.0,
+    "avg_robustness": 1.0,
+    "avg_syntactic_validity": 1.0,
+    "avg_efficiency": 0.31746031746031744
+  }
+}

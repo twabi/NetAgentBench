@@ -1,0 +1,33 @@
+{
+  "task_id": "reachability_linear_2n_R1_to_R2",
+  "testee_id": "example_engineer",
+  "testee_type": "human",
+  "approach": {
+    "description": "Configure IP addresses on connecting interfaces and enable them to establish basic reachability between R1 and R2",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "configure terminal",
+          "interface eth0",
+          "ip address 10.0.0.1/24",
+          "no shutdown",
+          "exit",
+          "exit"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "configure terminal",
+          "interface eth0",
+          "ip address 10.0.0.2/24",
+          "no shutdown",
+          "exit",
+          "exit"
+        ]
+      }
+    ]
+  }
+}
+

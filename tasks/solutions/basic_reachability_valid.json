@@ -1,0 +1,24 @@
+{
+  "task_id": "basic_reachability",
+  "testee_id": "basic_reachability_valid",
+  "testee_type": "baseline",
+  "approach": {
+    "description": "Configure IP addresses on both router interfaces",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "ip addr add 192.168.1.1/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "ip addr add 192.168.1.2/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "task_id": "ospf_area0_linear_3n",
+  "testee_id": "example_engineer",
+  "testee_type": "human",
+  "approach": {
+    "description": "Configure OSPF area 0 on a linear topology with three routers. Each router gets IP addresses on its interfaces and OSPF is enabled on all interfaces to form adjacencies",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "configure terminal",
+          "interface eth0",
+          "ip address 10.0.1.1/24",
+          "no shutdown",
+          "exit",
+          "router ospf",
+          "network 10.0.1.0/24 area 0",
+          "exit",
+          "exit"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "configure terminal",
+          "interface eth0",
+          "ip address 10.0.1.2/24",
+          "no shutdown",
+          "exit",
+          "interface eth1",
+          "ip address 10.0.2.1/24",
+          "no shutdown",
+          "exit",
+          "router ospf",
+          "network 10.0.1.0/24 area 0",
+          "network 10.0.2.0/24 area 0",
+          "exit",
+          "exit"
+        ]
+      },
+      {
+        "node": "R3",
+        "commands": [
+          "configure terminal",
+          "interface eth0",
+          "ip address 10.0.2.2/24",
+          "no shutdown",
+          "exit",
+          "router ospf",
+          "network 10.0.2.0/24 area 0",
+          "exit",
+          "exit"
+        ]
+      }
+    ]
+  }
+}
+

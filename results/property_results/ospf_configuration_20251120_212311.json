@@ -1,0 +1,1612 @@
+{
+  "property_type": "ospf_configuration",
+  "total_tasks": 10,
+  "successful_tasks": 0,
+  "results": [
+    {
+      "run_id": "run_1763664560_e8389533",
+      "timestamp": "2025-11-20T20:49:20.403460",
+      "task_id": "ospf_area0_linear_10n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.06911373138427734,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.06450414657592773,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R3_R4",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R3-R4 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R3-R4 established"
+          },
+          "evaluation_time_seconds": 0.06479525566101074,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R4_R5",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R4-R5 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R4-R5 established"
+          },
+          "evaluation_time_seconds": 0.056490182876586914,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R5_R6",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R5-R6 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R5-R6 established"
+          },
+          "evaluation_time_seconds": 0.06417679786682129,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R6_R7",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R6-R7 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R6-R7 established"
+          },
+          "evaluation_time_seconds": 0.049491167068481445,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R7_R8",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R7-R8 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R7-R8 established"
+          },
+          "evaluation_time_seconds": 0.05192732810974121,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R8_R9",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R8-R9 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R8-R9 established"
+          },
+          "evaluation_time_seconds": 0.044730424880981445,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R9_R10",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R9-R10 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R9-R10 established"
+          },
+          "evaluation_time_seconds": 0.029400110244750977,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R10",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.10.10 (192.168.10.10): 56 data bytes\n\n--- 192.168.10.10 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.052517175674438,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.04939389228820801,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.9090909090909091,
+        "robustness": 0.0,
+        "syntactic_validity": 0.8529411764705882,
+        "efficiency": 0.8823529411764706,
+        "final_score": 0.6224598930481283,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 4.520645618438721,
+        "config_execution_time": 13.709126234054565,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.596991777420044,
+        "total_time": 150.87727999687195
+      },
+      "execution_log": [
+        "2025-11-20T20:50:25.052258 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:25.108797 | R1 | ip addr add 10.0.1.1/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:25.172487 | R1 | ip link set dev lo up | \u2713",
+        "2025-11-20T20:50:25.222787 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T20:50:26.279743 | R1 | sleep 1 | \u2713",
+        "2025-11-20T20:50:26.343625 | R1 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.1.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:26.398127 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:26.455643 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:26.523443 | R2 | ip addr add 10.0.1.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:26.573088 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T20:50:26.622428 | R2 | ip addr add 10.0.2.1/30 dev eth2 | \u2713",
+        "2025-11-20T20:50:27.675761 | R2 | sleep 1 | \u2713",
+        "2025-11-20T20:50:27.730165 | R2 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.1.0/30 area 0\" -c \"network 10.0.2.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:27.789191 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:27.858151 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:27.904027 | R3 | ip addr add 10.0.2.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:27.955886 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T20:50:28.006810 | R3 | ip addr add 10.0.3.1/30 dev eth3 | \u2713",
+        "2025-11-20T20:50:29.064968 | R3 | sleep 1 | \u2713",
+        "2025-11-20T20:50:29.125102 | R3 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.2.0/30 area 0\" -c \"network 10.0.3.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:29.188787 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:29.239648 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:29.287026 | R4 | ip addr add 10.0.3.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:29.341365 | R4 | ip link set dev eth4 up | \u2713",
+        "2025-11-20T20:50:29.396498 | R4 | ip addr add 10.0.4.1/30 dev eth4 | \u2713",
+        "2025-11-20T20:50:30.460680 | R4 | sleep 1 | \u2713",
+        "2025-11-20T20:50:30.527295 | R4 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.3.0/30 area 0\" -c \"network 10.0.4.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:30.599356 | R5 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:30.648020 | R5 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:30.699430 | R5 | ip addr add 10.0.4.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:30.756209 | R5 | ip link set dev eth5 up | \u2713",
+        "2025-11-20T20:50:30.818807 | R5 | ip addr add 10.0.5.1/30 dev eth5 | \u2713",
+        "2025-11-20T20:50:31.875803 | R5 | sleep 1 | \u2713",
+        "2025-11-20T20:50:31.934828 | R5 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 5.5.5.5\" -c \"network 10.0.4.0/30 area 0\" -c \"network 10.0.5.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:31.993535 | R6 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:32.050275 | R6 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:32.106211 | R6 | ip addr add 10.0.5.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:32.158226 | R6 | ip link set dev eth6 up | \u2713",
+        "2025-11-20T20:50:32.206019 | R6 | ip addr add 10.0.6.1/30 dev eth6 | \u2713",
+        "2025-11-20T20:50:33.254965 | R6 | sleep 1 | \u2713",
+        "2025-11-20T20:50:33.305318 | R6 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 6.6.6.6\" -c \"network 10.0.5.0/30 area 0\" -c \"network 10.0.6.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:33.354406 | R7 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:33.405965 | R7 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:33.464927 | R7 | ip addr add 10.0.6.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:33.511841 | R7 | ip link set dev eth7 up | \u2713",
+        "2025-11-20T20:50:33.573261 | R7 | ip addr add 10.0.7.1/30 dev eth7 | \u2713",
+        "2025-11-20T20:50:34.629127 | R7 | sleep 1 | \u2713",
+        "2025-11-20T20:50:34.692432 | R7 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 7.7.7.7\" -c \"network 10.0.6.0/30 area 0\" -c \"network 10.0.7.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:34.756330 | R8 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:34.806410 | R8 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:34.861687 | R8 | ip addr add 10.0.7.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:34.919935 | R8 | ip link set dev eth8 up | \u2713",
+        "2025-11-20T20:50:34.973365 | R8 | ip addr add 10.0.8.1/30 dev eth8 | \u2713",
+        "2025-11-20T20:50:36.027948 | R8 | sleep 1 | \u2713",
+        "2025-11-20T20:50:36.068852 | R8 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 8.8.8.8\" -c \"network 10.0.7.0/30 area 0\" -c \"network 10.0.8.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:36.111448 | R9 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:50:36.135228 | R9 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:36.183831 | R9 | ip addr add 10.0.8.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:36.236889 | R9 | ip link set dev eth9 up | \u2713",
+        "2025-11-20T20:50:36.286935 | R9 | ip addr add 10.0.9.1/30 dev eth9 | \u2713",
+        "2025-11-20T20:50:37.334162 | R9 | sleep 1 | \u2713",
+        "2025-11-20T20:50:37.386569 | R9 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 9.9.9.9\" -c \"network 10.0.8.0/30 area 0\" -c \"network 10.0.9.0/30 area 0\" -c \"end\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:50:37.421287 | R10 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:50:37.471145 | R10 | ip addr add 10.0.9.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:50:37.525627 | R10 | ip link set dev lo up | \u2713",
+        "2025-11-20T20:50:37.584945 | R10 | ip addr add 192.168.10.10/32 dev lo | \u2713",
+        "2025-11-20T20:50:38.636585 | R10 | sleep 1 | \u2713",
+        "2025-11-20T20:50:38.682537 | R10 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 10.10.10.10\" -c \"network 10.0.9.0/30 area 0\" -c \"network 192.168.10.10/32 area 0\" -c \"end\" -c \"write memory\" | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.1.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R2: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.1.0/30 area 0\" -c \"network 10.0.2.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R3: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.2.0/30 area 0\" -c \"network 10.0.3.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R4: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.3.0/30 area 0\" -c \"network 10.0.4.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R5: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 5.5.5.5\" -c \"network 10.0.4.0/30 area 0\" -c \"network 10.0.5.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R6: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 6.6.6.6\" -c \"network 10.0.5.0/30 area 0\" -c \"network 10.0.6.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R7: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 7.7.7.7\" -c \"network 10.0.6.0/30 area 0\" -c \"network 10.0.7.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R8: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 8.8.8.8\" -c \"network 10.0.7.0/30 area 0\" -c \"network 10.0.8.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R9: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 9.9.9.9\" -c \"network 10.0.8.0/30 area 0\" -c \"network 10.0.9.0/30 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Command failed on R10: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 10.10.10.10\" -c \"network 10.0.9.0/30 area 0\" -c \"network 192.168.10.10/32 area 0\" -c \"end\" -c \"write memory\" - ",
+        "Property reachability_R1_to_R10 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763664788_edfc8e0e",
+      "timestamp": "2025-11-20T20:53:08.020120",
+      "task_id": "ospf_area0_linear_2n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.0726613998413086,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R2",
+          "satisfied": true,
+          "observation_raw": "PING 192.168.2.2 (192.168.2.2): 56 data bytes\n64 bytes from 192.168.2.2: seq=0 ttl=64 time=0.103 ms\n64 bytes from 192.168.2.2: seq=1 ttl=64 time=0.189 ms\n64 bytes from 192.168.2.2: seq=2 ttl=64 time=0.152 ms\n\n--- 192.168.2.2 ping statistics ---\n3 packets transmitted, 3 packets received, 0% packet loss\nround-trip min/avg/max = 0.103/0.148/0.189 ms\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "3 packets transmitted, 3 packets received"
+          },
+          "evaluation_time_seconds": 2.0554392337799072,
+          "error_message": null
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.07238268852233887,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 1.0,
+        "robustness": 1.0,
+        "syntactic_validity": 0.5,
+        "efficiency": 1.0,
+        "final_score": 0.8999999999999999,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": true
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.7056012153625488,
+        "config_execution_time": 0.38712000846862793,
+        "convergence_time": 120.0,
+        "evaluation_time": 2.200687885284424,
+        "total_time": 123.30676889419556
+      },
+      "execution_log": [
+        "2025-11-20T20:54:08.796232 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:54:08.843120 | R1 | ip addr add 192.168.2.1/24 dev eth1 | \u2713",
+        "2025-11-20T20:54:08.893705 | R1 | systemctl restart frr | \u2717",
+        "2025-11-20T20:54:08.936764 | R1 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 192.168.2.0/24 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T20:54:08.986859 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:54:09.028223 | R2 | ip addr add 192.168.2.2/24 dev eth1 | \u2713",
+        "2025-11-20T20:54:09.073348 | R2 | systemctl restart frr | \u2717",
+        "2025-11-20T20:54:09.125012 | R2 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 192.168.2.0/24 area 0\" -c \"exit\" -c \"write memory\" | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: systemctl restart frr - ",
+        "Command failed on R1: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 192.168.2.0/24 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R2: systemctl restart frr - ",
+        "Command failed on R2: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 192.168.2.0/24 area 0\" -c \"exit\" -c \"write memory\" - "
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763664974_2cf7c474",
+      "timestamp": "2025-11-20T20:56:14.185347",
+      "task_id": "ospf_area0_linear_3n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.06637430191040039,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.06953740119934082,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R3",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.3.3 (192.168.3.3): 56 data bytes\n\n--- 192.168.3.3 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.057087182998657,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.05260491371154785,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.75,
+        "robustness": 0.0,
+        "syntactic_validity": 0.6086956521739131,
+        "efficiency": 0.782608695652174,
+        "final_score": 0.5000000000000001,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.6920957565307617,
+        "config_execution_time": 1.287233829498291,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.245792865753174,
+        "total_time": 134.23399233818054
+      },
+      "execution_log": [
+        "2025-11-20T20:57:14.951689 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:57:15.005647 | R1 | ip addr add 10.0.12.1/30 dev eth1 | \u2713",
+        "2025-11-20T20:57:15.058119 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T20:57:15.110002 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:57:15.167155 | R1 | cat > /etc/frr/daemons <<'EOF'\nzebra=yes\nospfd=yes\nEOF | \u2717",
+        "2025-11-20T20:57:15.226247 | R1 | systemctl restart frr || service frr restart || /etc/init.d/frr restart || true | \u2717",
+        "2025-11-20T20:57:15.286770 | R1 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 10.0.12.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"exit\" -c \"interface eth1\" -c \"ip ospf area 0\" -c \"exit\" -c \"write\" | \u2717",
+        "2025-11-20T20:57:15.341514 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:57:15.392612 | R2 | ip addr add 10.0.12.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:57:15.450357 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T20:57:15.506104 | R2 | ip addr add 10.0.23.1/30 dev eth2 | \u2713",
+        "2025-11-20T20:57:15.561039 | R2 | ip addr add 192.168.2.2/32 dev lo | \u2713",
+        "2025-11-20T20:57:15.619988 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:57:15.673293 | R2 | cat > /etc/frr/daemons <<'EOF'\nzebra=yes\nospfd=yes\nEOF | \u2717",
+        "2025-11-20T20:57:15.727854 | R2 | systemctl restart frr || service frr restart || /etc/init.d/frr restart || true | \u2717",
+        "2025-11-20T20:57:15.787996 | R2 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 10.0.12.0/30 area 0\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"exit\" -c \"interface eth1\" -c \"ip ospf area 0\" -c \"interface eth2\" -c \"ip ospf area 0\" -c \"exit\" -c \"write\" | \u2717",
+        "2025-11-20T20:57:15.841637 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T20:57:15.902809 | R3 | ip addr add 10.0.23.2/30 dev eth1 | \u2713",
+        "2025-11-20T20:57:15.958811 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T20:57:16.012301 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T20:57:16.058500 | R3 | cat > /etc/frr/daemons <<'EOF'\nzebra=yes\nospfd=yes\nEOF | \u2717",
+        "2025-11-20T20:57:16.112858 | R3 | systemctl restart frr || service frr restart || /etc/init.d/frr restart || true | \u2717",
+        "2025-11-20T20:57:16.172573 | R3 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"exit\" -c \"interface eth1\" -c \"ip ospf area 0\" -c \"exit\" -c \"write\" | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: cat > /etc/frr/daemons <<'EOF'\nzebra=yes\nospfd=yes\nEOF - ",
+        "Command failed on R1: systemctl restart frr || service frr restart || /etc/init.d/frr restart || true - ",
+        "Command failed on R1: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 10.0.12.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"exit\" -c \"interface eth1\" -c \"ip ospf area 0\" -c \"exit\" -c \"write\" - ",
+        "Command failed on R2: cat > /etc/frr/daemons <<'EOF'\nzebra=yes\nospfd=yes\nEOF - ",
+        "Command failed on R2: systemctl restart frr || service frr restart || /etc/init.d/frr restart || true - ",
+        "Command failed on R2: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 10.0.12.0/30 area 0\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"exit\" -c \"interface eth1\" -c \"ip ospf area 0\" -c \"interface eth2\" -c \"ip ospf area 0\" -c \"exit\" -c \"write\" - ",
+        "Command failed on R3: cat > /etc/frr/daemons <<'EOF'\nzebra=yes\nospfd=yes\nEOF - ",
+        "Command failed on R3: systemctl restart frr || service frr restart || /etc/init.d/frr restart || true - ",
+        "Command failed on R3: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"exit\" -c \"interface eth1\" -c \"ip ospf area 0\" -c \"exit\" -c \"write\" - ",
+        "Property reachability_R1_to_R3 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763665172_5614704c",
+      "timestamp": "2025-11-20T20:59:32.944954",
+      "task_id": "ospf_area0_linear_4n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.05036640167236328,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.04945540428161621,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R3_R4",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R3-R4 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R3-R4 established"
+          },
+          "evaluation_time_seconds": 0.0646669864654541,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R4",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.4.4 (192.168.4.4): 56 data bytes\n\n--- 192.168.4.4 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.051785469055176,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.05010342597961426,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.8,
+        "robustness": 0.0,
+        "syntactic_validity": 0.8571428571428571,
+        "efficiency": 0.8571428571428571,
+        "final_score": 0.5771428571428572,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.9935779571533203,
+        "config_execution_time": 1.5616238117218018,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.266621589660645,
+        "total_time": 134.84352707862854
+      },
+      "execution_log": [
+        "2025-11-20T21:00:34.018775 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:00:34.065386 | R1 | ip addr add 10.0.12.1/30 dev eth1 | \u2713",
+        "2025-11-20T21:00:34.118824 | R1 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:00:34.172752 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T21:00:34.232764 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:00:34.288614 | R1 | vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.12.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:00:34.342079 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:00:34.394198 | R2 | ip addr add 10.0.12.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:00:34.455891 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:00:34.518399 | R2 | ip addr add 10.0.23.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:00:34.583993 | R2 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:00:34.647432 | R2 | ip addr add 192.168.2.2/32 dev lo | \u2713",
+        "2025-11-20T21:00:34.699710 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:00:34.749730 | R2 | vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.12.0/30 area 0\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:00:34.807836 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:00:34.858274 | R3 | ip addr add 10.0.23.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:00:34.903848 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T21:00:34.962175 | R3 | ip addr add 10.0.34.1/30 dev eth3 | \u2713",
+        "2025-11-20T21:00:35.019437 | R3 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:00:35.077673 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T21:00:35.132541 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:00:35.186849 | R3 | vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.23.0/30 area 0\" -c \"network 10.0.34.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:00:35.252297 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:00:35.315116 | R4 | ip addr add 10.0.34.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:00:35.367297 | R4 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:00:35.415186 | R4 | ip addr add 192.168.4.4/32 dev lo | \u2713",
+        "2025-11-20T21:00:35.463600 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:00:35.520641 | R4 | vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.34.0/30 area 0\" -c \"network 192.168.4.4/32 area 0\" -c \"end\" -c \"write\" | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.12.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R2: vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.12.0/30 area 0\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R3: vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.23.0/30 area 0\" -c \"network 10.0.34.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R4: vtysh -c \"conf t\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.34.0/30 area 0\" -c \"network 192.168.4.4/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Property reachability_R1_to_R4 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763665400_7e194d84",
+      "timestamp": "2025-11-20T21:03:20.276556",
+      "task_id": "ospf_area0_linear_5n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.06714630126953125,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.05017256736755371,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R3_R4",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R3-R4 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R3-R4 established"
+          },
+          "evaluation_time_seconds": 0.0637826919555664,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R4_R5",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R4-R5 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R4-R5 established"
+          },
+          "evaluation_time_seconds": 0.057770729064941406,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R5",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.5.5 (192.168.5.5): 56 data bytes\n\n--- 192.168.5.5 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.067293643951416,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.058332204818725586,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.8333333333333334,
+        "robustness": 0.0,
+        "syntactic_validity": 0.7222222222222222,
+        "efficiency": 0.8333333333333334,
+        "final_score": 0.5611111111111112,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.9000997543334961,
+        "config_execution_time": 1.8408300876617432,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.364771127700806,
+        "total_time": 135.13185596466064
+      },
+      "execution_log": [
+        "2025-11-20T21:04:21.269435 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:04:21.326865 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:04:21.378468 | R1 | ip addr add 10.0.12.1/30 dev eth1 | \u2713",
+        "2025-11-20T21:04:21.441752 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T21:04:21.498127 | R1 | systemctl restart frr || true | \u2717",
+        "2025-11-20T21:04:21.545639 | R1 | vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 1.1.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 192.168.1.1/32 area 0' -c 'end' -c 'write memory' | \u2717",
+        "2025-11-20T21:04:21.603347 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:04:21.655626 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:04:21.706828 | R2 | ip addr add 10.0.12.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:04:21.746081 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:04:21.794424 | R2 | ip addr add 10.0.23.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:04:21.840974 | R2 | ip addr add 192.168.2.2/32 dev lo | \u2713",
+        "2025-11-20T21:04:21.895281 | R2 | systemctl restart frr || true | \u2717",
+        "2025-11-20T21:04:21.941977 | R2 | vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 2.2.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.2.2/32 area 0' -c 'end' -c 'write memory' | \u2717",
+        "2025-11-20T21:04:21.978465 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:04:22.019586 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:04:22.053720 | R3 | ip addr add 10.0.23.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:04:22.118551 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T21:04:22.181031 | R3 | ip addr add 10.0.34.1/30 dev eth3 | \u2713",
+        "2025-11-20T21:04:22.233948 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T21:04:22.285829 | R3 | systemctl restart frr || true | \u2717",
+        "2025-11-20T21:04:22.336334 | R3 | vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 3.3.3.3' -c 'network 10.0.23.0/30 area 0' -c 'network 10.0.34.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'end' -c 'write memory' | \u2717",
+        "2025-11-20T21:04:22.390853 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:04:22.428676 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:04:22.467595 | R4 | ip addr add 10.0.34.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:04:22.526677 | R4 | ip link set dev eth4 up | \u2713",
+        "2025-11-20T21:04:22.586795 | R4 | ip addr add 10.0.45.1/30 dev eth4 | \u2713",
+        "2025-11-20T21:04:22.637568 | R4 | ip addr add 192.168.4.4/32 dev lo | \u2713",
+        "2025-11-20T21:04:22.696630 | R4 | systemctl restart frr || true | \u2717",
+        "2025-11-20T21:04:22.764669 | R4 | vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 4.4.4.4' -c 'network 10.0.34.0/30 area 0' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.4.4/32 area 0' -c 'end' -c 'write memory' | \u2717",
+        "2025-11-20T21:04:22.821895 | R5 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:04:22.875513 | R5 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:04:22.916440 | R5 | ip addr add 10.0.45.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:04:22.954422 | R5 | ip addr add 192.168.5.5/32 dev lo | \u2713",
+        "2025-11-20T21:04:22.988829 | R5 | systemctl restart frr || true | \u2717",
+        "2025-11-20T21:04:23.042308 | R5 | vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 5.5.5.5' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.5.5/32 area 0' -c 'end' -c 'write memory' | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: systemctl restart frr || true - ",
+        "Command failed on R1: vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 1.1.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 192.168.1.1/32 area 0' -c 'end' -c 'write memory' - ",
+        "Command failed on R2: systemctl restart frr || true - ",
+        "Command failed on R2: vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 2.2.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.2.2/32 area 0' -c 'end' -c 'write memory' - ",
+        "Command failed on R3: systemctl restart frr || true - ",
+        "Command failed on R3: vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 3.3.3.3' -c 'network 10.0.23.0/30 area 0' -c 'network 10.0.34.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'end' -c 'write memory' - ",
+        "Command failed on R4: systemctl restart frr || true - ",
+        "Command failed on R4: vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 4.4.4.4' -c 'network 10.0.34.0/30 area 0' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.4.4/32 area 0' -c 'end' -c 'write memory' - ",
+        "Command failed on R5: systemctl restart frr || true - ",
+        "Command failed on R5: vtysh -c 'configure terminal' -c 'router ospf' -c 'ospf router-id 5.5.5.5' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.5.5/32 area 0' -c 'end' -c 'write memory' - ",
+        "Property reachability_R1_to_R5 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763665630_423659d7",
+      "timestamp": "2025-11-20T21:07:10.380174",
+      "task_id": "ospf_area0_linear_6n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.05629873275756836,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.06540894508361816,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R3_R4",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R3-R4 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R3-R4 established"
+          },
+          "evaluation_time_seconds": 0.06363248825073242,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R4_R5",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R4-R5 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R4-R5 established"
+          },
+          "evaluation_time_seconds": 0.052521705627441406,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R5_R6",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R5-R6 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R5-R6 established"
+          },
+          "evaluation_time_seconds": 0.04959535598754883,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R6",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.6.6 (192.168.6.6): 56 data bytes\n\n--- 192.168.6.6 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.058468580245972,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.05004405975341797,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.8571428571428571,
+        "robustness": 0.0,
+        "syntactic_validity": 0.8421052631578947,
+        "efficiency": 0.9473684210526315,
+        "final_score": 0.6060150375939849,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.9556059837341309,
+        "config_execution_time": 2.0840632915496826,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.39622688293457,
+        "total_time": 135.46359658241272
+      },
+      "execution_log": [
+        "2025-11-20T21:08:11.418754 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:08:11.480996 | R1 | ip addr add 10.0.12.1/30 dev eth1 | \u2713",
+        "2025-11-20T21:08:11.536727 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T21:08:11.604029 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:08:11.665473 | R1 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 1.1.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 192.168.1.1/32 area 0' -c 'exit' -c 'exit' | \u2717",
+        "2025-11-20T21:08:11.717587 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:08:11.758179 | R2 | ip addr add 10.0.12.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:08:11.787016 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:08:11.823670 | R2 | ip addr add 10.0.23.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:08:11.867074 | R2 | ip addr add 192.168.2.2/32 dev lo | \u2713",
+        "2025-11-20T21:08:11.920823 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:08:11.989277 | R2 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 2.2.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.2.2/32 area 0' -c 'exit' -c 'exit' | \u2717",
+        "2025-11-20T21:08:12.047669 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:08:12.098597 | R3 | ip addr add 10.0.23.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:08:12.146627 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T21:08:12.204112 | R3 | ip addr add 10.0.34.1/30 dev eth3 | \u2713",
+        "2025-11-20T21:08:12.254490 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T21:08:12.306803 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:08:12.363984 | R3 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 3.3.3.3' -c 'network 10.0.23.0/30 area 0' -c 'network 10.0.34.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'exit' -c 'exit' | \u2717",
+        "2025-11-20T21:08:12.422821 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:08:12.472497 | R4 | ip addr add 10.0.34.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:08:12.520021 | R4 | ip link set dev eth4 up | \u2713",
+        "2025-11-20T21:08:12.583526 | R4 | ip addr add 10.0.45.1/30 dev eth4 | \u2713",
+        "2025-11-20T21:08:12.647431 | R4 | ip addr add 192.168.4.4/32 dev lo | \u2713",
+        "2025-11-20T21:08:12.704816 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:08:12.769598 | R4 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 4.4.4.4' -c 'network 10.0.34.0/30 area 0' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.4.4/32 area 0' -c 'exit' -c 'exit' | \u2717",
+        "2025-11-20T21:08:12.829577 | R5 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:08:12.886955 | R5 | ip addr add 10.0.45.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:08:12.935503 | R5 | ip link set dev eth5 up | \u2713",
+        "2025-11-20T21:08:12.996878 | R5 | ip addr add 10.0.56.1/30 dev eth5 | \u2713",
+        "2025-11-20T21:08:13.043583 | R5 | ip addr add 192.168.5.5/32 dev lo | \u2713",
+        "2025-11-20T21:08:13.097742 | R5 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:08:13.155139 | R5 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 5.5.5.5' -c 'network 10.0.45.0/30 area 0' -c 'network 10.0.56.0/30 area 0' -c 'network 192.168.5.5/32 area 0' -c 'exit' -c 'exit' | \u2717",
+        "2025-11-20T21:08:13.213006 | R6 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:08:13.269824 | R6 | ip addr add 10.0.56.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:08:13.335638 | R6 | ip addr add 192.168.6.6/32 dev lo | \u2713",
+        "2025-11-20T21:08:13.385813 | R6 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:08:13.445913 | R6 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 6.6.6.6' -c 'network 10.0.56.0/30 area 0' -c 'network 192.168.6.6/32 area 0' -c 'exit' -c 'exit' | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 1.1.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 192.168.1.1/32 area 0' -c 'exit' -c 'exit' - ",
+        "Command failed on R2: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 2.2.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.2.2/32 area 0' -c 'exit' -c 'exit' - ",
+        "Command failed on R3: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 3.3.3.3' -c 'network 10.0.23.0/30 area 0' -c 'network 10.0.34.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'exit' -c 'exit' - ",
+        "Command failed on R4: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 4.4.4.4' -c 'network 10.0.34.0/30 area 0' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.4.4/32 area 0' -c 'exit' -c 'exit' - ",
+        "Command failed on R5: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 5.5.5.5' -c 'network 10.0.45.0/30 area 0' -c 'network 10.0.56.0/30 area 0' -c 'network 192.168.5.5/32 area 0' -c 'exit' -c 'exit' - ",
+        "Command failed on R6: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 6.6.6.6' -c 'network 10.0.56.0/30 area 0' -c 'network 192.168.6.6/32 area 0' -c 'exit' -c 'exit' - ",
+        "Property reachability_R1_to_R6 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763665841_46160bef",
+      "timestamp": "2025-11-20T21:10:41.082784",
+      "task_id": "ospf_area0_linear_7n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.055298805236816406,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.05032038688659668,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R3_R4",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R3-R4 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R3-R4 established"
+          },
+          "evaluation_time_seconds": 0.0511934757232666,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R4_R5",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R4-R5 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R4-R5 established"
+          },
+          "evaluation_time_seconds": 0.05338931083679199,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R5_R6",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R5-R6 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R5-R6 established"
+          },
+          "evaluation_time_seconds": 0.05119967460632324,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R6_R7",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R6-R7 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R6-R7 established"
+          },
+          "evaluation_time_seconds": 0.050872087478637695,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R7",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.7.7 (192.168.7.7): 56 data bytes\n\n--- 192.168.7.7 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.043198823928833,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.06142282485961914,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.875,
+        "robustness": 0.0,
+        "syntactic_validity": 0.7627118644067796,
+        "efficiency": 0.711864406779661,
+        "final_score": 0.573728813559322,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.9714350700378418,
+        "config_execution_time": 3.303161144256592,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.417236328125,
+        "total_time": 136.72465538978577
+      },
+      "execution_log": [
+        "2025-11-20T21:11:42.148615 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:11:42.210902 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:11:42.263929 | R1 | ip addr add 10.0.12.1/30 dev eth1 | \u2713",
+        "2025-11-20T21:11:42.317052 | R1 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:11:42.365205 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T21:11:42.432178 | R1 | systemctl enable --now frr | \u2717",
+        "2025-11-20T21:11:42.490828 | R1 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 192.168.1.1/32 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:11:42.550121 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:11:42.601304 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:11:42.651191 | R2 | ip addr add 10.0.12.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:11:42.711538 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:11:42.765114 | R2 | ip addr add 10.0.23.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:11:42.821814 | R2 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:11:42.877183 | R2 | ip addr add 192.168.2.2/32 dev lo | \u2713",
+        "2025-11-20T21:11:42.931631 | R2 | systemctl enable --now frr | \u2717",
+        "2025-11-20T21:11:42.988101 | R2 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.2.2/32 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:11:43.036212 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:11:43.092055 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:11:43.157132 | R3 | ip addr add 10.0.23.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:11:43.207023 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T21:11:43.258525 | R3 | ip addr add 10.0.34.1/30 dev eth3 | \u2713",
+        "2025-11-20T21:11:43.324324 | R3 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:11:43.385660 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T21:11:43.441964 | R3 | systemctl enable --now frr | \u2717",
+        "2025-11-20T21:11:43.504095 | R3 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.3.3' -c 'network 10.0.23.0/30 area 0' -c 'network 10.0.34.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:11:43.565594 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:11:43.617226 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:11:43.681848 | R4 | ip addr add 10.0.34.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:11:43.732750 | R4 | ip link set dev eth4 up | \u2713",
+        "2025-11-20T21:11:43.785159 | R4 | ip addr add 10.0.45.1/30 dev eth4 | \u2713",
+        "2025-11-20T21:11:43.847512 | R4 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:11:43.901791 | R4 | ip addr add 192.168.4.4/32 dev lo | \u2713",
+        "2025-11-20T21:11:43.953842 | R4 | systemctl enable --now frr | \u2717",
+        "2025-11-20T21:11:44.012017 | R4 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.4.4' -c 'network 10.0.34.0/30 area 0' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.4.4/32 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:11:44.066075 | R5 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:11:44.120904 | R5 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:11:44.179413 | R5 | ip addr add 10.0.45.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:11:44.231704 | R5 | ip link set dev eth5 up | \u2713",
+        "2025-11-20T21:11:44.285932 | R5 | ip addr add 10.0.56.1/30 dev eth5 | \u2713",
+        "2025-11-20T21:11:44.342116 | R5 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:11:44.397089 | R5 | ip addr add 192.168.5.5/32 dev lo | \u2713",
+        "2025-11-20T21:11:44.456168 | R5 | systemctl enable --now frr | \u2717",
+        "2025-11-20T21:11:44.514037 | R5 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.5.5' -c 'network 10.0.45.0/30 area 0' -c 'network 10.0.56.0/30 area 0' -c 'network 192.168.5.5/32 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:11:44.574404 | R6 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:11:44.631258 | R6 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:11:44.681759 | R6 | ip addr add 10.0.56.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:11:44.733372 | R6 | ip link set dev eth6 up | \u2713",
+        "2025-11-20T21:11:44.794700 | R6 | ip addr add 10.0.67.1/30 dev eth6 | \u2713",
+        "2025-11-20T21:11:44.848120 | R6 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:11:44.896878 | R6 | ip addr add 192.168.6.6/32 dev lo | \u2713",
+        "2025-11-20T21:11:44.955034 | R6 | systemctl enable --now frr | \u2717",
+        "2025-11-20T21:11:45.011978 | R6 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.6.6' -c 'network 10.0.56.0/30 area 0' -c 'network 10.0.67.0/30 area 0' -c 'network 192.168.6.6/32 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:11:45.054003 | R7 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:11:45.111469 | R7 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:11:45.160134 | R7 | ip addr add 10.0.67.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:11:45.214894 | R7 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:11:45.278275 | R7 | ip addr add 192.168.7.7/32 dev lo | \u2713",
+        "2025-11-20T21:11:45.329857 | R7 | systemctl enable --now frr | \u2717",
+        "2025-11-20T21:11:45.388695 | R7 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.7.7' -c 'network 10.0.67.0/30 area 0' -c 'network 192.168.7.7/32 area 0' -c 'end' -c 'write' | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: systemctl enable --now frr - ",
+        "Command failed on R1: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 192.168.1.1/32 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R2: systemctl enable --now frr - ",
+        "Command failed on R2: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.2.2/32 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R3: systemctl enable --now frr - ",
+        "Command failed on R3: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.3.3' -c 'network 10.0.23.0/30 area 0' -c 'network 10.0.34.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R4: systemctl enable --now frr - ",
+        "Command failed on R4: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.4.4' -c 'network 10.0.34.0/30 area 0' -c 'network 10.0.45.0/30 area 0' -c 'network 192.168.4.4/32 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R5: systemctl enable --now frr - ",
+        "Command failed on R5: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.5.5' -c 'network 10.0.45.0/30 area 0' -c 'network 10.0.56.0/30 area 0' -c 'network 192.168.5.5/32 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R6: systemctl enable --now frr - ",
+        "Command failed on R6: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.6.6' -c 'network 10.0.56.0/30 area 0' -c 'network 10.0.67.0/30 area 0' -c 'network 192.168.6.6/32 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R7: systemctl enable --now frr - ",
+        "Command failed on R7: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 192.168.7.7' -c 'network 10.0.67.0/30 area 0' -c 'network 192.168.7.7/32 area 0' -c 'end' -c 'write' - ",
+        "Property reachability_R1_to_R7 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763666055_1c5a0823",
+      "timestamp": "2025-11-20T21:14:15.445289",
+      "task_id": "ospf_area0_linear_8n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.04800057411193848,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.03591012954711914,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R3_R4",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R3-R4 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R3-R4 established"
+          },
+          "evaluation_time_seconds": 0.05397486686706543,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R4_R5",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R4-R5 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R4-R5 established"
+          },
+          "evaluation_time_seconds": 0.05924701690673828,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R5_R6",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R5-R6 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R5-R6 established"
+          },
+          "evaluation_time_seconds": 0.05653715133666992,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R6_R7",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R6-R7 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R6-R7 established"
+          },
+          "evaluation_time_seconds": 0.05848264694213867,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R7_R8",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R7-R8 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R7-R8 established"
+          },
+          "evaluation_time_seconds": 0.05978560447692871,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R8",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.8.8 (192.168.8.8): 56 data bytes\n\n--- 192.168.8.8 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.069961547851562,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.0598604679107666,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.8888888888888888,
+        "robustness": 0.0,
+        "syntactic_validity": 0.8461538461538461,
+        "efficiency": 0.9230769230769231,
+        "final_score": 0.6170940170940171,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 1.4365854263305664,
+        "config_execution_time": 2.8714873790740967,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.502302408218384,
+        "total_time": 136.86044645309448
+      },
+      "execution_log": [
+        "2025-11-20T21:15:17.011836 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:17.079877 | R1 | ip addr add 10.0.1.1/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:17.118707 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T21:15:17.149546 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:17.190809 | R1 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.1.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T21:15:17.286065 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:17.373029 | R2 | ip addr add 10.0.1.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:17.434226 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:15:17.482330 | R2 | ip addr add 10.0.2.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:15:17.525531 | R2 | ip addr add 192.168.2.2/32 dev lo | \u2713",
+        "2025-11-20T21:15:17.572657 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:17.605788 | R2 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.1.0/30 area 0\" -c \"network 10.0.2.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T21:15:17.638797 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:17.670343 | R3 | ip addr add 10.0.2.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:17.706136 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T21:15:17.745098 | R3 | ip addr add 10.0.3.1/30 dev eth3 | \u2713",
+        "2025-11-20T21:15:17.787743 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T21:15:17.827754 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:17.894276 | R3 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.2.0/30 area 0\" -c \"network 10.0.3.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T21:15:17.925567 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:17.969773 | R4 | ip addr add 10.0.3.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:18.031638 | R4 | ip link set dev eth4 up | \u2713",
+        "2025-11-20T21:15:18.097111 | R4 | ip addr add 10.0.4.1/30 dev eth4 | \u2713",
+        "2025-11-20T21:15:18.144237 | R4 | ip addr add 192.168.4.4/32 dev lo | \u2713",
+        "2025-11-20T21:15:18.190175 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:18.247466 | R4 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.3.0/30 area 0\" -c \"network 10.0.4.0/30 area 0\" -c \"network 192.168.4.4/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T21:15:18.276392 | R5 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:18.305206 | R5 | ip addr add 10.0.4.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:18.340191 | R5 | ip link set dev eth5 up | \u2713",
+        "2025-11-20T21:15:18.375965 | R5 | ip addr add 10.0.5.1/30 dev eth5 | \u2713",
+        "2025-11-20T21:15:18.421612 | R5 | ip addr add 192.168.5.5/32 dev lo | \u2713",
+        "2025-11-20T21:15:18.484423 | R5 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:18.565795 | R5 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 5.5.5.5\" -c \"network 10.0.4.0/30 area 0\" -c \"network 10.0.5.0/30 area 0\" -c \"network 192.168.5.5/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T21:15:18.638014 | R6 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:18.716210 | R6 | ip addr add 10.0.5.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:18.798273 | R6 | ip link set dev eth6 up | \u2713",
+        "2025-11-20T21:15:18.875342 | R6 | ip addr add 10.0.6.1/30 dev eth6 | \u2713",
+        "2025-11-20T21:15:18.941042 | R6 | ip addr add 192.168.6.6/32 dev lo | \u2713",
+        "2025-11-20T21:15:19.011665 | R6 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:19.084201 | R6 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 6.6.6.6\" -c \"network 10.0.5.0/30 area 0\" -c \"network 10.0.6.0/30 area 0\" -c \"network 192.168.6.6/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T21:15:19.156685 | R7 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:19.229147 | R7 | ip addr add 10.0.6.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:19.289665 | R7 | ip link set dev eth7 up | \u2713",
+        "2025-11-20T21:15:19.347240 | R7 | ip addr add 10.0.7.1/30 dev eth7 | \u2713",
+        "2025-11-20T21:15:19.411012 | R7 | ip addr add 192.168.7.7/32 dev lo | \u2713",
+        "2025-11-20T21:15:19.447847 | R7 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:19.492463 | R7 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 7.7.7.7\" -c \"network 10.0.6.0/30 area 0\" -c \"network 10.0.7.0/30 area 0\" -c \"network 192.168.7.7/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717",
+        "2025-11-20T21:15:19.544223 | R8 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:15:19.607281 | R8 | ip addr add 10.0.7.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:15:19.661734 | R8 | ip addr add 192.168.8.8/32 dev lo | \u2713",
+        "2025-11-20T21:15:19.723687 | R8 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:15:19.802171 | R8 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 8.8.8.8\" -c \"network 10.0.7.0/30 area 0\" -c \"network 192.168.8.8/32 area 0\" -c \"exit\" -c \"write memory\" | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.1.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R2: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.1.0/30 area 0\" -c \"network 10.0.2.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R3: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.2.0/30 area 0\" -c \"network 10.0.3.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R4: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.3.0/30 area 0\" -c \"network 10.0.4.0/30 area 0\" -c \"network 192.168.4.4/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R5: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 5.5.5.5\" -c \"network 10.0.4.0/30 area 0\" -c \"network 10.0.5.0/30 area 0\" -c \"network 192.168.5.5/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R6: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 6.6.6.6\" -c \"network 10.0.5.0/30 area 0\" -c \"network 10.0.6.0/30 area 0\" -c \"network 192.168.6.6/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R7: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 7.7.7.7\" -c \"network 10.0.6.0/30 area 0\" -c \"network 10.0.7.0/30 area 0\" -c \"network 192.168.7.7/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Command failed on R8: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 8.8.8.8\" -c \"network 10.0.7.0/30 area 0\" -c \"network 192.168.8.8/32 area 0\" -c \"exit\" -c \"write memory\" - ",
+        "Property reachability_R1_to_R8 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763666264_02b76938",
+      "timestamp": "2025-11-20T21:17:44.793527",
+      "task_id": "ospf_area0_linear_9n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.06822514533996582,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.06352043151855469,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R3_R4",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R3-R4 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R3-R4 established"
+          },
+          "evaluation_time_seconds": 0.04640698432922363,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R4_R5",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R4-R5 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R4-R5 established"
+          },
+          "evaluation_time_seconds": 0.041429758071899414,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R5_R6",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R5-R6 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R5-R6 established"
+          },
+          "evaluation_time_seconds": 0.03612995147705078,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R6_R7",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R6-R7 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R6-R7 established"
+          },
+          "evaluation_time_seconds": 0.03492283821105957,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R7_R8",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R7-R8 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R7-R8 established"
+          },
+          "evaluation_time_seconds": 0.019972562789916992,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R8_R9",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R8-R9 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R8-R9 established"
+          },
+          "evaluation_time_seconds": 0.040627479553222656,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R9",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.9.9 (192.168.9.9): 56 data bytes\n\n--- 192.168.9.9 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.048850297927856,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.05858564376831055,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.9,
+        "robustness": 0.0,
+        "syntactic_validity": 0.847457627118644,
+        "efficiency": 0.9152542372881356,
+        "final_score": 0.6210169491525425,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 1.2604947090148926,
+        "config_execution_time": 3.768404483795166,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.461763143539429,
+        "total_time": 137.5340292453766
+      },
+      "execution_log": [
+        "2025-11-20T21:18:46.190672 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:46.259441 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:46.329302 | R1 | ip addr add 10.0.12.1/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:46.397270 | R1 | ip addr add 192.168.1.1/32 dev lo | \u2713",
+        "2025-11-20T21:18:46.470617 | R1 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.12.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:46.533235 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:46.605551 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:46.682738 | R2 | ip addr add 10.0.12.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:46.745223 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:18:46.814909 | R2 | ip addr add 10.0.23.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:18:46.874750 | R2 | ip addr add 192.168.2.2/32 dev lo | \u2713",
+        "2025-11-20T21:18:46.950659 | R2 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.12.0/30 area 0\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:47.012232 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:47.075731 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:47.146088 | R3 | ip addr add 10.0.23.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:47.211895 | R3 | ip link set dev eth3 up | \u2713",
+        "2025-11-20T21:18:47.274734 | R3 | ip addr add 10.0.34.1/30 dev eth3 | \u2713",
+        "2025-11-20T21:18:47.343139 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T21:18:47.408581 | R3 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.23.0/30 area 0\" -c \"network 10.0.34.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:47.478122 | R4 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:47.541295 | R4 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:47.604858 | R4 | ip addr add 10.0.34.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:47.668398 | R4 | ip link set dev eth4 up | \u2713",
+        "2025-11-20T21:18:47.729983 | R4 | ip addr add 10.0.45.1/30 dev eth4 | \u2713",
+        "2025-11-20T21:18:47.806646 | R4 | ip addr add 192.168.4.4/32 dev lo | \u2713",
+        "2025-11-20T21:18:47.877737 | R4 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.34.0/30 area 0\" -c \"network 10.0.45.0/30 area 0\" -c \"network 192.168.4.4/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:47.944932 | R5 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:48.011492 | R5 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:48.079622 | R5 | ip addr add 10.0.45.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:48.148994 | R5 | ip link set dev eth5 up | \u2713",
+        "2025-11-20T21:18:48.222261 | R5 | ip addr add 10.0.56.1/30 dev eth5 | \u2713",
+        "2025-11-20T21:18:48.256841 | R5 | ip addr add 192.168.5.5/32 dev lo | \u2713",
+        "2025-11-20T21:18:48.333293 | R5 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 5.5.5.5\" -c \"network 10.0.45.0/30 area 0\" -c \"network 10.0.56.0/30 area 0\" -c \"network 192.168.5.5/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:48.401430 | R6 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:48.477558 | R6 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:48.551315 | R6 | ip addr add 10.0.56.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:48.627001 | R6 | ip link set dev eth6 up | \u2713",
+        "2025-11-20T21:18:48.701592 | R6 | ip addr add 10.0.67.1/30 dev eth6 | \u2713",
+        "2025-11-20T21:18:48.766094 | R6 | ip addr add 192.168.6.6/32 dev lo | \u2713",
+        "2025-11-20T21:18:48.836056 | R6 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 6.6.6.6\" -c \"network 10.0.56.0/30 area 0\" -c \"network 10.0.67.0/30 area 0\" -c \"network 192.168.6.6/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:48.902792 | R7 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:48.973287 | R7 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:49.050365 | R7 | ip addr add 10.0.67.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:49.115816 | R7 | ip link set dev eth7 up | \u2713",
+        "2025-11-20T21:18:49.186453 | R7 | ip addr add 10.0.78.1/30 dev eth7 | \u2713",
+        "2025-11-20T21:18:49.254058 | R7 | ip addr add 192.168.7.7/32 dev lo | \u2713",
+        "2025-11-20T21:18:49.357218 | R7 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 7.7.7.7\" -c \"network 10.0.67.0/30 area 0\" -c \"network 10.0.78.0/30 area 0\" -c \"network 192.168.7.7/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:49.410797 | R8 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:49.448732 | R8 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:49.499536 | R8 | ip addr add 10.0.78.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:49.546694 | R8 | ip link set dev eth8 up | \u2713",
+        "2025-11-20T21:18:49.592177 | R8 | ip addr add 10.0.89.1/30 dev eth8 | \u2713",
+        "2025-11-20T21:18:49.613694 | R8 | ip addr add 192.168.8.8/32 dev lo | \u2713",
+        "2025-11-20T21:18:49.661656 | R8 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 8.8.8.8\" -c \"network 10.0.78.0/30 area 0\" -c \"network 10.0.89.0/30 area 0\" -c \"network 192.168.8.8/32 area 0\" -c \"end\" -c \"write\" | \u2717",
+        "2025-11-20T21:18:49.697838 | R9 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:18:49.740145 | R9 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:18:49.789828 | R9 | ip addr add 10.0.89.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:18:49.823519 | R9 | ip addr add 192.168.9.9/32 dev lo | \u2713",
+        "2025-11-20T21:18:49.862001 | R9 | vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 9.9.9.9\" -c \"network 10.0.89.0/30 area 0\" -c \"network 192.168.9.9/32 area 0\" -c \"end\" -c \"write\" | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 1.1.1.1\" -c \"network 10.0.12.0/30 area 0\" -c \"network 192.168.1.1/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R2: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 2.2.2.2\" -c \"network 10.0.12.0/30 area 0\" -c \"network 10.0.23.0/30 area 0\" -c \"network 192.168.2.2/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R3: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 3.3.3.3\" -c \"network 10.0.23.0/30 area 0\" -c \"network 10.0.34.0/30 area 0\" -c \"network 192.168.3.3/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R4: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 4.4.4.4\" -c \"network 10.0.34.0/30 area 0\" -c \"network 10.0.45.0/30 area 0\" -c \"network 192.168.4.4/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R5: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 5.5.5.5\" -c \"network 10.0.45.0/30 area 0\" -c \"network 10.0.56.0/30 area 0\" -c \"network 192.168.5.5/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R6: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 6.6.6.6\" -c \"network 10.0.56.0/30 area 0\" -c \"network 10.0.67.0/30 area 0\" -c \"network 192.168.6.6/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R7: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 7.7.7.7\" -c \"network 10.0.67.0/30 area 0\" -c \"network 10.0.78.0/30 area 0\" -c \"network 192.168.7.7/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R8: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 8.8.8.8\" -c \"network 10.0.78.0/30 area 0\" -c \"network 10.0.89.0/30 area 0\" -c \"network 192.168.8.8/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Command failed on R9: vtysh -c \"configure terminal\" -c \"router ospf\" -c \"router-id 9.9.9.9\" -c \"network 10.0.89.0/30 area 0\" -c \"network 192.168.9.9/32 area 0\" -c \"end\" -c \"write\" - ",
+        "Property reachability_R1_to_R9 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    },
+    {
+      "run_id": "run_1763666456_e7ea2a92",
+      "timestamp": "2025-11-20T21:20:56.763523",
+      "task_id": "ospf_area0_mesh_3n",
+      "testee_id": "llm_openai_gpt-5-mini",
+      "testee_type": "llm",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "ospf_adjacency_R1_R2",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R2 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R2 established"
+          },
+          "evaluation_time_seconds": 0.06335902214050293,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R1_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R1-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R1-R3 established"
+          },
+          "evaluation_time_seconds": 0.06129884719848633,
+          "error_message": null
+        },
+        {
+          "property_id": "ospf_adjacency_R2_R3",
+          "satisfied": true,
+          "observation_raw": "OSPF adjacency R2-R3 established\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "OSPF adjacency R2-R3 established"
+          },
+          "evaluation_time_seconds": 0.04815053939819336,
+          "error_message": null
+        },
+        {
+          "property_id": "reachability_R1_to_R3",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.3.3 (192.168.3.3): 56 data bytes\n\n--- 192.168.3.3 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.05057978630066,
+          "error_message": "Command exited with code 1"
+        },
+        {
+          "property_id": "routing_table_complete",
+          "satisfied": true,
+          "observation_raw": "Routing table complete\n",
+          "observation_parsed": {
+            "found": true,
+            "search_text": "Routing table complete"
+          },
+          "evaluation_time_seconds": 0.054046630859375,
+          "error_message": null
+        }
+      ],
+      "scoring": {
+        "completeness": 0.8,
+        "robustness": 0.0,
+        "syntactic_validity": 0.85,
+        "efficiency": 0.9,
+        "final_score": 0.5800000000000001,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.9770681858062744,
+        "config_execution_time": 1.1035432815551758,
+        "convergence_time": 120.0,
+        "evaluation_time": 12.27763843536377,
+        "total_time": 134.3780553340912
+      },
+      "execution_log": [
+        "2025-11-20T21:21:57.827882 | R1 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:21:57.883319 | R1 | ip addr add 10.0.12.1/30 dev eth1 | \u2713",
+        "2025-11-20T21:21:57.942851 | R1 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:21:57.998453 | R1 | ip addr add 10.0.13.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:21:58.055517 | R1 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:21:58.109366 | R1 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 1.1.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.13.0/30 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:21:58.165118 | R2 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:21:58.216286 | R2 | ip addr add 10.0.12.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:21:58.265907 | R2 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:21:58.314701 | R2 | ip addr add 10.0.23.1/30 dev eth2 | \u2713",
+        "2025-11-20T21:21:58.367649 | R2 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:21:58.419210 | R2 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 2.2.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'end' -c 'write' | \u2717",
+        "2025-11-20T21:21:58.463178 | R3 | ip link set dev lo up | \u2713",
+        "2025-11-20T21:21:58.524726 | R3 | ip addr add 192.168.3.3/32 dev lo | \u2713",
+        "2025-11-20T21:21:58.573628 | R3 | ip link set dev eth1 up | \u2713",
+        "2025-11-20T21:21:58.628315 | R3 | ip addr add 10.0.13.2/30 dev eth1 | \u2713",
+        "2025-11-20T21:21:58.686005 | R3 | ip link set dev eth2 up | \u2713",
+        "2025-11-20T21:21:58.748246 | R3 | ip addr add 10.0.23.2/30 dev eth2 | \u2713",
+        "2025-11-20T21:21:58.809429 | R3 | sysctl -w net.ipv4.ip_forward=1 | \u2713",
+        "2025-11-20T21:21:58.862865 | R3 | vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 3.3.3.3' -c 'network 10.0.13.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'end' -c 'write' | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 1.1.1.1' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.13.0/30 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R2: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 2.2.2.2' -c 'network 10.0.12.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'end' -c 'write' - ",
+        "Command failed on R3: vtysh -c 'configure terminal' -c 'router ospf' -c 'router-id 3.3.3.3' -c 'network 10.0.13.0/30 area 0' -c 'network 10.0.23.0/30 area 0' -c 'network 192.168.3.3/32 area 0' -c 'end' -c 'write' - ",
+        "Property reachability_R1_to_R3 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    }
+  ],
+  "average_score": 0.6158568678701963,
+  "aggregate_metrics": {
+    "avg_completeness": 0.8613455988455989,
+    "avg_robustness": 0.1,
+    "avg_syntactic_validity": 0.7689430508846745,
+    "avg_efficiency": 0.8753001815502186
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "task_id": "reachability_linear_2n_R1_to_R2",
+  "testee_id": "human_engineer_001",
+  "testee_type": "human",
+  "approach": {
+    "description": "Configure IP addresses and bring up interfaces for two-node reachability",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "ip addr add 10.0.0.1/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "ip addr add 10.0.0.2/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      }
+    ]
+  }
+}
+

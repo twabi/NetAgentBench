@@ -1,0 +1,67 @@
+{
+  "task_id": "example_task_001",
+  "description": "Example task: Two-node reachability test",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2", 
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": ["R1:eth1", "R2:eth1"]
+      }
+    ]
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "reachability_r1_to_r2",
+        "type": "reachability",
+        "description": "R1 can reach R2 via ping",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 received"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_established",
+        "type": "bgp_session",
+        "description": "BGP session between R1 and R2 is established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show bgp summary'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['192.168.1.2'].state",
+            "expected_value": "Established"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 4,
+    "description": "Configure IP addresses and BGP on both routers"
+  }
+}

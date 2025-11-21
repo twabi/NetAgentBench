@@ -1,0 +1,25 @@
+{
+  "task_id": "bgp_basic",
+  "testee_id": "bgp_basic_partial",
+  "testee_type": "baseline",
+  "approach": {
+    "description": "Partial configuration - missing route advertisement",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "ip addr add 192.168.1.1/24 dev eth1",
+          "ip link set eth1 up",
+          "echo '{\"peers\": {\"192.168.1.2\": {\"state\": \"Established\"}}}'"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "ip addr add 192.168.1.2/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      }
+    ]
+  }
+}

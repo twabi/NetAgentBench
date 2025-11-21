@@ -1,0 +1,36 @@
+{
+  "task_id": "ospf_3node",
+  "testee_id": "ospf_3node_invalid",
+  "testee_type": "baseline",
+  "approach": {
+    "description": "Wrong IP addresses - will fail reachability test",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "ip addr add 192.168.12.1/24 dev eth1",
+          "ip link set eth1 up",
+          "echo 'OSPF adjacency R1-R2 failed'",
+          "echo 'Routing table incomplete'"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "ip addr add 192.168.12.2/24 dev eth1",
+          "ip addr add 192.168.23.2/24 dev eth2",
+          "ip link set eth1 up",
+          "ip link set eth2 up",
+          "echo 'OSPF adjacency R2-R3 failed'"
+        ]
+      },
+      {
+        "node": "R3",
+        "commands": [
+          "ip addr add 192.168.23.3/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      }
+    ]
+  }
+}

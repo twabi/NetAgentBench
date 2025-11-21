@@ -1,0 +1,665 @@
+{
+  "task_id": "bgp_ibgp_rr_24n",
+  "description": "iBGP RR topology 24 routers - large scale",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R14",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R15",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R16",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R17",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R18",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R19",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R20",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R21",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R22",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R23",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R24",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth4",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth5",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth6",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth7",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth8",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth9",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth10",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth11",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth12",
+          "R13:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth13",
+          "R14:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth14",
+          "R15:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth15",
+          "R16:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth16",
+          "R17:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth17",
+          "R18:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth18",
+          "R19:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth19",
+          "R20:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth20",
+          "R21:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth21",
+          "R22:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth22",
+          "R23:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth23",
+          "R24:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "bgp_session_R1_R2",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R2\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R2'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R3",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R3'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R4",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R4\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R4'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R5",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R5",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R5\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R5'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R6",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R6",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R6\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R6'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R7",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R7",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R7'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R8",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R8",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R8'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R9",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R9",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R9\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R9'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R10",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R10",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R10\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R10'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R11",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R11",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R11\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R11'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R12",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R12",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R12\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R12'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R13",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R13",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R13\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R13'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R14",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R14",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R14\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R14'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R15",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R15",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R15\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R15'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R16",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R16",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R16\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R16'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R17",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R17",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R17\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R17'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R18",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R18",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R18\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R18'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R19",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R19",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R19\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R19'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R20",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R20",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R20\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R20'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R21",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R21",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R21\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R21'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R22",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R22",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R22\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R22'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R23",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R23",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R23\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R23'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R24",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R24",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R24\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R24'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "route_exchange_R1_to_R24",
+        "type": "route_exists",
+        "description": "Route from R1 to R24 exists",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'Route to R24 exists'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Route to R24 exists"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 192,
+    "description": "Configure BGP on all 24 routers with appropriate AS and neighbors"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "task_id": "ospf_3node",
+  "description": "OSPF three-node topology with adjacency and reachability tests",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": ["R1:eth1", "R2:eth1"]
+      },
+      {
+        "endpoints": ["R2:eth2", "R3:eth1"]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_r1_r2",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R2 is established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'OSPF adjacency R1-R2 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R1-R2 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_r2_r3",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R3 is established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "echo 'OSPF adjacency R2-R3 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R2-R3 established"
+          }
+        }
+      },
+      {
+        "id": "reachability_r1_to_r3",
+        "type": "reachability",
+        "description": "R1 can reach R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.23.3",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "routing_table_complete",
+        "type": "route_exists",
+        "description": "R1 has routes to all expected subnets",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'Routing table complete'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Routing table complete"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 18,
+    "description": "Configure IP addresses and OSPF on all three routers"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "task_id": "bgp_ebgp_2as",
+  "testee_id": "example_engineer",
+  "testee_type": "human",
+  "approach": {
+    "description": "Configure eBGP between two autonomous systems (AS 65001 and AS 65002) with basic interface addressing and BGP neighbor relationships",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "configure terminal",
+          "interface eth0",
+          "ip address 10.0.0.1/24",
+          "no shutdown",
+          "exit",
+          "router bgp 65001",
+          "neighbor 10.0.0.2 remote-as 65002",
+          "network 192.168.1.0/24",
+          "exit",
+          "exit"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "configure terminal",
+          "interface eth0",
+          "ip address 10.0.0.2/24",
+          "no shutdown",
+          "exit",
+          "router bgp 65002",
+          "neighbor 10.0.0.1 remote-as 65001",
+          "network 192.168.2.0/24",
+          "exit",
+          "exit"
+        ]
+      }
+    ]
+  }
+}
+

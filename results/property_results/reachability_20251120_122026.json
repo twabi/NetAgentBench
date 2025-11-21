@@ -1,0 +1,83 @@
+{
+  "property_type": "reachability",
+  "total_tasks": 1,
+  "successful_tasks": 0,
+  "results": [
+    {
+      "run_id": "run_1763633952_0a324d62",
+      "timestamp": "2025-11-20T12:19:12.586271",
+      "task_id": "reachability_linear_10n_R1_to_R10",
+      "testee_id": "baseline",
+      "testee_type": "baseline",
+      "success": false,
+      "property_results": [
+        {
+          "property_id": "reachability_R1_to_R10",
+          "satisfied": false,
+          "observation_raw": "PING 192.168.10.10 (192.168.10.10): 56 data bytes\n\n--- 192.168.10.10 ping statistics ---\n3 packets transmitted, 0 packets received, 100% packet loss\n",
+          "observation_parsed": null,
+          "evaluation_time_seconds": 12.03470516204834,
+          "error_message": "Command exited with code 1"
+        }
+      ],
+      "scoring": {
+        "completeness": 0.0,
+        "robustness": 0.0,
+        "syntactic_validity": 0.0,
+        "efficiency": 1.0,
+        "final_score": 0.1,
+        "weights": {
+          "completeness": 0.4,
+          "robustness": 0.3,
+          "syntactic_validity": 0.2,
+          "efficiency": 0.1
+        }
+      },
+      "validity": {
+        "is_valid_solution": false,
+        "condition_a_syntactic": false,
+        "condition_b_semantic": false
+      },
+      "metrics": {
+        "infrastructure_provision_time": 0.926300048828125,
+        "config_execution_time": 0.3437628746032715,
+        "convergence_time": 60.0,
+        "evaluation_time": 12.034734725952148,
+        "total_time": 73.31977462768555
+      },
+      "execution_log": [
+        "2025-11-20T12:19:43.580224 | R1 | # baseline | \u2717",
+        "2025-11-20T12:19:43.618696 | R2 | # baseline | \u2717",
+        "2025-11-20T12:19:43.654231 | R3 | # baseline | \u2717",
+        "2025-11-20T12:19:43.685644 | R4 | # baseline | \u2717",
+        "2025-11-20T12:19:43.722196 | R5 | # baseline | \u2717",
+        "2025-11-20T12:19:43.753090 | R6 | # baseline | \u2717",
+        "2025-11-20T12:19:43.782904 | R7 | # baseline | \u2717",
+        "2025-11-20T12:19:43.821397 | R8 | # baseline | \u2717",
+        "2025-11-20T12:19:43.849684 | R9 | # baseline | \u2717",
+        "2025-11-20T12:19:43.870638 | R10 | # baseline | \u2717"
+      ],
+      "errors": [
+        "Command failed on R1: # baseline - ",
+        "Command failed on R2: # baseline - ",
+        "Command failed on R3: # baseline - ",
+        "Command failed on R4: # baseline - ",
+        "Command failed on R5: # baseline - ",
+        "Command failed on R6: # baseline - ",
+        "Command failed on R7: # baseline - ",
+        "Command failed on R8: # baseline - ",
+        "Command failed on R9: # baseline - ",
+        "Command failed on R10: # baseline - ",
+        "Property reachability_R1_to_R10 failed: Command exited with code 1"
+      ],
+      "final_state": null
+    }
+  ],
+  "average_score": 0.1,
+  "aggregate_metrics": {
+    "avg_completeness": 0.0,
+    "avg_robustness": 0.0,
+    "avg_syntactic_validity": 0.0,
+    "avg_efficiency": 1.0
+  }
+}

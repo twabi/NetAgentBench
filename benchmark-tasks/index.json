@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "generated": "2025-11-20T20:46:13.759569Z",
+  "total_tasks": 316,
+  "property_types": {
+    "reachability": {
+      "count": 116,
+      "description": "Network connectivity and reachability between nodes",
+      "tasks_dir": "property_types/reachability/tasks/"
+    },
+    "bgp_configuration": {
+      "count": 100,
+      "description": "BGP protocol configuration, session establishment, and route exchange",
+      "tasks_dir": "property_types/bgp_configuration/tasks/"
+    },
+    "ospf_configuration": {
+      "count": 100,
+      "description": "OSPF protocol configuration, adjacencies, and routing",
+      "tasks_dir": "property_types/ospf_configuration/tasks/"
+    }
+  },
+  "topology_patterns": {
+    "linear": "Chain topology",
+    "star": "Hub-spoke topology",
+    "ring": "Circular topology",
+    "mesh": "Full mesh topology",
+    "tree": "Hierarchical tree topology"
+  }
+}

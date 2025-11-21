@@ -1,0 +1,63 @@
+{
+  "task_id": "advanced_task_001",
+  "testee_id": "advanced_testee_001",
+  "testee_type": "human",
+  "approach": {
+    "description": "Configure OSPF on all routers with loopback interfaces",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "vtysh -c 'configure terminal'",
+          "vtysh -c 'interface eth1'",
+          "vtysh -c 'ip address 192.168.1.1/24'",
+          "vtysh -c 'ip ospf hello-interval 10'",
+          "vtysh -c 'ip ospf dead-interval 40'",
+          "vtysh -c 'interface lo'",
+          "vtysh -c 'ip address 1.1.1.1/32'",
+          "vtysh -c 'router ospf'",
+          "vtysh -c 'network 192.168.1.0/24 area 0'",
+          "vtysh -c 'network 1.1.1.1/32 area 0'",
+          "vtysh -c 'end'"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "vtysh -c 'configure terminal'",
+          "vtysh -c 'interface eth1'",
+          "vtysh -c 'ip address 192.168.1.2/24'",
+          "vtysh -c 'ip ospf hello-interval 10'",
+          "vtysh -c 'ip ospf dead-interval 40'",
+          "vtysh -c 'interface eth2'",
+          "vtysh -c 'ip address 192.168.2.1/24'",
+          "vtysh -c 'ip ospf hello-interval 10'",
+          "vtysh -c 'ip ospf dead-interval 40'",
+          "vtysh -c 'interface lo'",
+          "vtysh -c 'ip address 2.2.2.2/32'",
+          "vtysh -c 'router ospf'",
+          "vtysh -c 'network 192.168.1.0/24 area 0'",
+          "vtysh -c 'network 192.168.2.0/24 area 0'",
+          "vtysh -c 'network 2.2.2.2/32 area 0'",
+          "vtysh -c 'end'"
+        ]
+      },
+      {
+        "node": "R3",
+        "commands": [
+          "vtysh -c 'configure terminal'",
+          "vtysh -c 'interface eth1'",
+          "vtysh -c 'ip address 192.168.2.2/24'",
+          "vtysh -c 'ip ospf hello-interval 10'",
+          "vtysh -c 'ip ospf dead-interval 40'",
+          "vtysh -c 'interface lo'",
+          "vtysh -c 'ip address 3.3.3.3/32'",
+          "vtysh -c 'router ospf'",
+          "vtysh -c 'network 192.168.2.0/24 area 0'",
+          "vtysh -c 'network 3.3.3.3/32 area 0'",
+          "vtysh -c 'end'"
+        ]
+      }
+    ]
+  }
+}

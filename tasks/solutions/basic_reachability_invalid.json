@@ -1,0 +1,24 @@
+{
+  "task_id": "basic_reachability",
+  "testee_id": "basic_reachability_invalid",
+  "testee_type": "baseline",
+  "approach": {
+    "description": "Configure wrong IP addresses - will fail reachability test",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "ip addr add 192.168.2.1/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "ip addr add 192.168.2.2/24 dev eth1",
+          "ip link set eth1 up"
+        ]
+      }
+    ]
+  }
+}

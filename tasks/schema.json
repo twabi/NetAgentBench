@@ -1,0 +1,460 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://network-config-benchmark.org/schemas/combined.json",
+  "title": "Network Configuration Benchmark Schema",
+  "description": "Combined schema for task definitions and submissions",
+  "definitions": {
+    "TaskDefinition": {
+      "$defs": {
+        "ConvergenceConfig": {
+          "description": "Convergence configuration.\n\nDefines timeouts for protocol convergence (Assumption 2 in formalization).",
+          "properties": {
+            "timeout_seconds": {
+              "default": 30,
+              "description": "Maximum time to wait for convergence",
+              "title": "Timeout Seconds",
+              "type": "integer"
+            },
+            "check_interval_seconds": {
+              "default": 2,
+              "description": "Interval between convergence checks",
+              "title": "Check Interval Seconds",
+              "type": "integer"
+            }
+          },
+          "title": "ConvergenceConfig",
+          "type": "object"
+        },
+        "EvaluationProcedure": {
+          "description": "Evaluation procedure specification.\n\nDefines HOW to check a property - this is the key innovation that makes\nthe benchmark task-driven and platform-agnostic.",
+          "properties": {
+            "method": {
+              "description": "Evaluation method (e.g., 'exec_and_parse')",
+              "title": "Method",
+              "type": "string"
+            },
+            "target_node": {
+              "description": "Node to execute evaluation on",
+              "title": "Target Node",
+              "type": "string"
+            },
+            "command": {
+              "description": "Command to execute",
+              "title": "Command",
+              "type": "string"
+            },
+            "parser": {
+              "description": "Parser type: 'json', 'regex', 'text'",
+              "title": "Parser",
+              "type": "string"
+            },
+            "success_condition": {
+              "additionalProperties": true,
+              "description": "Condition that defines success",
+              "title": "Success Condition",
+              "type": "object"
+            }
+          },
+          "required": [
+            "method",
+            "target_node",
+            "command",
+            "parser",
+            "success_condition"
+          ],
+          "title": "EvaluationProcedure",
+          "type": "object"
+        },
+        "IntentSpecification": {
+          "description": "Intent specification P = {p\u2081, p\u2082, ..., p\u2098} (Definition 11).\n\nThe set of properties that must be satisfied for the configuration\nto achieve the desired network intent.",
+          "properties": {
+            "properties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Property"
+              },
+              "minItems": 1,
+              "description": "Set of required properties",
+              "title": "Properties"
+            }
+          },
+          "required": [
+            "properties"
+          ],
+          "title": "IntentSpecification",
+          "type": "object"
+        },
+        "Interface": {
+          "description": "Interface configuration for a node",
+          "properties": {
+            "name": {
+              "description": "Interface name (e.g., 'eth1', 'lo0')",
+              "title": "Name",
+              "type": "string"
+            },
+            "ip": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "IP address with prefix (e.g., '192.168.1.1/24')",
+              "title": "Ip"
+            },
+            "mtu": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "MTU size",
+              "title": "Mtu"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "title": "Interface",
+          "type": "object"
+        },
+        "Link": {
+          "description": "Network link specification.\n\nConnects two node interfaces using endpoint format \"node:interface\".",
+          "properties": {
+            "endpoints": {
+              "description": "Two endpoints in format 'node:interface'",
+              "items": {
+                "type": "string"
+              },
+              "title": "Endpoints",
+              "type": "array"
+            }
+          },
+          "required": [
+            "endpoints"
+          ],
+          "title": "Link",
+          "type": "object"
+        },
+        "Node": {
+          "description": "Network node specification.\n\nRepresents a single network device in the topology.",
+          "properties": {
+            "name": {
+              "description": "Unique node identifier",
+              "title": "Name",
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/NodeType",
+              "description": "Node type"
+            },
+            "image": {
+              "default": "frrouting/frr:latest",
+              "description": "Container image",
+              "title": "Image",
+              "type": "string"
+            },
+            "platform": {
+              "$ref": "#/$defs/Platform",
+              "default": "frr",
+              "description": "Network platform"
+            }
+          },
+          "required": [
+            "name",
+            "type"
+          ],
+          "title": "Node",
+          "type": "object"
+        },
+        "NodeType": {
+          "description": "Types of network nodes",
+          "enum": [
+            "router",
+            "switch",
+            "host",
+            "linux"
+          ],
+          "title": "NodeType",
+          "type": "string"
+        },
+        "OptimalSolution": {
+          "description": "Optimal solution specification (Definition 15).\n\nOptional reference for efficiency scoring.",
+          "properties": {
+            "command_count": {
+              "description": "Number of commands in optimal solution",
+              "title": "Command Count",
+              "type": "integer"
+            },
+            "description": {
+              "description": "Description of optimal approach",
+              "title": "Description",
+              "type": "string"
+            }
+          },
+          "required": [
+            "command_count",
+            "description"
+          ],
+          "title": "OptimalSolution",
+          "type": "object"
+        },
+        "Platform": {
+          "description": "Supported network platforms (Definition 12 in formalization)",
+          "enum": [
+            "frr",
+            "cisco_ios",
+            "juniper_junos",
+            "vyos"
+          ],
+          "title": "Platform",
+          "type": "string"
+        },
+        "Property": {
+          "description": "Network property p: S \u00d7 Condition \u2192 {true, false} (Definition 10).\n\nA property that must be satisfied for the configuration to be valid.",
+          "properties": {
+            "id": {
+              "description": "Unique property identifier",
+              "title": "Id",
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/PropertyType",
+              "description": "Property type"
+            },
+            "description": {
+              "description": "Human-readable description",
+              "title": "Description",
+              "type": "string"
+            },
+            "evaluation": {
+              "$ref": "#/$defs/EvaluationProcedure",
+              "description": "How to evaluate this property"
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "description",
+            "evaluation"
+          ],
+          "title": "Property",
+          "type": "object"
+        },
+        "PropertyType": {
+          "description": "Types of network properties (Definition 10 in formalization)",
+          "enum": [
+            "reachability",
+            "bgp_configuration",
+            "route_exists",
+            "ospf_configuration",
+            "interface_up"
+          ],
+          "title": "PropertyType",
+          "type": "string"
+        },
+        "TopologySpecification": {
+          "description": "Topology specification T \u2208 \u03a3_infra^+ (Definition 7 in formalization).\n\nDefines the network topology including nodes, links, and interface configurations.",
+          "properties": {
+            "nodes": {
+              "description": "Network nodes",
+              "items": {
+                "$ref": "#/$defs/Node"
+              },
+              "minItems": 1,
+              "title": "Nodes",
+              "type": "array"
+            },
+            "links": {
+              "description": "Network links",
+              "items": {
+                "$ref": "#/$defs/Link"
+              },
+              "title": "Links",
+              "type": "array"
+            },
+            "interfaces": {
+              "description": "Interface configurations",
+              "items": {
+                "$ref": "#/$defs/Interface"
+              },
+              "title": "Interfaces",
+              "type": "array"
+            }
+          },
+          "required": [
+            "nodes"
+          ],
+          "title": "TopologySpecification",
+          "type": "object"
+        }
+      },
+      "description": "Complete task definition - the main model.\n\nA task specifies:\n- What topology to provision (infrastructure layer)\n- What intent to achieve (SUT layer)\n- How to evaluate success (property evaluation)\n- Platform-specific information\n\nThis is the \"source of truth\" that drives the entire benchmark.",
+      "properties": {
+        "task_id": {
+          "description": "Unique task identifier",
+          "title": "Task Id",
+          "type": "string"
+        },
+        "description": {
+          "description": "Task description",
+          "title": "Description",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/Platform",
+          "description": "Target platform D"
+        },
+        "topology": {
+          "$ref": "#/$defs/TopologySpecification",
+          "description": "Network topology T"
+        },
+        "intent": {
+          "$ref": "#/$defs/IntentSpecification",
+          "description": "Intent specification P"
+        },
+        "convergence": {
+          "$ref": "#/$defs/ConvergenceConfig",
+          "description": "Convergence configuration"
+        },
+        "optimal_solution": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OptimalSolution"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optimal solution for efficiency scoring"
+        }
+      },
+      "required": [
+        "task_id",
+        "description",
+        "platform",
+        "topology",
+        "intent"
+      ],
+      "title": "TaskDefinition",
+      "type": "object"
+    },
+    "Submission": {
+      "$defs": {
+        "Approach": {
+          "description": "Configuration approach A = \u27e8a\u2081, a\u2082, ..., a\u2099\u27e9 \u2208 \u03a3_config^+ (Definition 14).\n\nRepresents the complete configuration strategy provided by the testee\nto achieve the specified intent starting from the initial state.\n\nThe approach is organized as command sequences per node for clarity,\nbut logically represents a sequential execution plan.",
+          "properties": {
+            "description": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Human-readable description of the configuration approach",
+              "title": "Description"
+            },
+            "commands": {
+              "description": "Command sequences organized by target node",
+              "items": {
+                "$ref": "#/$defs/CommandSequence"
+              },
+              "minItems": 1,
+              "title": "Commands",
+              "type": "array"
+            }
+          },
+          "required": [
+            "commands"
+          ],
+          "title": "Approach",
+          "type": "object"
+        },
+        "CommandSequence": {
+          "description": "Command sequence for a specific node.\n\nGroups commands that should be executed on a single node.\nThis provides structure to the configuration approach.",
+          "properties": {
+            "node": {
+              "description": "Target node name",
+              "title": "Node",
+              "type": "string"
+            },
+            "commands": {
+              "description": "List of commands to execute on this node",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Commands",
+              "type": "array"
+            }
+          },
+          "required": [
+            "node",
+            "commands"
+          ],
+          "title": "CommandSequence",
+          "type": "object"
+        }
+      },
+      "description": "Complete submission from a testee (LLM, human, or baseline system).\n\nThis is the standardized input format for the benchmark - it links\na testee's configuration approach to a specific task.\n\nAttributes:\n    task_id: References the TaskDefinition being solved\n    testee_id: Unique identifier for the testee (e.g., \"gpt4_20251013\", \"human_expert_1\")\n    testee_type: Type of testee (\"llm\", \"human\", \"baseline\")\n    approach: The configuration approach proposed by the testee",
+      "properties": {
+        "task_id": {
+          "description": "Task identifier being solved",
+          "title": "Task Id",
+          "type": "string"
+        },
+        "testee_id": {
+          "description": "Unique testee identifier",
+          "title": "Testee Id",
+          "type": "string"
+        },
+        "testee_type": {
+          "description": "Type of testee: 'llm', 'human', or 'baseline'",
+          "title": "Testee Type",
+          "type": "string"
+        },
+        "approach": {
+          "$ref": "#/$defs/Approach",
+          "description": "Proposed configuration approach"
+        }
+      },
+      "required": [
+        "task_id",
+        "testee_id",
+        "testee_type",
+        "approach"
+      ],
+      "title": "Submission",
+      "type": "object"
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/definitions/TaskDefinition"
+    },
+    {
+      "$ref": "#/definitions/Submission"
+    }
+  ],
+  "examples": [
+    {
+      "description": "Example task definition",
+      "$ref": "#/definitions/TaskDefinition"
+    },
+    {
+      "description": "Example submission",
+      "$ref": "#/definitions/Submission"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "task_id": "ospf_3node",
+  "testee_id": "ospf_3node_partial",
+  "testee_type": "baseline",
+  "approach": {
+    "description": "Partial configuration - missing R3 configuration",
+    "commands": [
+      {
+        "node": "R1",
+        "commands": [
+          "ip addr add 192.168.12.1/24 dev eth1",
+          "ip link set eth1 up",
+          "echo 'OSPF adjacency R1-R2 established'"
+        ]
+      },
+      {
+        "node": "R2",
+        "commands": [
+          "ip addr add 192.168.12.2/24 dev eth1",
+          "ip addr add 192.168.23.2/24 dev eth2",
+          "ip link set eth1 up",
+          "ip link set eth2 up"
+        ]
+      }
+    ]
+  }
+}

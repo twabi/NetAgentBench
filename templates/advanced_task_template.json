@@ -1,0 +1,121 @@
+{
+  "task_id": "advanced_task_001",
+  "description": "Advanced task: OSPF three-node topology with multiple properties",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router", 
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest", 
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": ["R1:eth1", "R2:eth1"]
+      },
+      {
+        "endpoints": ["R2:eth2", "R3:eth1"]
+      }
+    ]
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_r1_r2",
+        "type": "ospf_adjacency",
+        "description": "OSPF adjacency between R1 and R2 is up",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.neighbors[?(@.neighbor_id=='192.168.1.2')].state",
+            "expected_value": "Full"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_r2_r3",
+        "type": "ospf_adjacency", 
+        "description": "OSPF adjacency between R2 and R3 is up",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.neighbors[?(@.neighbor_id=='192.168.2.2')].state",
+            "expected_value": "Full"
+          }
+        }
+      },
+      {
+        "id": "route_r1_to_r3",
+        "type": "route_exists",
+        "description": "R1 has route to R3's loopback",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip route 3.3.3.3'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "3\\.3\\.3\\.3/32.*via.*192\\.168\\.1\\.2",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "interface_r1_eth1_up",
+        "type": "interface_up",
+        "description": "R1's eth1 interface is up",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ip link show eth1",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "state UP"
+          }
+        }
+      },
+      {
+        "id": "no_ospf_errors",
+        "type": "reachability",
+        "description": "No OSPF errors in logs",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show log'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "(?i)(error|fail|down)",
+            "must_match": false
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 12,
+    "description": "Configure OSPF on all interfaces and loopbacks"
+  }
+}
