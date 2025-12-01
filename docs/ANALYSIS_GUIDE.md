@@ -219,6 +219,43 @@ Effect size quantifies the magnitude of the difference between groups:
 
 ---
 
+## Metric Interpretation Guide
+
+This section explains common anomalies you might observe in the analysis results.
+
+### 1. Identical Completeness and Robustness Scores
+**Symptom**: You see identical values for `completeness` and `robustness` (e.g., both are exactly `0.928571...`).
+
+**Cause**: This occurs in "All-or-Nothing" tasks (like BGP or Reachability) where the model either satisfies **ALL** properties (Completeness = 1.0) or **NONE** (Completeness = 0.0).
+
+**Explanation**:
+*   **Completeness**: Fraction of properties satisfied.
+*   **Robustness**: Defined as 1.0 if Completeness = 1.0, else 0.0 (in the current MVP implementation).
+*   **Result**: If a testee only ever gets 0.0 or 1.0 for Completeness, the average Robustness will mathematically equal the average Completeness.
+
+### 2. High Scores but 0 Successful Tasks
+**Symptom**: A testee has high scores (e.g., Completeness > 0.9) but `successful_tasks` is 0.
+
+**Cause**: The definition of a "Valid Solution" (Theorem 1) is strict:
+1.  **Semantic Completeness**: All properties are satisfied.
+2.  **Syntactic Correctness**: **Every single command** must return exit code 0.
+
+**Explanation**:
+Models often achieve the desired network state (Semantic Completeness = 1.0) but fail the Syntactic Correctness check due to non-fatal errors in the execution log (e.g., a `vtysh` command returning a non-zero code despite applying the config).
+
+*   **Impact**: The task is marked as "Invalid" (`successful_tasks` count doesn't increase), but the partial scores (Completeness, Robustness) are still high because they measure the network state, not the command exit codes.
+
+### 3. "Eerily Similar" Comparison Scores
+**Symptom**: Two different models have nearly identical final scores (e.g., `0.711` vs `0.712`).
+
+**Cause**: This happens when models hit the same "ceiling" or "floor" constraints.
+
+**Explanation**:
+*   If both models consistently solve the logic (Completeness = 1.0) but consistently fail the syntactic check (Syntactic Validity < 1.0 due to the same tool usage patterns), their scores will converge.
+*   The binary nature of some metrics (Robustness) amplifies this convergence, as there is less room for subtle variation.
+
+---
+
 ## Output Formats
 
 ### JSON Format
