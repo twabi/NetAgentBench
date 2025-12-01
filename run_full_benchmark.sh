@@ -13,7 +13,7 @@ set -e  # Exit on error
 
 # Configuration
 BATCH_NAME="${1:-benchmark_run_$(date +%Y%m%d_%H%M%S)}"
-TASK_LIMIT=100
+TASK_LIMIT=50
 PROPERTY_TYPES=("reachability" "bgp_configuration" "ospf_configuration")
 MODELS=(
     "openai:gpt-5-mini"

@@ -469,7 +469,27 @@ class GeminiProvider(LLMProvider):
         full_prompt = f"{system_prompt}\n\n{prompt}"
         
         def _call_api():
-            response = self.model_instance.generate_content(full_prompt)
+            # Set timeout using request_options (available in google-generativeai >= 0.5.0)
+            # For older versions, timeout is handled by the httpx client internally
+            try:
+                # Try with request_options first (newer API)
+                request_options = {"timeout": self.timeout}
+                response = self.model_instance.generate_content(
+                    full_prompt,
+                    request_options=request_options
+                )
+            except (TypeError, ValueError) as e:
+                # Fallback for older versions that don't support request_options
+                # Error message typically contains "request_options" or "Unknown field"
+                error_str = str(e)
+                if "request_options" in error_str or "Unknown field" in error_str:
+                    logger.warning(
+                        f"request_options not supported in this google-generativeai version. "
+                        f"Using default timeout. Consider upgrading to >= 0.5.0. Error: {error_str}"
+                    )
+                    response = self.model_instance.generate_content(full_prompt)
+                else:
+                    raise
             
             # Check if response was blocked
             if response.prompt_feedback and response.prompt_feedback.block_reason:
