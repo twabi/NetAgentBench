@@ -89,6 +89,7 @@ class CommandExecutor:
                 stdout=True,
                 stderr=True,
                 demux=False,  # Don't separate stdout/stderr
+                timeout=timeout,
             )
             
             # Decode output

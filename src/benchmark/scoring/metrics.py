@@ -26,10 +26,10 @@ class ScoringCalculator:
     
     # Default weights for final score calculation
     DEFAULT_WEIGHTS = {
-        "completeness": 0.4,
+        "completeness": 0.5,
         "robustness": 0.3,
         "syntactic_validity": 0.2,
-        "efficiency": 0.1,
+        "efficiency": 0.0,
     }
     
     def compute_completeness(

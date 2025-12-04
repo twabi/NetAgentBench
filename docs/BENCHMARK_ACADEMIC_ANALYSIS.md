@@ -808,6 +808,8 @@ A comprehensive benchmark run was executed with the following configuration:
 | GPT-5-mini | 129 | 0.809 | 0.496 | 0.861 | 0.689 | 0.712 |
 | Gemini 2.5 Pro | 129 | 0.840 | 0.504 | 0.786 | 0.697 | 0.712 |
 
+![Overall Performance Comparison](../results/charts/overall_comparison.png)
+
 #### Key Observations
 
 1. **Near-Identical Final Scores**: Both models achieved 0.712 final score, indicating equivalent overall performance
@@ -832,6 +834,8 @@ A comprehensive benchmark run was executed with the following configuration:
 
 ### 7.3 Property-Type Breakdown
 
+![Property Breakdown - Final Score](../results/charts/property_breakdown_final_score.png)
+
 #### Reachability Tasks
 
 | Testee | Total Tasks | Completeness | Robustness | Syntactic Validity | Efficiency | Final Score |
@@ -855,6 +859,8 @@ A comprehensive benchmark run was executed with the following configuration:
 - Gemini 2.5 Pro achieved 100% completeness on 7 more tasks than GPT-5-mini
 - Both models show excellent syntactic validity (~0.99), indicating commands are well-formed
 - Both models show relatively low completeness (~0.54-0.67) and efficiency (~0.34-0.39), indicating reachability tasks are challenging
+
+![Property Breakdown - Completeness](../results/charts/property_breakdown_completeness.png)
 
 #### BGP Configuration Tasks
 
@@ -881,6 +887,8 @@ A comprehensive benchmark run was executed with the following configuration:
 - High efficiency (~0.91-0.96) shows solutions are close to optimal
 - GPT-5-mini shows better syntactic validity (0.781 vs 0.672) and slightly higher final score (0.895 vs 0.869)
 - No statistically significant difference
+
+![Property Breakdown - Robustness](../results/charts/property_breakdown_robustness.png)
 
 #### OSPF Configuration Tasks
 
@@ -909,6 +917,8 @@ A comprehensive benchmark run was executed with the following configuration:
 - GPT-5-mini shows better syntactic validity (0.825 vs 0.714)
 - Both models show reasonable efficiency (~0.75-0.78)
 - OSPF tasks appear to be the most challenging for both models
+
+![Property Breakdown - Syntactic Validity](../results/charts/property_breakdown_syntactic_validity.png)
 
 ### 7.4 Task Difficulty Analysis
 
