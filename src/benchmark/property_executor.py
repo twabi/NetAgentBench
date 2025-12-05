@@ -277,8 +277,16 @@ class PropertyExecutor:
         property_results: Dict[str, PropertyExecutionResult] = {}
         all_benchmark_results: List[BenchmarkResult] = []
         
-        for property_type_enum in PropertyType:
-            property_type = property_type_enum.value
+        for prop_value in PropertyType.__iter__():
+            # Check if prop_value is an Enum member or the value itself
+            if hasattr(prop_value, 'value'):
+                property_type = prop_value.value
+            else:
+                property_type = prop_value
+
+            if property_type not in TaskRepository.VALID_PROPERTY_TYPES:
+                continue
+            
             logger.info(f"Processing property type: {property_type}")
             
             # Skip property types that don't have tasks in the repository
@@ -290,17 +298,16 @@ class PropertyExecutor:
                     limit=limit,
                 )
                 
-                # Only include if tasks were found
-                if prop_result.total_tasks > 0:
-                    property_results[property_type] = prop_result
+                # Only include if tasks were found OR keep empty result if desired
+                # Currently we only include if tasks > 0 OR if we want to show 0/0 tasks
+                property_results[property_type] = prop_result
+                if prop_result.results:
                     all_benchmark_results.extend(prop_result.results)
                     
                     # Extract testee info from first result
-                    if prop_result.results and testee_id == "unknown":
+                    if testee_id == "unknown":
                         testee_id = prop_result.results[0].testee_id
                         testee_type = prop_result.results[0].testee_type
-                else:
-                    logger.info(f"No tasks found for property type: {property_type}, skipping")
                     
             except ValueError as e:
                 # Property type not in repository - skip it

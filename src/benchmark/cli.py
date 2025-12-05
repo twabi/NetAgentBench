@@ -48,6 +48,11 @@ PROVIDER_REGISTRY = {
         "default_model": "claude-3-5-sonnet-20241022",
         "description": "Anthropic Claude models",
     },
+    "ollama": {
+        "env_var": None,  # No API key needed usually
+        "default_model": "llama3",
+        "description": "Ollama local models",
+    },
 }
 
 
@@ -268,11 +273,12 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 
 @main.command()
 @click.argument("property_type", type=click.Choice(TaskRepository.VALID_PROPERTY_TYPES, case_sensitive=False))
-@click.option("--provider", type=click.Choice(list(PROVIDER_REGISTRY.keys())), help="LLM provider (openai, gemini, anthropic)")
+@click.option("--provider", type=click.Choice(list(PROVIDER_REGISTRY.keys())), help="LLM provider (openai, gemini, anthropic, ollama)")
 @click.option("--model", help="LLM model name (uses provider default if not specified)")
+@click.option("--base-url", help="Base URL for local providers (e.g. Ollama)")
 @click.option("--limit", type=int, help="Limit number of tasks to run")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
-def run_llm(property_type, provider, model, limit, output_dir):
+def run_llm(property_type, provider, model, base_url, limit, output_dir):
     """
     Run all tasks for a property type using an LLM testee.
     
@@ -287,28 +293,38 @@ def run_llm(property_type, provider, model, limit, output_dir):
         \b
         # Run 3 BGP tasks with specific Gemini model
         benchmark run-llm bgp_configuration --provider gemini --model gemini-2.5-pro --limit 3
+        
+        \b
+        # Run with Ollama on custom host
+        benchmark run-llm reachability --provider ollama --base-url http://myserver:11434
     """
     # Load environment variables
     load_dotenv()
 
     if not provider:
         click.echo("Error: --provider is required for run-llm command.", err=True)
-        click.echo("Available providers: openai, gemini, anthropic")
+        click.echo("Available providers: openai, gemini, anthropic, ollama")
         sys.exit(1)
 
     try:
         # Import LLM components
-        from benchmark.llm.providers import OpenAIProvider, GeminiProvider, AnthropicProvider
+        from benchmark.llm.providers import OpenAIProvider, GeminiProvider, AnthropicProvider, OllamaProvider
         from benchmark.llm.runner import LLMTestee
         from benchmark.models.llm_config import LLMConfig
 
         # Get API key
         env_var = PROVIDER_REGISTRY[provider]["env_var"]
-        api_key = os.getenv(env_var)
-        if not api_key:
-            click.echo(f"Error: {env_var} not found in environment.", err=True)
-            click.echo("Please set it in .env file or environment variables.")
-            sys.exit(1)
+        api_key = None
+        if env_var:
+            api_key = os.getenv(env_var)
+            if not api_key:
+                click.echo(f"Error: {env_var} not found in environment.", err=True)
+                click.echo("Please set it in .env file or environment variables.")
+                sys.exit(1)
+
+        # Get base_url if not provided
+        if not base_url and provider == "ollama":
+             base_url = os.getenv("OLLAMA_BASE_URL")
 
         # Use default model if not specified
         if model is None:
@@ -319,6 +335,8 @@ def run_llm(property_type, provider, model, limit, output_dir):
             max_tokens = 10000  # GPT-5 needs higher limits for reasoning tokens
         elif "gemini" in model:
             max_tokens = 8192  # Gemini default
+        elif "ollama" in provider:
+            max_tokens = 4096   # Decent default for Llama3/Mistral
         else:
             max_tokens = 2000  # Conservative default
 
@@ -327,6 +345,7 @@ def run_llm(property_type, provider, model, limit, output_dir):
             provider=provider,
             model=model,
             api_key=api_key,
+            base_url=base_url,
             temperature=0.7,
             max_tokens=max_tokens,
         )
@@ -335,6 +354,7 @@ def run_llm(property_type, provider, model, limit, output_dir):
             "openai": OpenAIProvider,
             "gemini": GeminiProvider,
             "anthropic": AnthropicProvider,
+            "ollama": OllamaProvider,
         }
         provider_instance = provider_classes[provider](config)
         testee = LLMTestee(provider=provider_instance, testee_id=f"llm_{provider}_{model}")
@@ -442,10 +462,11 @@ def run_human(property_type, limit, output_dir):
 @main.command()
 @click.option("--provider", type=click.Choice(list(PROVIDER_REGISTRY.keys())), help="LLM provider for LLM mode")
 @click.option("--model", help="LLM model name")
+@click.option("--base-url", help="Base URL for local providers (e.g. Ollama)")
 @click.option("--testee-type", type=click.Choice(["llm", "baseline", "human"]), default="baseline", help="Testee type to use")
 @click.option("--limit", type=int, help="Limit number of tasks per property type")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
-def run_all(provider, model, testee_type, limit, output_dir):
+def run_all(provider, model, base_url, testee_type, limit, output_dir):
     """
     Run tasks across ALL property types with a testee.
     
@@ -468,15 +489,21 @@ def run_all(provider, model, testee_type, limit, output_dir):
                 click.echo("Error: --provider is required for LLM testee type.", err=True)
                 sys.exit(1)
 
-            from benchmark.llm.providers import OpenAIProvider, GeminiProvider, AnthropicProvider
+            from benchmark.llm.providers import OpenAIProvider, GeminiProvider, AnthropicProvider, OllamaProvider
             from benchmark.llm.runner import LLMTestee
             from benchmark.models.llm_config import LLMConfig
 
             env_var = PROVIDER_REGISTRY[provider]["env_var"]
-            api_key = os.getenv(env_var)
-            if not api_key:
-                click.echo(f"Error: {env_var} not found in environment.", err=True)
-                sys.exit(1)
+            api_key = None
+            if env_var:
+                api_key = os.getenv(env_var)
+                if not api_key:
+                    click.echo(f"Error: {env_var} not found in environment.", err=True)
+                    sys.exit(1)
+            
+            # Get base_url if not provided
+            if not base_url and provider == "ollama":
+                 base_url = os.getenv("OLLAMA_BASE_URL")
 
             if model is None:
                 model = PROVIDER_REGISTRY[provider]["default_model"]
@@ -486,6 +513,8 @@ def run_all(provider, model, testee_type, limit, output_dir):
                 max_tokens = 10000  # GPT-5 needs higher limits for reasoning tokens
             elif "gemini" in model:
                 max_tokens = 8192  # Gemini default
+            elif "ollama" in provider:
+                max_tokens = 4096
             else:
                 max_tokens = 2000  # Conservative default
 
@@ -493,6 +522,7 @@ def run_all(provider, model, testee_type, limit, output_dir):
                 provider=provider,
                 model=model,
                 api_key=api_key,
+                base_url=base_url,
                 temperature=0.7,
                 max_tokens=max_tokens,
             )
@@ -501,6 +531,7 @@ def run_all(provider, model, testee_type, limit, output_dir):
                 "openai": OpenAIProvider,
                 "gemini": GeminiProvider,
                 "anthropic": AnthropicProvider,
+                "ollama": OllamaProvider,
             }
             provider_instance = provider_classes[provider](config)
             testee = LLMTestee(provider=provider_instance, testee_id=f"llm_{provider}_{model}")

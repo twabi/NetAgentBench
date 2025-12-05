@@ -18,6 +18,8 @@ PROPERTY_TYPES=("reachability" "bgp_configuration" "ospf_configuration")
 MODELS=(
     "openai:gpt-5-mini"
     "gemini:gemini-2.5-pro"
+    # "ollama:llama3"  # Local Ollama model (requires running instance)
+    # "ollama:llama3:http://myserver:11434"  # Remote Ollama instance
 )
 
 echo "================================================================================"
@@ -79,15 +81,21 @@ for property in "${PROPERTY_TYPES[@]}"; do
     for model_spec in "${MODELS[@]}"; do
         task_counter=$((task_counter + 1))
         
-        IFS=':' read -r provider model <<< "$model_spec"
+        IFS=':' read -r provider model base_url <<< "$model_spec"
         
         echo "[$task_counter/$total_tasks] Running $property with $provider:$model" | tee -a "$LOG_FILE"
         echo "--------------------------------------------------------------------------------" | tee -a "$LOG_FILE"
         
-        run_cmd poetry run benchmark run-llm "$property" \
+        cmd_args=(poetry run benchmark run-llm "$property" \
             --provider "$provider" \
             --model "$model" \
-            --limit "$TASK_LIMIT"
+            --limit "$TASK_LIMIT")
+            
+        if [ ! -z "$base_url" ]; then
+            cmd_args+=(--base-url "$base_url")
+        fi
+
+        run_cmd "${cmd_args[@]}"
         
         echo "Completed: $property with $provider:$model" | tee -a "$LOG_FILE"
         echo "" | tee -a "$LOG_FILE"

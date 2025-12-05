@@ -626,20 +626,31 @@ class OllamaProvider(LLMProvider):
         
         def _call_api():
             with self.httpx.Client(timeout=self.timeout) as client:
+                # Use /api/chat instead of /api/generate for better instruction following
                 response = client.post(
-                    f"{self.base_url}/api/generate",
+                    f"{self.base_url}/api/chat",
                     json={
                         "model": self.model,
-                        "prompt": f"{system_prompt}\n\n{prompt}",
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": prompt}
+                        ],
                         "stream": False,
                         "options": {
                             "temperature": self.temperature,
                             "num_predict": self.max_tokens,
+                            "num_ctx": self.config.provider_config.get("num_ctx", 8192),
                         }
                     }
                 )
                 response.raise_for_status()
-                return response.json()["response"]
+                json_response = response.json()
+                content = json_response["message"]["content"]
+                
+                if not content:
+                    logger.warning(f"Ollama returned empty content. Full response: {json_response}")
+                
+                return content
         
         return self._retry_with_backoff(_call_api)
 

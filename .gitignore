@@ -26,6 +26,7 @@ venv/
 env/
 ENV/
 .venv
+.env
 
 # Poetry
 # Note: poetry.lock should be committed for reproducibility
