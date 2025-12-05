@@ -67,14 +67,46 @@ for property in "${PROPERTY_TYPES[@]}"; do
     for model_spec in "${MODELS[@]}"; do
         task_counter=$((task_counter + 1))
         
-        IFS=':' read -r provider model <<< "$model_spec"
+        # Parse model_spec: provider:model:base_url or provider:model
+        # Handle URLs that contain colons by looking for http:// or https://
+        if [[ "$model_spec" == *"http://"* ]] || [[ "$model_spec" == *"https://"* ]]; then
+            # Extract provider (first field before first colon)
+            provider="${model_spec%%:*}"
+            # Extract base_url (everything from http:// or https:// to end, including the protocol)
+            if [[ "$model_spec" == *"http://"* ]]; then
+                base_url="${model_spec#*http://}"
+                base_url="http://${base_url}"
+            else
+                base_url="${model_spec#*https://}"
+                base_url="https://${base_url}"
+            fi
+            # Extract model (everything between provider: and :http:// or :https://)
+            # Remove provider: prefix
+            temp="${model_spec#${provider}:}"
+            # Remove :base_url suffix (but base_url includes http://, so we need to remove :http://...)
+            if [[ "$base_url" == "http://"* ]]; then
+                model="${temp%:http://*}"
+            else
+                model="${temp%:https://*}"
+            fi
+        else
+            # Simple case: provider:model (no base_url)
+            IFS=':' read -r provider model <<< "$model_spec"
+            base_url=""
+        fi
         
         echo "[$task_counter/$total_tasks] Running $property with $provider:$model" | tee -a "$LOG_FILE"
         
-        run_cmd poetry run benchmark run-llm "$property" \
+        cmd_args=(poetry run benchmark run-llm "$property" \
             --provider "$provider" \
             --model "$model" \
-            --limit "$TASK_LIMIT"
+            --limit "$TASK_LIMIT")
+            
+        if [ ! -z "$base_url" ]; then
+            cmd_args+=(--base-url "$base_url")
+        fi
+
+        run_cmd "${cmd_args[@]}"
         
         sleep 2
     done
