@@ -117,21 +117,24 @@ class TestCommandExecutorUnit:
             assert exit_code == 1
 
     def test_exec_on_node_respects_timeout(self):
-        """Test that timeout parameter is passed to Docker"""
+        """Test that timeout raises TimeoutError"""
         executor = CommandExecutor()
         
         mock_container = Mock()
-        mock_container.exec_run.return_value = (0, b"output")
+        # Simulate long running command
+        def long_running(*args, **kwargs):
+            time.sleep(0.2)
+            return (0, b"output")
+            
+        mock_container.exec_run.side_effect = long_running
         
         with patch('docker.from_env') as mock_docker:
             mock_client = Mock()
             mock_client.containers.get.return_value = mock_container
             mock_docker.return_value = mock_client
             
-            executor.exec_on_node("test_container", "test_cmd", timeout=15)
-            
-            # Verify exec_run was called (timeout may be in kwargs)
-            mock_container.exec_run.assert_called_once()
+            with pytest.raises(TimeoutError):
+                executor.exec_on_node("test_container", "test_cmd", timeout=0.1)
 
 
 @pytest.mark.skipif(CommandExecutor is None, reason="CommandExecutor not implemented yet")

@@ -18,8 +18,8 @@ PROPERTY_TYPES=("reachability" "bgp_configuration" "ospf_configuration")
 MODELS=(
     "openai:gpt-5-mini"
     "gemini:gemini-2.5-pro"
-    # "ollama:llama3"  # Local Ollama model (requires running instance)
-    # "ollama:llama3:http://myserver:11434"  # Remote Ollama instance
+    "ollama:qwen3:30b:http://10.23.52.8:11434"
+    "ollama:deepseek-r1:70b:http://10.23.52.8:11434"
 )
 
 echo "================================================================================"
@@ -111,9 +111,9 @@ echo "==========================================================================
 echo "" | tee -a "$LOG_FILE"
 
 # Phase 2: Run analyses
-echo "Comparison Analysis: GPT-5-mini vs Gemini 2.5 Pro" | tee -a "$LOG_FILE"
+echo "Comparison Analysis: All Models" | tee -a "$LOG_FILE"
 run_cmd poetry run benchmark analyze \
-    "llm_openai_gpt-5-mini,llm_gemini_gemini-2.5-pro" \
+    "llm_openai_gpt-5-mini,llm_gemini_gemini-2.5-pro,llm_ollama_qwen3:30b,llm_ollama_deepseek-r1:70b" \
     --batch-name "$BATCH_NAME"
 
 echo "" | tee -a "$LOG_FILE"
@@ -136,6 +136,20 @@ echo "" | tee -a "$LOG_FILE"
 echo "Testee Analysis: Gemini 2.5 Pro" | tee -a "$LOG_FILE"
 run_cmd poetry run benchmark analyze \
     "llm_gemini_gemini-2.5-pro" \
+    --batch-name "$BATCH_NAME"
+
+echo "" | tee -a "$LOG_FILE"
+
+echo "Testee Analysis: Qwen3 30B" | tee -a "$LOG_FILE"
+run_cmd poetry run benchmark analyze \
+    "llm_ollama_qwen3:30b" \
+    --batch-name "$BATCH_NAME"
+
+echo "" | tee -a "$LOG_FILE"
+
+echo "Testee Analysis: Deepseek R1 70B" | tee -a "$LOG_FILE"
+run_cmd poetry run benchmark analyze \
+    "llm_ollama_deepseek-r1:70b" \
     --batch-name "$BATCH_NAME"
 
 # End time

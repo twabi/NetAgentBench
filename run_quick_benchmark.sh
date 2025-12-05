@@ -10,7 +10,7 @@ set -e  # Exit on error
 
 # Configuration
 BATCH_NAME="${1:-quick_test_$(date +%Y%m%d_%H%M%S)}"
-TASK_LIMIT=2
+TASK_LIMIT=3
 PROPERTY_TYPES=("reachability" "bgp_configuration" "ospf_configuration")
 MODELS=(
     "openai:gpt-5-mini"

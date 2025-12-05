@@ -5,6 +5,7 @@ This module handles execution of configuration commands on containers
 and logging of execution results.
 """
 import time
+import concurrent.futures
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Tuple
@@ -81,16 +82,35 @@ class CommandExecutor:
             # Get the container
             container = self.docker_client.containers.get(container_name)
             
-            # Execute command
-            # Note: Docker exec_run returns (exit_code, output)
-            # By default, stderr is merged into stdout
-            exit_code, output = container.exec_run(
-                command,
-                stdout=True,
-                stderr=True,
-                demux=False,  # Don't separate stdout/stderr
-                timeout=timeout,
-            )
+            def _run_cmd():
+                # Execute command
+                # Note: Docker exec_run returns (exit_code, output)
+                # By default, stderr is merged into stdout
+                # demux=False means (exit_code, output) where output is combined stdout+stderr
+                return container.exec_run(
+                    command,
+                    stdout=True,
+                    stderr=True,
+                    demux=False,
+                )
+
+            # Use ThreadPoolExecutor to support timeout
+            executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+            future = executor.submit(_run_cmd)
+            
+            try:
+                exit_code, output = future.result(timeout=timeout)
+                executor.shutdown(wait=True)
+            except concurrent.futures.TimeoutError:
+                # We can't cancel the running thread easily without shutting down the executor
+                # without waiting. The thread will eventually finish or hang until container dies.
+                # In Python 3.9+, shutdown(wait=False, cancel_futures=True) is available.
+                # Assuming standard environment, we use wait=False to return immediately.
+                executor.shutdown(wait=False)
+                raise TimeoutError(f"Command '{command}' timed out after {timeout} seconds on {container_name}")
+            except Exception:
+                executor.shutdown(wait=False)
+                raise
             
             # Decode output
             if isinstance(output, bytes):
