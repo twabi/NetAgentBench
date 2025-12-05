@@ -11,6 +11,70 @@ Before you begin, ensure you have:
 - **Containerlab** - For network topology provisioning
 - **Poetry** - For Python dependency management (recommended) or pip
 
+## Prerequisites Setup
+
+Before installing the benchmark, you must ensure all required dependencies are properly installed and configured on your system.
+
+### 1. Verify Docker Installation
+
+**Docker** is critical for running containerized network topologies. Ensure Docker is installed and running:
+
+```bash
+# Check if Docker is running
+sudo systemctl status docker
+
+# If Docker is not installed, install it (Ubuntu/Debian)
+sudo apt-get update
+sudo apt-get install docker.io docker-compose
+
+# Start Docker service
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+**Important**: Ensure your user is in the `docker` group so you don't need `sudo`:
+
+```bash
+# Add your user to docker group
+sudo usermod -aG docker $USER
+
+# Apply changes immediately without logging out
+newgrp docker
+
+# Verify you can run Docker without sudo
+docker ps
+```
+
+### 2. Install Containerlab
+
+**Containerlab** is critical for provisioning the network topologies. This must be installed:
+
+```bash
+# Install Containerlab
+bash -c "$(curl -sL https://get.containerlab.dev)"
+
+# Verify installation
+sudo clab version
+```
+
+### 3. Install Python 3.10+ and Poetry
+
+Ensure you have Python 3.10 or higher, then install Poetry:
+
+```bash
+# Check Python version
+python3 --version  # Should be 3.10 or higher
+
+# Install Poetry (recommended method)
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Add to PATH (add to ~/.bashrc or ~/.zshrc)
+export PATH="$HOME/.local/bin:$PATH"
+
+# Verify installation
+poetry --version
+```
+
 ### Installing Prerequisites
 
 #### Docker
@@ -23,10 +87,12 @@ sudo apt-get install docker.io docker-compose
 # Start Docker service
 sudo systemctl start docker
 sudo systemctl enable docker
+sudo systemctl status docker  # Verify it's running
 
 # Add your user to docker group (to run without sudo)
 sudo usermod -aG docker $USER
-# Log out and back in for changes to take effect
+# Apply changes immediately without logging out
+newgrp docker
 ```
 
 #### Containerlab
@@ -54,9 +120,16 @@ poetry --version
 
 ## Installation
 
-### Step 1: Clone or Navigate to Project
+### Step 1: Clone the Repository
+
+Clone the benchmark repository to your machine:
 
 ```bash
+# Clone the repository
+git clone <repository-url> benchmark
+cd benchmark
+
+# Or if you already have the repository, navigate to it
 cd /path/to/benchmark
 ```
 

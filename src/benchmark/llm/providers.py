@@ -625,32 +625,102 @@ class OllamaProvider(LLMProvider):
         )
         
         def _call_api():
-            with self.httpx.Client(timeout=self.timeout) as client:
+            # Create proper httpx.Timeout object
+            timeout_config = self.httpx.Timeout(
+                connect=10.0,  # Connection timeout
+                read=self.timeout,  # Read timeout
+                write=10.0,  # Write timeout
+                pool=10.0  # Pool timeout
+            )
+            
+            url = f"{self.base_url}/api/chat"
+            logger.debug(f"OllamaProvider: Connecting to {url}")
+            
+            with self.httpx.Client(
+                timeout=timeout_config,
+                verify=False,  # Disable SSL verification for local/private servers
+                follow_redirects=True
+            ) as client:
                 # Use /api/chat instead of /api/generate for better instruction following
-                response = client.post(
-                    f"{self.base_url}/api/chat",
-                    json={
-                        "model": self.model,
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": prompt}
-                        ],
-                        "stream": False,
-                        "options": {
-                            "temperature": self.temperature,
-                            "num_predict": self.max_tokens,
-                            "num_ctx": self.config.provider_config.get("num_ctx", 8192),
+                try:
+                    response = client.post(
+                        url,
+                        json={
+                            "model": self.model,
+                            "messages": [
+                                {"role": "system", "content": system_prompt},
+                                {"role": "user", "content": prompt}
+                            ],
+                            "stream": False,
+                            "options": {
+                                "temperature": self.temperature,
+                                "num_predict": self.max_tokens,
+                                "num_ctx": self.config.provider_config.get("num_ctx", 8192),
+                            }
                         }
-                    }
-                )
-                response.raise_for_status()
-                json_response = response.json()
-                content = json_response["message"]["content"]
-                
-                if not content:
-                    logger.warning(f"Ollama returned empty content. Full response: {json_response}")
-                
-                return content
+                    )
+                    response.raise_for_status()
+                    json_response = response.json()
+                    
+                    # Extract content - check both content and thinking fields
+                    content = json_response.get("message", {}).get("content", "")
+                    thinking = json_response.get("message", {}).get("thinking", "")
+                    done_reason = json_response.get("done_reason", "")
+                    eval_count = json_response.get("eval_count", 0)
+                    
+                    # Log diagnostic information
+                    if done_reason == "length":
+                        logger.warning(
+                            f"Ollama hit token limit (eval_count={eval_count}, "
+                            f"max_tokens={self.max_tokens}). Consider increasing max_tokens."
+                        )
+                    
+                    # If content is empty but thinking exists, try to extract JSON from thinking
+                    # Reasoning models sometimes put the final answer at the end of thinking
+                    if not content and thinking:
+                        logger.info(
+                            f"Ollama content is empty but thinking field has {len(thinking)} chars. "
+                            f"Attempting to extract JSON from thinking field."
+                        )
+                        # Try to find JSON at the end of thinking (reasoning models often put answer there)
+                        # Look for JSON object starting from the last occurrence of '{'
+                        last_brace = thinking.rfind('{')
+                        if last_brace != -1:
+                            potential_json = thinking[last_brace:]
+                            # Check if it looks like valid JSON (has closing brace)
+                            if potential_json.count('{') == potential_json.count('}'):
+                                logger.info("Found potential JSON in thinking field, using it as content")
+                                content = potential_json
+                            else:
+                                # If no complete JSON found, use the entire thinking as fallback
+                                logger.warning("No complete JSON found in thinking, using entire thinking as content")
+                                content = thinking
+                        else:
+                            # No JSON structure found, use thinking as fallback
+                            logger.warning("No JSON structure found in thinking, using entire thinking as content")
+                            content = thinking
+                    
+                    if not content:
+                        logger.error(
+                            f"Ollama returned empty content and no thinking. "
+                            f"Full response keys: {list(json_response.keys())}, "
+                            f"done_reason: {done_reason}, eval_count: {eval_count}"
+                        )
+                        if "message" in json_response:
+                            logger.error(f"Message keys: {list(json_response['message'].keys())}")
+                    
+                    return content
+                except self.httpx.ConnectError as e:
+                    logger.error(f"Ollama connection error to {url}: {e}")
+                    raise ConnectionError(f"Failed to connect to Ollama at {self.base_url}. "
+                                         f"Please verify the server is running and accessible. "
+                                         f"Error: {e}")
+                except self.httpx.TimeoutException as e:
+                    logger.error(f"Ollama request timeout to {url}: {e}")
+                    raise TimeoutError(f"Request to Ollama at {self.base_url} timed out after {self.timeout}s")
+                except Exception as e:
+                    logger.error(f"Ollama API error to {url}: {e}")
+                    raise
         
         return self._retry_with_backoff(_call_api)
 

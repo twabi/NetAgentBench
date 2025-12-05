@@ -331,12 +331,20 @@ def run_llm(property_type, provider, model, base_url, limit, output_dir):
             model = PROVIDER_REGISTRY[provider]["default_model"]
 
         # Auto-select max_tokens based on model
+        provider_config = {}
         if "gpt-5" in model:
             max_tokens = 10000  # GPT-5 needs higher limits for reasoning tokens
         elif "gemini" in model:
             max_tokens = 8192  # Gemini default
         elif "ollama" in provider:
-            max_tokens = 4096   # Decent default for Llama3/Mistral
+            # Reasoning models (qwen3, deepseek-r1) need much higher limits
+            # because they output thinking before content
+            if any(reasoning_model in model for reasoning_model in ["qwen3", "deepseek-r1", "gpt-oss"]):
+                max_tokens = 32768  # Very high limit for reasoning models
+                provider_config["num_ctx"] = 32768  # Also increase context window
+            else:
+                max_tokens = 8192   # Decent default for other Ollama models
+                provider_config["num_ctx"] = 16384  # Higher context for better responses
         else:
             max_tokens = 2000  # Conservative default
 
@@ -348,6 +356,7 @@ def run_llm(property_type, provider, model, base_url, limit, output_dir):
             base_url=base_url,
             temperature=0.7,
             max_tokens=max_tokens,
+            provider_config=provider_config,
         )
 
         provider_classes = {
