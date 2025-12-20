@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Full Benchmark Comparison: GPT-5-mini vs Gemini 2.5 Pro
+# Full Benchmark Comparison
 #
 # This script runs 100 tasks per property type for both models (600 total tasks)
 # and performs comprehensive statistical analysis.
@@ -13,7 +13,7 @@ set -e  # Exit on error
 
 # Configuration
 BATCH_NAME="${1:-benchmark_run_$(date +%Y%m%d_%H%M%S)}"
-TASK_LIMIT=50
+TASK_LIMIT=100
 PROPERTY_TYPES=("reachability" "bgp_configuration" "ospf_configuration")
 MODELS=(
     "openai:gpt-5-mini"
