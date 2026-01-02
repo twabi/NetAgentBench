@@ -1,0 +1,80 @@
+{
+  "task_id": "vlan_access_4n_vlan200",
+  "description": "Configure Access ports for VLAN 200",
+  "platform": "nokia_srl",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "vlan_200_exists",
+        "type": "vlan_configuration",
+        "description": "VLAN 200 exists on all nodes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show vlan brief'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "200"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 8,
+    "description": "Configure VLANs on 4 nodes"
+  }
+}

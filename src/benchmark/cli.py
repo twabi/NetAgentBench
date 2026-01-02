@@ -80,12 +80,20 @@ def main(verbose, quiet):
     type=click.Choice(TaskRepository.VALID_PROPERTY_TYPES, case_sensitive=False),
     help="Filter tasks by property type.",
 )
+@click.option(
+    "--platform",
+    type=click.Choice(TaskRepository.VALID_PLATFORMS, case_sensitive=False),
+    help="Filter tasks by platform (frr, cisco_ios_xe, nokia_srl, mixed).",
+)
 @click.option("--verbose", is_flag=True, help="Show detailed task information.")
-def list_tasks(property_type, verbose):
+def list_tasks(property_type, platform, verbose):
     """List available tasks in the task repository."""
     try:
         repo = TaskRepository()
-        tasks = repo.list_tasks(property_type=property_type)
+        if property_type:
+            tasks = repo.load_tasks_by_property(property_type, platform=platform)
+        else:
+            tasks = repo.list_tasks(property_type=property_type)
         if not tasks:
             click.echo("No tasks found.")
             return
@@ -276,9 +284,10 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @click.option("--provider", type=click.Choice(list(PROVIDER_REGISTRY.keys())), help="LLM provider (openai, gemini, anthropic, ollama)")
 @click.option("--model", help="LLM model name (uses provider default if not specified)")
 @click.option("--base-url", help="Base URL for local providers (e.g. Ollama)")
+@click.option("--platform", type=click.Choice(TaskRepository.VALID_PLATFORMS, case_sensitive=False), help="Filter by platform")
 @click.option("--limit", type=int, help="Limit number of tasks to run")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
-def run_llm(property_type, provider, model, base_url, limit, output_dir):
+def run_llm(property_type, provider, model, base_url, platform, limit, output_dir):
     """
     Run all tasks for a property type using an LLM testee.
     
@@ -375,6 +384,7 @@ def run_llm(property_type, provider, model, base_url, limit, output_dir):
             property_type=property_type,
             testee=testee,
             limit=limit,
+            platform=platform,
             output_dir=output_dir,
         )
 
@@ -392,9 +402,73 @@ def run_llm(property_type, provider, model, base_url, limit, output_dir):
 
 @main.command()
 @click.argument("property_type", type=click.Choice(TaskRepository.VALID_PROPERTY_TYPES, case_sensitive=False))
+@click.option("--endpoint", default="http://localhost:8000", help="Dagent HTTP endpoint")
+@click.option("--platform", type=click.Choice(TaskRepository.VALID_PLATFORMS, case_sensitive=False), help="Filter by platform")
 @click.option("--limit", type=int, help="Limit number of tasks to run")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
-def run_baseline(property_type, limit, output_dir):
+def run_dagent(property_type, endpoint, platform, limit, output_dir):
+    """
+    Run all tasks for a property type using dagent multi-agent system.
+    
+    Connects to a running dagent instance to generate configurations
+    using multi-agent orchestration (DAG, FSM, or automated handoff).
+    
+    Start dagent first: uvicorn dagent.main:app --reload
+    
+    Examples:
+    
+        \\b
+        # Run reachability tasks with dagent (default localhost)
+        benchmark run-dagent reachability
+        
+        \\b
+        # Run 5 BGP tasks with dagent on custom endpoint
+        benchmark run-dagent bgp_configuration --endpoint http://myserver:8000 --limit 5
+        
+        \\b
+        # Run on specific platform
+        benchmark run-dagent ospf_configuration --platform cisco_ios_xe --limit 10
+    """
+    try:
+        # Import dagent adapter
+        from benchmark.testee.dagent_adapter import DagentAdapter
+
+        testee = DagentAdapter(
+            endpoint=endpoint,
+            testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}",
+        )
+
+        click.echo(f"Using dagent at: {endpoint}")
+
+        _run_property_execution(
+            property_type=property_type,
+            testee=testee,
+            limit=limit,
+            platform=platform,
+            output_dir=output_dir,
+        )
+
+    except ImportError as e:
+        click.echo(f"Error: Dagent adapter not available: {e}", err=True)
+        sys.exit(1)
+    except ConnectionError as e:
+        click.echo(f"Error: Could not connect to dagent: {e}", err=True)
+        click.echo("Make sure dagent is running: uvicorn dagent.main:app --reload")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Dagent benchmark execution failed: {e}")
+        click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
+@main.command()
+@click.argument("property_type", type=click.Choice(TaskRepository.VALID_PROPERTY_TYPES, case_sensitive=False))
+@click.option("--platform", type=click.Choice(TaskRepository.VALID_PLATFORMS, case_sensitive=False), help="Filter by platform")
+@click.option("--limit", type=int, help="Limit number of tasks to run")
+@click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
+def run_baseline(property_type, platform, limit, output_dir):
     """
     Run all tasks for a property type using baseline (empty) configurations.
     
@@ -418,6 +492,7 @@ def run_baseline(property_type, limit, output_dir):
             property_type=property_type,
             testee=testee,
             limit=limit,
+            platform=platform,
             output_dir=output_dir,
         )
 
@@ -429,9 +504,10 @@ def run_baseline(property_type, limit, output_dir):
 
 @main.command()
 @click.argument("property_type", type=click.Choice(TaskRepository.VALID_PROPERTY_TYPES, case_sensitive=False))
+@click.option("--platform", type=click.Choice(TaskRepository.VALID_PLATFORMS, case_sensitive=False), help="Filter by platform")
 @click.option("--limit", type=int, help="Limit number of tasks to run")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
-def run_human(property_type, limit, output_dir):
+def run_human(property_type, platform, limit, output_dir):
     """
     Run tasks interactively with human testee.
     
@@ -456,6 +532,7 @@ def run_human(property_type, limit, output_dir):
             property_type=property_type,
             testee=testee,
             limit=limit,
+            platform=platform,
             output_dir=output_dir,
         )
 
@@ -608,6 +685,7 @@ def _run_property_execution(
     testee: BaseTestee,
     limit: Optional[int],
     output_dir: Optional[str],
+    platform: Optional[str] = None,
 ):
     """
     Internal helper to run property-based execution.
@@ -617,6 +695,7 @@ def _run_property_execution(
         testee: Testee instance to use
         limit: Optional task limit
         output_dir: Optional custom output directory
+        platform: Optional platform filter
     """
     # Setup components
     repo = TaskRepository()
@@ -624,7 +703,8 @@ def _run_property_execution(
     storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
     executor = PropertyExecutor(controller, repo, storage=storage)
 
-    click.echo(f"\nRunning {property_type} tasks (limit: {limit or 'all'})")
+    platform_str = f" for {platform}" if platform else ""
+    click.echo(f"\nRunning {property_type} tasks{platform_str} (limit: {limit or 'all'})")
     click.echo(f"{'='*80}\n")
 
     # Run tasks
@@ -632,6 +712,7 @@ def _run_property_execution(
         property_type=property_type,
         submission_generator=testee.generate_submission,
         limit=limit,
+        platform=platform,
     )
 
     # Save result

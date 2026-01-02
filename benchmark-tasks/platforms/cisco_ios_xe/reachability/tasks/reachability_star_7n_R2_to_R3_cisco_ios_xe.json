@@ -1,0 +1,116 @@
+{
+  "task_id": "reachability_star_7n_R2_to_R3_cisco_ios_xe",
+  "description": "Star 7-node topology: Spoke R2 to spoke R3 reachability",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth4",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth5",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth6",
+          "R7:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "reachability_R2_to_R3",
+        "type": "reachability",
+        "description": "R2 can reach R3 via ping",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "ping -c 3 192.168.2.3",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 14,
+    "description": "Configure IP addresses and bring up interfaces on all 7 nodes"
+  }
+}

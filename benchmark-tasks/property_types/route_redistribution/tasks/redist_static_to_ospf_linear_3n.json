@@ -1,0 +1,82 @@
+{
+  "task_id": "redist_static_to_ospf_linear_3n",
+  "description": "Linear 3-node: Redistribute static routes into OSPF",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "redist_static_to_ospf",
+        "type": "route_redistribution",
+        "description": "Routes from static are redistributed into ospf",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config' | grep redistribute",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "redistribute static"
+          }
+        }
+      },
+      {
+        "id": "routes_in_ospf",
+        "type": "route_exists",
+        "description": "Redistributed routes appear in ospf table",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf' 2>/dev/null || vtysh -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "S"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 20,
+    "description": "Configure static\u2192ospf redistribution on 3 nodes"
+  }
+}

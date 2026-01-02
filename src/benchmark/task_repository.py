@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 class TaskRepository:
     """Load and manage benchmark tasks organized by property type."""
 
-    VALID_PROPERTY_TYPES = ["reachability", "bgp_configuration", "ospf_configuration"]
+    VALID_PROPERTY_TYPES = ["reachability", "bgp_configuration", "ospf_configuration", "vlan_configuration", "acl_configuration", "firewall_rules", "route_redistribution", "mixed_platform"]
+    VALID_PLATFORMS = ["frr", "cisco_ios_xe", "nokia_srl", "mixed"]
 
     def __init__(self, tasks_dir: Path = Path("benchmark-tasks")):
         """
@@ -52,26 +53,15 @@ class TaskRepository:
         with open(index_path, 'r') as f:
             return json.load(f)
 
-    def _load_tasks_from_dir(self, property_type: str) -> List[TaskDefinition]:
+    def _scan_dir(self, path: Path) -> List[TaskDefinition]:
         """
-        Load all tasks from a property type directory.
-
-        Args:
-            property_type: Property type to load tasks for
-
-        Returns:
-            List of TaskDefinition objects
+        Scan a directory for task JSON files.
         """
-        tasks_path = self.tasks_dir / "property_types" / property_type / "tasks"
-
-        if not tasks_path.exists():
-            logger.warning(f"Tasks directory not found: {tasks_path}")
-            return []
-
         tasks = []
-        task_files = sorted(tasks_path.glob("*.json"))
-
-        for task_file in task_files:
+        if not path.exists():
+            return tasks
+            
+        for task_file in sorted(path.glob("*.json")):
             try:
                 with open(task_file, 'r') as f:
                     task_data = json.load(f)
@@ -80,13 +70,42 @@ class TaskRepository:
             except Exception as e:
                 logger.warning(f"Failed to load task {task_file}: {e}")
                 continue
+        return tasks
 
+    def _load_tasks_from_dir(self, property_type: str, platform: Optional[str] = None) -> List[TaskDefinition]:
+        """
+        Load all tasks for a property type from legacy and platform directories.
+        
+        Args:
+            property_type: Property type to load tasks for
+            platform: Optional platform filter (frr, cisco_ios_xe, nokia_srl, mixed)
+        """
+        tasks = []
+        
+        # If platform is specified, only scan that platform directory
+        if platform:
+            task_path = self.tasks_dir / "platforms" / platform / property_type / "tasks"
+            tasks.extend(self._scan_dir(task_path))
+        else:
+            # 1. Legacy path: property_types/<prop>/tasks
+            legacy_path = self.tasks_dir / "property_types" / property_type / "tasks"
+            tasks.extend(self._scan_dir(legacy_path))
+
+            # 2. Platform paths: platforms/<platform>/<prop>/tasks
+            platforms_path = self.tasks_dir / "platforms"
+            if platforms_path.exists():
+                for platform_dir in platforms_path.iterdir():
+                    if platform_dir.is_dir():
+                        task_path = platform_dir / property_type / "tasks"
+                        tasks.extend(self._scan_dir(task_path))
+        
         return tasks
 
     def load_tasks_by_property(
         self,
         property_type: str,
-        limit: Optional[int] = None
+        limit: Optional[int] = None,
+        platform: Optional[str] = None
     ) -> List[TaskDefinition]:
         """
         Load tasks for a specific property type.
@@ -94,6 +113,7 @@ class TaskRepository:
         Args:
             property_type: "reachability", "bgp_configuration", "ospf_configuration"
             limit: Optional limit on number of tasks (None = all tasks)
+            platform: Optional platform filter (frr, cisco_ios_xe, nokia_srl)
 
         Returns:
             List of TaskDefinition objects
@@ -106,8 +126,14 @@ class TaskRepository:
                 f"Invalid property type: {property_type}. "
                 f"Valid types: {', '.join(self.VALID_PROPERTY_TYPES)}"
             )
+        
+        if platform and platform not in self.VALID_PLATFORMS:
+            raise ValueError(
+                f"Invalid platform: {platform}. "
+                f"Valid platforms: {', '.join(self.VALID_PLATFORMS)}"
+            )
 
-        tasks = self._load_tasks_from_dir(property_type)
+        tasks = self._load_tasks_from_dir(property_type, platform=platform)
 
         # Apply limit if specified
         if limit is not None:
@@ -179,18 +205,36 @@ class TaskRepository:
             FileNotFoundError: If task is not found
         """
         # Search all property type directories for the task
-        for property_type in self.VALID_PROPERTY_TYPES:
-            tasks_path = self.tasks_dir / "property_types" / property_type / "tasks"
-            task_file = tasks_path / f"{task_id}.json"
-
-            if task_file.exists():
+        # Search strategy:
+        # 1. Check legacy property types
+        # 2. Check platform directories
+        
+        candidates = []
+        
+        # Search all possible locations
+        # Legacy
+        for prop_type in self.VALID_PROPERTY_TYPES:
+            legacy_path = self.tasks_dir / "property_types" / prop_type / "tasks" / f"{task_id}.json"
+            candidates.append(legacy_path)
+            
+        # Platforms
+        platforms_path = self.tasks_dir / "platforms"
+        if platforms_path.exists():
+            for platform_dir in platforms_path.iterdir():
+                if platform_dir.is_dir():
+                    for prop_type in self.VALID_PROPERTY_TYPES:
+                        path = platform_dir / prop_type / "tasks" / f"{task_id}.json"
+                        candidates.append(path)
+                        
+        for path in candidates:
+            if path.exists():
                 try:
-                    with open(task_file, 'r') as f:
+                    with open(path, 'r') as f:
                         task_data = json.load(f)
                         return TaskDefinition.model_validate(task_data)
                 except Exception as e:
-                    raise FileNotFoundError(f"Failed to load task {task_id}: {e}")
-
+                    logger.warning(f"Found task file {path} but failed to load: {e}")
+        
         raise FileNotFoundError(f"Task not found: {task_id}")
 
     def list_tasks(self, property_type: Optional[str] = None) -> List[TaskDefinition]:

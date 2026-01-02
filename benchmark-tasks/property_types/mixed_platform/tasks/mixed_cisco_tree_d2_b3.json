@@ -1,0 +1,206 @@
+{
+  "task_id": "mixed_cisco_tree_d2_b3",
+  "description": "Tree d2b3 (13 nodes): Cisco root",
+  "platform": "frr",
+  "mixed_platforms": [
+    "arista_eos",
+    "cisco_ios_xe"
+  ],
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth1",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth3",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth1",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth1",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth3",
+          "R13:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "mixed_platform_connectivity",
+        "type": "reachability",
+        "description": "Connectivity verified between mixed platforms",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted"
+          }
+        }
+      },
+      {
+        "id": "platform_interop",
+        "type": "interface_up",
+        "description": "Interfaces up across platform boundary",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ip link show",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "state UP"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 45,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 52,
+    "description": "Configure connectivity across 2 platforms"
+  }
+}

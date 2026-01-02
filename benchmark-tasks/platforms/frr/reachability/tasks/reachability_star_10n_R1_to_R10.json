@@ -1,0 +1,152 @@
+{
+  "task_id": "reachability_star_10n_R1_to_R10",
+  "description": "Star 10-node topology: Hub R1 to spoke R10 reachability",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth4",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth5",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth6",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth7",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth8",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth9",
+          "R10:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "reachability_R1_to_R10",
+        "type": "reachability",
+        "description": "R1 can reach R10 via ping",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.1.10",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 20,
+    "description": "Configure IP addresses and bring up interfaces on all 10 nodes"
+  }
+}

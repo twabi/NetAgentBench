@@ -1,0 +1,120 @@
+{
+  "task_id": "acl_srcip_linear_5n_192_168_0_0",
+  "description": "Linear 5-node: Permit traffic from 192.168.0.0/16",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth4",
+          "R5:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_FILTER_SRC_exists",
+        "type": "acl_configuration",
+        "description": "ACL FILTER_SRC is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FILTER_SRC"
+          }
+        }
+      },
+      {
+        "id": "acl_FILTER_SRC_rule_0",
+        "type": "acl_rule",
+        "description": "ACL FILTER_SRC contains rule: permit ip from 192.168.0.0/16",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_FILTER_SRC_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group FILTER_SRC"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 13,
+    "description": "Configure ACL FILTER_SRC with permit ip on 5 nodes"
+  }
+}

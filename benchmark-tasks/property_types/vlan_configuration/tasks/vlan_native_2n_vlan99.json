@@ -1,0 +1,56 @@
+{
+  "task_id": "vlan_native_2n_vlan99",
+  "description": "Linear 2-node: Configure native VLAN 99 on trunks",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "vlan_99_exists",
+        "type": "vlan_configuration",
+        "description": "VLAN 99 exists on all nodes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show vlan brief'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "99"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 4,
+    "description": "Configure VLANs on 2 nodes"
+  }
+}

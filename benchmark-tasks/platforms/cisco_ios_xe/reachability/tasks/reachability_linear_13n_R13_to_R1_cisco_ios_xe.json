@@ -1,0 +1,188 @@
+{
+  "task_id": "reachability_linear_13n_R13_to_R1_cisco_ios_xe",
+  "description": "Linear 13-node topology: R13 to R1 reachability (reverse)",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth4",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth5",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth6",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth7",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth8",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth9",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth10",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth11",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth12",
+          "R13:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "reachability_R13_to_R1",
+        "type": "reachability",
+        "description": "R13 can reach R1 via ping",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R13",
+          "command": "ping -c 3 192.168.1.1",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 26,
+    "description": "Configure IP addresses and bring up interfaces on all 13 nodes"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "task_id": "fw_conntrack_related_3n_cisco_ios_xe",
+  "description": "Linear 3-node: Allow related connections",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "fw_TRACK_RELATED_exists",
+        "type": "firewall_rule",
+        "description": "Firewall rule TRACK_RELATED is configured with permit",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip firewall'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "TRACK_RELATED"
+          }
+        }
+      },
+      {
+        "id": "reach_allowed_by_TRACK_RELATED",
+        "type": "reachability",
+        "description": "Traffic is allowed through firewall",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 2 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "2 packets transmitted"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 12,
+    "description": "Configure firewall rule TRACK_RELATED on 3 nodes"
+  }
+}

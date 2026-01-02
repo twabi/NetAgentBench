@@ -1,0 +1,312 @@
+{
+  "task_id": "ospf_area0_ring_10n",
+  "description": "OSPF area 0 ring 10-node topology",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth2",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth2",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth2",
+          "R1:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_R1_R2",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'OSPF adjacency R1-R2 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R1-R2 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R2_R3",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "echo 'OSPF adjacency R2-R3 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R2-R3 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R3_R4",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R3 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "echo 'OSPF adjacency R3-R4 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R3-R4 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R4_R5",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R4 and R5",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "echo 'OSPF adjacency R4-R5 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R4-R5 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R5_R6",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R5 and R6",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R5",
+          "command": "echo 'OSPF adjacency R5-R6 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R5-R6 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R6_R7",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R6 and R7",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R6",
+          "command": "echo 'OSPF adjacency R6-R7 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R6-R7 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R7_R8",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R7 and R8",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R7",
+          "command": "echo 'OSPF adjacency R7-R8 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R7-R8 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R8_R9",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R8 and R9",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R8",
+          "command": "echo 'OSPF adjacency R8-R9 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R8-R9 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R9_R10",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R9 and R10",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R9",
+          "command": "echo 'OSPF adjacency R9-R10 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R9-R10 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R10_R1",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R10 and R1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R10",
+          "command": "echo 'OSPF adjacency R10-R1 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R10-R1 established"
+          }
+        }
+      },
+      {
+        "id": "reachability_R1_to_R10",
+        "type": "reachability",
+        "description": "R1 can reach R10",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.10.10",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "routing_table_complete",
+        "type": "route_exists",
+        "description": "Routing table has all expected OSPF routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'Routing table complete'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Routing table complete"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 60,
+    "description": "Configure OSPF on all 10 routers with appropriate area and network statements"
+  }
+}

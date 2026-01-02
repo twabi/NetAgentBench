@@ -1,0 +1,70 @@
+{
+  "task_id": "vlan_svi_2n_vlan10",
+  "description": "Linear 2-node: Create VLAN 10 SVI with IP",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "vlan_10_exists",
+        "type": "vlan_configuration",
+        "description": "VLAN 10 exists on all nodes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show vlan brief'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10"
+          }
+        }
+      },
+      {
+        "id": "svi_vlan10",
+        "type": "svi_configuration",
+        "description": "SVI for VLAN 10 has correct IP",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip interface vlan10'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "192.168.10.1"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 6,
+    "description": "Configure VLANs on 2 nodes"
+  }
+}

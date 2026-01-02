@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from topology_generator import TopologyGenerator
 
 
-def generate_ospf_tasks() -> List[Dict[str, Any]]:
+def generate_ospf_tasks(platform: str = "frr") -> List[Dict[str, Any]]:
     """
     Generate all OSPF configuration task variations.
     
@@ -22,7 +22,7 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
     Returns:
         List of task dictionaries
     """
-    generator = TopologyGenerator()
+    generator = TopologyGenerator(default_platform=platform)
     tasks = []
 
     # Single area (area 0) linear topologies - expanded
@@ -93,7 +93,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
                 task_id=f"ospf_area0_tree_d{depth}_b{branch}",
                 description=f"OSPF area 0 tree depth {depth} branch {branch}",
                 area_config="single_area",
-                node_count=node_count
+                node_count=node_count,
+                platform=platform
             )
             tasks.append(task)
 
@@ -108,7 +109,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
                 task_id=f"ospf_multiarea_tree_d{depth}_b{branch}",
                 description=f"OSPF multi-area tree depth {depth} branching {branch}",
                 area_config="multi_area",
-                node_count=len(topo.nodes)
+                node_count=len(topo.nodes),
+                platform=platform
             )
             tasks.append(task)
 
@@ -122,7 +124,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
             task_id=f"ospf_multiarea_linear_{node_count}n",
             description=f"OSPF multi-area linear {node_count}-node with ABR",
             area_config="multi_area",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -136,7 +139,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
             task_id=f"ospf_multiarea_ring_{node_count}n",
             description=f"OSPF multi-area ring {node_count}-node with ABRs",
             area_config="multi_area",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -150,7 +154,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
             task_id=f"ospf_area0_linear_{node_count}n",
             description=f"OSPF area 0 linear {node_count}-node - large scale",
             area_config="single_area",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -164,7 +169,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
             task_id=f"ospf_area0_star_{node_count}n",
             description=f"OSPF area 0 star {node_count}-node - large scale",
             area_config="single_area",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -178,7 +184,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
             task_id=f"ospf_area0_ring_{node_count}n",
             description=f"OSPF area 0 ring {node_count}-node - large scale",
             area_config="single_area",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -192,7 +199,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
             task_id=f"ospf_multiarea_linear_{node_count}n",
             description=f"OSPF multi-area linear {node_count}-node - large scale",
             area_config="multi_area",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -206,7 +214,8 @@ def generate_ospf_tasks() -> List[Dict[str, Any]]:
             task_id=f"ospf_multiarea_ring_{node_count}n",
             description=f"OSPF multi-area ring {node_count}-node - large scale",
             area_config="multi_area",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -218,7 +227,8 @@ def create_ospf_task(
     task_id: str,
     description: str,
     area_config: str,
-    node_count: int
+    node_count: int,
+    platform: str = "frr"
 ) -> Dict[str, Any]:
     """
     Create an OSPF configuration task.
@@ -229,10 +239,14 @@ def create_ospf_task(
         description: Task description
         area_config: "single_area" or "multi_area"
         node_count: Number of nodes
+        platform: Platform type
 
     Returns:
         Task dictionary
     """
+    if platform != "frr":
+        task_id = f"{task_id}_{platform}"
+    
     # Convert topology to dict
     topo_dict = {
         "nodes": [
@@ -316,7 +330,7 @@ def create_ospf_task(
     task = {
         "task_id": task_id,
         "description": description,
-        "platform": "frr",
+        "platform": platform,
         "topology": topo_dict,
         "intent": {
             "properties": properties

@@ -1,0 +1,216 @@
+{
+  "task_id": "acl_tree_d2_b3_nokia_srl",
+  "description": "Tree d2b3 (13 nodes): ACL at root",
+  "platform": "nokia_srl",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth1",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth3",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth1",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth1",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth3",
+          "R13:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_TREE_FILTER_exists",
+        "type": "acl_configuration",
+        "description": "ACL TREE_FILTER is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "TREE_FILTER"
+          }
+        }
+      },
+      {
+        "id": "acl_TREE_FILTER_rule_0",
+        "type": "acl_rule",
+        "description": "ACL TREE_FILTER contains rule: permit tcp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_TREE_FILTER_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group TREE_FILTER"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 29,
+    "description": "Configure ACL TREE_FILTER with permit tcp on 13 nodes"
+  }
+}

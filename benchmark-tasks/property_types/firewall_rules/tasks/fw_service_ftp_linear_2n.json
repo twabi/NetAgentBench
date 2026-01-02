@@ -1,0 +1,70 @@
+{
+  "task_id": "fw_service_ftp_linear_2n",
+  "description": "Linear 2-node: Allow FTP service through firewall",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "fw_ALLOW_FTP_exists",
+        "type": "firewall_rule",
+        "description": "Firewall rule ALLOW_FTP is configured with permit",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip firewall'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "ALLOW_FTP"
+          }
+        }
+      },
+      {
+        "id": "reach_allowed_by_ALLOW_FTP",
+        "type": "reachability",
+        "description": "Traffic is allowed through firewall",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 2 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "2 packets transmitted"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 8,
+    "description": "Configure firewall rule ALLOW_FTP on 2 nodes"
+  }
+}

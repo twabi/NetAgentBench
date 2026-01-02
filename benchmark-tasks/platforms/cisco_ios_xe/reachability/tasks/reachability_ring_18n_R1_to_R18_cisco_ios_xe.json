@@ -1,0 +1,254 @@
+{
+  "task_id": "reachability_ring_18n_R1_to_R18_cisco_ios_xe",
+  "description": "Ring 18-node topology: R1 to R18 reachability",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R14",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R15",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R16",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R17",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R18",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth2",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth2",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth2",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth2",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth2",
+          "R13:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth2",
+          "R14:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R14:eth2",
+          "R15:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R15:eth2",
+          "R16:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R16:eth2",
+          "R17:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R17:eth2",
+          "R18:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R18:eth2",
+          "R1:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "reachability_R1_to_R18",
+        "type": "reachability",
+        "description": "R1 can reach R18 via ping",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.18.18",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 36,
+    "description": "Configure IP addresses and bring up interfaces on all 18 nodes"
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "task_id": "acl_ring_6n",
+  "description": "Ring 6-node: ACL applied on ring topology",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R1:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_RING_FILTER_exists",
+        "type": "acl_configuration",
+        "description": "ACL RING_FILTER is configured with permit icmp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "RING_FILTER"
+          }
+        }
+      },
+      {
+        "id": "acl_RING_FILTER_permit",
+        "type": "acl_rule",
+        "description": "ACL contains permit rule for icmp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_RING_FILTER_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group RING_FILTER"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 15,
+    "description": "Configure ACL RING_FILTER with permit icmp on 6 nodes"
+  }
+}

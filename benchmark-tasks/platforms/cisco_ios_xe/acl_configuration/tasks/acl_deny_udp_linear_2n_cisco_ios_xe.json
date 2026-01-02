@@ -1,0 +1,84 @@
+{
+  "task_id": "acl_deny_udp_linear_2n_cisco_ios_xe",
+  "description": "Linear 2-node: Deny UDP traffic",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_DENY_UDP_exists",
+        "type": "acl_configuration",
+        "description": "ACL DENY_UDP is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "DENY_UDP"
+          }
+        }
+      },
+      {
+        "id": "acl_DENY_UDP_rule_0",
+        "type": "acl_rule",
+        "description": "ACL DENY_UDP contains rule: deny udp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "deny"
+          }
+        }
+      },
+      {
+        "id": "acl_DENY_UDP_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group DENY_UDP"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 7,
+    "description": "Configure ACL DENY_UDP with deny udp on 2 nodes"
+  }
+}

@@ -21,6 +21,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 from generate_reachability_tasks import generate_reachability_tasks
 from generate_bgp_tasks import generate_bgp_tasks
 from generate_ospf_tasks import generate_ospf_tasks
+from generate_vlan_tasks import generate_vlan_tasks
+from generate_acl_tasks import generate_acl_tasks
+from generate_firewall_tasks import generate_firewall_tasks
+from generate_route_redistribution_tasks import generate_route_redistribution_tasks
+from generate_mixed_platform_tasks import generate_mixed_platform_tasks
 
 
 def save_tasks(tasks: List[Dict[str, Any]], output_dir: Path) -> None:
@@ -73,6 +78,31 @@ def generate_task_index(base_dir: Path, task_counts: Dict[str, int]) -> Dict[str
                 "count": task_counts.get("ospf_configuration", 0),
                 "description": "OSPF protocol configuration, adjacencies, and routing",
                 "tasks_dir": "property_types/ospf_configuration/tasks/"
+            },
+            "vlan_configuration": {
+                "count": task_counts.get("vlan_configuration", 0),
+                "description": "VLAN creation, trunk and access port configuration",
+                "tasks_dir": "property_types/vlan_configuration/tasks/"
+            },
+            "acl_configuration": {
+                "count": task_counts.get("acl_configuration", 0),
+                "description": "ACL/firewall rule configuration for traffic filtering",
+                "tasks_dir": "property_types/acl_configuration/tasks/"
+            },
+            "firewall_rules": {
+                "count": task_counts.get("firewall_rules", 0),
+                "description": "Firewall rules controlling reachability between zones",
+                "tasks_dir": "property_types/firewall_rules/tasks/"
+            },
+            "route_redistribution": {
+                "count": task_counts.get("route_redistribution", 0),
+                "description": "Route redistribution between routing protocols",
+                "tasks_dir": "property_types/route_redistribution/tasks/"
+            },
+            "mixed_platform": {
+                "count": task_counts.get("mixed_platform", 0),
+                "description": "Tasks with multiple platforms (FRR, Nokia, Arista, Cisco)",
+                "tasks_dir": "property_types/mixed_platform/tasks/"
             }
         },
         "topology_patterns": {
@@ -92,7 +122,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate benchmark tasks")
     parser.add_argument(
         "--property-type",
-        choices=["all", "reachability", "bgp_configuration", "ospf_configuration"],
+        choices=["all", "reachability", "bgp_configuration", "ospf_configuration", "vlan_configuration", "acl_configuration", "firewall_rules", "route_redistribution", "mixed_platform"],
         default="all",
         help="Which property type tasks to generate"
     )
@@ -100,6 +130,11 @@ def main() -> None:
         "--output-dir",
         default=str(Path(__file__).parent.parent),
         help="Output directory for generated tasks (default: benchmark-tasks/)"
+    )
+    parser.add_argument(
+        "--platform",
+        default="frr",
+        help="Target platform (default: frr)"
     )
 
     args = parser.parse_args()
@@ -109,6 +144,11 @@ def main() -> None:
         "reachability": generate_reachability_tasks,
         "bgp_configuration": generate_bgp_tasks,
         "ospf_configuration": generate_ospf_tasks,
+        "vlan_configuration": generate_vlan_tasks,
+        "acl_configuration": generate_acl_tasks,
+        "firewall_rules": generate_firewall_tasks,
+        "route_redistribution": generate_route_redistribution_tasks,
+        "mixed_platform": generate_mixed_platform_tasks,
     }
 
     if args.property_type == "all":
@@ -120,11 +160,17 @@ def main() -> None:
     total_generated = 0
 
     for prop_type in property_types:
-        print(f"Generating {prop_type} tasks...")
-        tasks = generators[prop_type]()
+        if prop_type == "mixed_platform":
+            print(f"Generating {prop_type} tasks (ignoring --platform)...")
+            tasks = generators[prop_type]()
+            # Mixed platform tasks go to specific directory
+            output_path = base_dir / "platforms" / "mixed" / prop_type / "tasks"
+        else:
+            print(f"Generating {prop_type} tasks for {args.platform}...")
+            tasks = generators[prop_type](platform=args.platform)
+            # Platform specific tasks go to platforms/<platform>/<property>/tasks
+            output_path = base_dir / "platforms" / args.platform / prop_type / "tasks"
 
-        # Save tasks to files
-        output_path = base_dir / "property_types" / prop_type / "tasks"
         save_tasks(tasks, output_path)
 
         print(f"  Generated {len(tasks)} {prop_type} tasks")

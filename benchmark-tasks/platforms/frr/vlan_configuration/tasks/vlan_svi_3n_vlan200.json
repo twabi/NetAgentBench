@@ -1,0 +1,82 @@
+{
+  "task_id": "vlan_svi_3n_vlan200",
+  "description": "Linear 3-node: Create VLAN 200 SVI with IP",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "vlan_200_exists",
+        "type": "vlan_configuration",
+        "description": "VLAN 200 exists on all nodes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show vlan brief'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "200"
+          }
+        }
+      },
+      {
+        "id": "svi_vlan200",
+        "type": "svi_configuration",
+        "description": "SVI for VLAN 200 has correct IP",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip interface vlan200'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "192.168.200.1"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 9,
+    "description": "Configure VLANs on 3 nodes"
+  }
+}

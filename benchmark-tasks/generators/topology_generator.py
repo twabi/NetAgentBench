@@ -18,19 +18,22 @@ from benchmark.models.task import (
     NodeType,
     Platform,
 )
+from benchmark.platforms import get_platform_image
 
 
 class TopologyGenerator:
     """Generate network topologies based on graph patterns."""
 
-    def __init__(self, base_network: str = "10.0.0.0/8"):
+    def __init__(self, base_network: str = "10.0.0.0/8", default_platform: str = "frr"):
         """
         Initialize TopologyGenerator.
 
         Args:
             base_network: Base network for IP allocation
+            default_platform: Default platform for nodes
         """
         self.base_network = base_network
+        self.default_platform = default_platform
         self.ip_counter = 1
 
     def allocate_ip(self, subnet_offset: int = 0) -> str:
@@ -61,8 +64,8 @@ class TopologyGenerator:
         return Node(
             name=f"R{node_id}",
             type=NodeType.ROUTER,
-            image="alpine:latest",
-            platform=Platform.FRR,
+            image=get_platform_image(self.default_platform),
+            platform=self.default_platform,
         )
 
     def _create_link(self, node1: str, interface1: str, node2: str, interface2: str) -> Link:

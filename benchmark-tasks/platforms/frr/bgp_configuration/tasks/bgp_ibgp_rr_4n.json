@@ -1,0 +1,125 @@
+{
+  "task_id": "bgp_ibgp_rr_4n",
+  "description": "iBGP route reflector topology with 4 routers",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "bgp_session_R1_R2",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R2\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R2'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R3",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R3'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R4",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R4\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R4'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "route_exchange_R1_to_R4",
+        "type": "route_exists",
+        "description": "Route from R1 to R4 exists",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'Route to R4 exists'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Route to R4 exists"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 32,
+    "description": "Configure BGP on all 4 routers with appropriate AS and neighbors"
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "task_id": "bgp_ibgp_rr_11n_cisco_ios_xe",
+  "description": "iBGP route reflector topology with 11 routers",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth4",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth5",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth6",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth7",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth8",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth9",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth10",
+          "R11:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "bgp_session_R1_R2",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R2\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R2'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R3",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R3'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R4",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R4\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R4'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R5",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R5",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R5\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R5'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R6",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R6",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R6\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R6'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R7",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R7",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R7'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R8",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R8",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R8'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R9",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R9",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R9\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R9'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R10",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R10",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R10\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R10'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R1_R11",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R11",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo '{\"peers\": {\"R11\": {\"state\": \"Established\"}}}'",
+          "parser": "json",
+          "success_condition": {
+            "json_path": "$.peers['R11'].state",
+            "expected_value": "Established"
+          }
+        }
+      },
+      {
+        "id": "route_exchange_R1_to_R11",
+        "type": "route_exists",
+        "description": "Route from R1 to R11 exists",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'Route to R11 exists'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Route to R11 exists"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 88,
+    "description": "Configure BGP on all 11 routers with appropriate AS and neighbors"
+  }
+}

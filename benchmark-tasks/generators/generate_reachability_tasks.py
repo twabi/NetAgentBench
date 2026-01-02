@@ -15,7 +15,7 @@ from topology_generator import TopologyGenerator
 from benchmark.models.task import PropertyType
 
 
-def generate_reachability_tasks() -> List[Dict[str, Any]]:
+def generate_reachability_tasks(platform: str = "frr") -> List[Dict[str, Any]]:
     """
     Generate all reachability task variations.
     
@@ -24,7 +24,7 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
     Returns:
         List of task dictionaries (not yet validated as TaskDefinition)
     """
-    generator = TopologyGenerator()
+    generator = TopologyGenerator(default_platform=platform)
     tasks = []
 
     # Linear topologies - expanded range and multiple test pairs
@@ -39,7 +39,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
             source="R1",
             destination=f"R{node_count}",
             dest_ip=f"192.168.{node_count}.{node_count}",
-            description=f"Linear {node_count}-node topology: R1 to R{node_count} reachability"
+            description=f"Linear {node_count}-node topology: R1 to R{node_count} reachability",
+            platform=platform
         )
         tasks.append(task)
         
@@ -52,7 +53,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
                 source=f"R{mid}",
                 destination=f"R{node_count}",
                 dest_ip=f"192.168.{node_count}.{node_count}",
-                description=f"Linear {node_count}-node topology: R{mid} to R{node_count} reachability"
+                description=f"Linear {node_count}-node topology: R{mid} to R{node_count} reachability",
+                platform=platform
             )
             tasks.append(task)
         
@@ -64,7 +66,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
                 source=f"R{node_count}",
                 destination="R1",
                 dest_ip="192.168.1.1",
-                description=f"Linear {node_count}-node topology: R{node_count} to R1 reachability (reverse)"
+                description=f"Linear {node_count}-node topology: R{node_count} to R1 reachability (reverse)",
+                platform=platform
             )
             tasks.append(task)
 
@@ -80,7 +83,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
             source="R1",
             destination=f"R{node_count}",
             dest_ip=f"192.168.1.{node_count}",
-            description=f"Star {node_count}-node topology: Hub R1 to spoke R{node_count} reachability"
+            description=f"Star {node_count}-node topology: Hub R1 to spoke R{node_count} reachability",
+            platform=platform
         )
         tasks.append(task)
         
@@ -92,7 +96,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
                 source="R2",
                 destination="R3",
                 dest_ip="192.168.2.3",
-                description=f"Star {node_count}-node topology: Spoke R2 to spoke R3 reachability"
+                description=f"Star {node_count}-node topology: Spoke R2 to spoke R3 reachability",
+                platform=platform
             )
             tasks.append(task)
 
@@ -108,7 +113,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
             source="R1",
             destination=f"R{node_count}",
             dest_ip=f"192.168.{node_count}.{node_count}",
-            description=f"Ring {node_count}-node topology: R1 to R{node_count} reachability"
+            description=f"Ring {node_count}-node topology: R1 to R{node_count} reachability",
+            platform=platform
         )
         tasks.append(task)
         
@@ -121,7 +127,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
                 source="R1",
                 destination=f"R{mid}",
                 dest_ip=f"192.168.{mid}.{mid}",
-                description=f"Ring {node_count}-node topology: R1 to R{mid} reachability (halfway)"
+                description=f"Ring {node_count}-node topology: R1 to R{mid} reachability (halfway)",
+                platform=platform
             )
             tasks.append(task)
 
@@ -137,7 +144,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
             source="R1",
             destination=f"R{node_count}",
             dest_ip=f"192.168.1.{node_count}",
-            description=f"Mesh {node_count}-node topology: R1 to R{node_count} reachability"
+            description=f"Mesh {node_count}-node topology: R1 to R{node_count} reachability",
+            platform=platform
         )
         tasks.append(task)
         
@@ -149,7 +157,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
                 source="R2",
                 destination=f"R{node_count-1}",
                 dest_ip=f"192.168.2.{node_count-1}",
-                description=f"Mesh {node_count}-node topology: R2 to R{node_count-1} reachability"
+                description=f"Mesh {node_count}-node topology: R2 to R{node_count-1} reachability",
+                platform=platform
             )
             tasks.append(task)
 
@@ -166,7 +175,8 @@ def generate_reachability_tasks() -> List[Dict[str, Any]]:
                 source="R1",
                 destination=f"R{node_count}",
                 dest_ip=f"192.168.1.{node_count}",
-                description=f"Tree depth {depth} branch {branch}: R1 to R{node_count} reachability"
+                description=f"Tree depth {depth} branch {branch}: R1 to R{node_count} reachability",
+                platform=platform
             )
             tasks.append(task)
 
@@ -179,7 +189,8 @@ def create_reachability_task(
     source: str,
     destination: str,
     dest_ip: str,
-    description: str
+    description: str,
+    platform: str = "frr"
 ) -> Dict[str, Any]:
     """
     Create a reachability task.
@@ -195,6 +206,9 @@ def create_reachability_task(
     Returns:
         Task dictionary
     """
+    if platform != "frr":
+        task_id = f"{task_id}_{platform}"
+
     # Convert topology to dict
     topo_dict = {
         "nodes": [
@@ -232,7 +246,7 @@ def create_reachability_task(
     task = {
         "task_id": task_id,
         "description": description,
-        "platform": "frr",
+        "platform": platform,
         "topology": topo_dict,
         "intent": {
             "properties": [property_def]

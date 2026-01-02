@@ -1,0 +1,540 @@
+{
+  "task_id": "acl_tree_d3_b3",
+  "description": "Tree d3b3 (40 nodes): ACL at root",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R14",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R15",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R16",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R17",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R18",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R19",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R20",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R21",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R22",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R23",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R24",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R25",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R26",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R27",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R28",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R29",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R30",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R31",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R32",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R33",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R34",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R35",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R36",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R37",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R38",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R39",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R40",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth1",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth3",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth1",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth1",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth3",
+          "R13:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth1",
+          "R14:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R15:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth3",
+          "R16:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth1",
+          "R17:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R18:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth3",
+          "R19:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth1",
+          "R20:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth2",
+          "R21:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth3",
+          "R22:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth1",
+          "R23:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth2",
+          "R24:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth3",
+          "R25:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth1",
+          "R26:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth2",
+          "R27:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth3",
+          "R28:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth1",
+          "R29:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth2",
+          "R30:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth3",
+          "R31:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth1",
+          "R32:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth2",
+          "R33:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth3",
+          "R34:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth1",
+          "R35:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth2",
+          "R36:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth3",
+          "R37:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth1",
+          "R38:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth2",
+          "R39:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth3",
+          "R40:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_TREE_FILTER_exists",
+        "type": "acl_configuration",
+        "description": "ACL TREE_FILTER is configured with permit tcp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "TREE_FILTER"
+          }
+        }
+      },
+      {
+        "id": "acl_TREE_FILTER_permit",
+        "type": "acl_rule",
+        "description": "ACL contains permit rule for tcp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_TREE_FILTER_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group TREE_FILTER"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 83,
+    "description": "Configure ACL TREE_FILTER with permit tcp on 40 nodes"
+  }
+}

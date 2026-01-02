@@ -29,6 +29,12 @@ python-dotenv = "^1.0.0"
 click = "^8.1.0"
 scipy = "^1.11.0"
 matplotlib = "^3.10.7"
+psutil = "^7.2.1"
+# MCP server dependencies
+mcp = "^1.0.0"
+fastapi = "^0.115.0"
+uvicorn = "^0.30.0"
+starlette = "^0.40.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

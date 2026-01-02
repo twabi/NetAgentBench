@@ -1,0 +1,70 @@
+{
+  "task_id": "vlan_svi_2n_vlan20",
+  "description": "Linear 2-node: Create VLAN 20 SVI with IP",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "vlan_20_exists",
+        "type": "vlan_configuration",
+        "description": "VLAN 20 exists on all nodes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show vlan brief'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "20"
+          }
+        }
+      },
+      {
+        "id": "svi_vlan20",
+        "type": "svi_configuration",
+        "description": "SVI for VLAN 20 has correct IP",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip interface vlan20'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "192.168.20.1"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 6,
+    "description": "Configure VLANs on 2 nodes"
+  }
+}

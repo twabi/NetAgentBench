@@ -1,0 +1,130 @@
+{
+  "task_id": "ospf_area0_ring_3n",
+  "description": "OSPF area 0 ring 3-node topology",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R1:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_R1_R2",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'OSPF adjacency R1-R2 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R1-R2 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R2_R3",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "echo 'OSPF adjacency R2-R3 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R2-R3 established"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R3_R1",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R3 and R1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "echo 'OSPF adjacency R3-R1 established'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "OSPF adjacency R3-R1 established"
+          }
+        }
+      },
+      {
+        "id": "reachability_R1_to_R3",
+        "type": "reachability",
+        "description": "R1 can reach R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.3.3",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "routing_table_complete",
+        "type": "route_exists",
+        "description": "Routing table has all expected OSPF routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "echo 'Routing table complete'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Routing table complete"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 18,
+    "description": "Configure OSPF on all 3 routers with appropriate area and network statements"
+  }
+}

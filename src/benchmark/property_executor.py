@@ -55,6 +55,7 @@ class PropertyExecutor:
         property_type: str,
         submission_generator: Callable[[TaskDefinition], Submission],
         limit: Optional[int] = None,
+        platform: Optional[str] = None,
     ) -> PropertyExecutionResult:
         """
         Run all tasks for a specific property type.
@@ -63,16 +64,18 @@ class PropertyExecutor:
             property_type: Property type identifier (e.g., "reachability")
             submission_generator: Function that generates a submission for each task
             limit: Optional limit on number of tasks (None = all tasks)
+            platform: Optional platform filter (frr, cisco_ios_xe, nokia_srl)
         
         Returns:
             PropertyExecutionResult with all individual results and aggregates
         """
+        platform_str = f" for {platform}" if platform else ""
         logger.info(
-            f"Running tasks for property type: {property_type} (limit={limit})"
+            f"Running tasks for property type: {property_type}{platform_str} (limit={limit})"
         )
 
         # Load tasks from repository
-        tasks = self.repository.load_tasks_by_property(property_type, limit=limit)
+        tasks = self.repository.load_tasks_by_property(property_type, limit=limit, platform=platform)
         logger.info(f"Loaded {len(tasks)} tasks for property type: {property_type}")
 
         if not tasks:

@@ -121,7 +121,7 @@ class TestPropertyExecutor:
         assert len(prop_result.results) == 1
         assert prop_result.average_score == 0.85
         mock_repository.load_tasks_by_property.assert_called_once_with(
-            "reachability", limit=None
+            "reachability", limit=None, platform=None
         )
         mock_controller.run.assert_called_once()
 
@@ -199,7 +199,7 @@ class TestPropertyExecutor:
 
         # Verify limit was passed to repository
         mock_repository.load_tasks_by_property.assert_called_once_with(
-            "ospf_configuration", limit=2
+            "ospf_configuration", limit=2, platform=None
         )
         assert prop_result.total_tasks == 2
 
@@ -386,7 +386,7 @@ class TestPropertyExecutorRunAll:
         mock_repository = Mock()
 
         # Setup repository to return different tasks for each property
-        def load_tasks_side_effect(property_type, limit=None):
+        def load_tasks_side_effect(property_type, limit=None, platform=None):
             if property_type == "reachability":
                 return [
                     self.create_mock_task("reach_1"),
@@ -460,7 +460,7 @@ class TestPropertyExecutorRunAll:
         mock_repository = Mock()
 
         # Return limited tasks
-        def load_tasks_side_effect(property_type, limit=None):
+        def load_tasks_side_effect(property_type, limit=None, platform=None):
             if property_type == "reachability":
                 return [self.create_mock_task("reach_1")]
             elif property_type == "bgp_configuration":

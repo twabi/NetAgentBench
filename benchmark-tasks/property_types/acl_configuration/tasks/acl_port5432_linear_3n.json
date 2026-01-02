@@ -1,0 +1,96 @@
+{
+  "task_id": "acl_port5432_linear_3n",
+  "description": "Linear 3-node: Permit TCP port 5432",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_PERMIT_PORT5432_exists",
+        "type": "acl_configuration",
+        "description": "ACL PERMIT_PORT5432 is configured with permit tcp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "PERMIT_PORT5432"
+          }
+        }
+      },
+      {
+        "id": "acl_PERMIT_PORT5432_permit",
+        "type": "acl_rule",
+        "description": "ACL contains permit rule for tcp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_PERMIT_PORT5432_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group PERMIT_PORT5432"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 9,
+    "description": "Configure ACL PERMIT_PORT5432 with permit tcp on 3 nodes"
+  }
+}

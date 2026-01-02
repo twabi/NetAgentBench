@@ -25,6 +25,11 @@ class Platform(str, Enum):
     CISCO_IOS = "cisco_ios"
     JUNIPER_JUNOS = "juniper_junos"
     VYOS = "vyos"
+    
+    # Added for Phase 2
+    NOKIA_SRL = "nokia_srl"
+    ARISTA_EOS = "arista_eos"
+    CISCO_IOS_XE = "cisco_ios_xe"
 
     # Richer platform options (commented out for future use)
     # # Open Source
@@ -98,6 +103,23 @@ class PropertyType(str, Enum):
     ROUTE_EXISTS = "route_exists"
     OSPF_CONFIGURATION = "ospf_configuration"
     INTERFACE_UP = "interface_up"
+    
+    # Layer 2 Configuration
+    VLAN_CONFIGURATION = "vlan_configuration"
+    TRUNK_CONFIGURATION = "trunk_configuration"
+    SVI_CONFIGURATION = "svi_configuration"
+    
+    # Security
+    ACL_CONFIGURATION = "acl_configuration"
+    ACL_RULE = "acl_rule"
+    ACL_INTERFACE_BINDING = "acl_interface_binding"
+    
+    # Firewall
+    FIREWALL_RULE = "firewall_rule"
+    FIREWALL_BLOCK = "firewall_block"
+    
+    # Route Redistribution
+    ROUTE_REDISTRIBUTION = "route_redistribution"
 
     # Richer property type options (commented out for future use)
     # # Basic Connectivity
@@ -357,6 +379,9 @@ class TaskDefinition(BaseModel):
     task_id: str = Field(..., description="Unique task identifier")
     description: str = Field(..., description="Task description")
     platform: Platform = Field(..., description="Target platform D")
+    mixed_platforms: Optional[List[Platform]] = Field(
+        None, description="List of platforms used in mixed-platform tasks"
+    )
     topology: TopologySpecification = Field(..., description="Network topology T")
     intent: IntentSpecification = Field(..., description="Intent specification P")
     convergence: ConvergenceConfig = Field(

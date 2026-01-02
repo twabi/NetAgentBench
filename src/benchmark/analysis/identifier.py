@@ -14,6 +14,11 @@ VALID_PROPERTY_TYPES = [
     "reachability",
     "bgp_configuration",
     "ospf_configuration",
+    "vlan_configuration",
+    "acl_configuration",
+    "firewall_rules",
+    "route_redistribution",
+    "mixed_platform",
 ]
 
 

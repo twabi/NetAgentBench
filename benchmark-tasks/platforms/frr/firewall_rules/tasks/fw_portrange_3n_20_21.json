@@ -1,0 +1,82 @@
+{
+  "task_id": "fw_portrange_3n_20_21",
+  "description": "Linear 3-node: Allow port range 20-21",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "fw_PORTS_20_21_exists",
+        "type": "firewall_rule",
+        "description": "Firewall rule PORTS_20_21 is configured with permit",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip firewall'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "PORTS_20_21"
+          }
+        }
+      },
+      {
+        "id": "reach_allowed_by_PORTS_20_21",
+        "type": "reachability",
+        "description": "Traffic is allowed through firewall",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 2 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "2 packets transmitted"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 10,
+    "description": "Configure firewall rule PORTS_20_21 on 3 nodes"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "generated": "2025-11-20T20:46:13.759569Z",
-  "total_tasks": 316,
+  "generated": "2025-12-30T01:17:07.562406Z",
+  "total_tasks": 829,
   "property_types": {
     "reachability": {
       "count": 116,
@@ -17,6 +17,31 @@
       "count": 100,
       "description": "OSPF protocol configuration, adjacencies, and routing",
       "tasks_dir": "property_types/ospf_configuration/tasks/"
+    },
+    "vlan_configuration": {
+      "count": 101,
+      "description": "VLAN creation, trunk and access port configuration",
+      "tasks_dir": "property_types/vlan_configuration/tasks/"
+    },
+    "acl_configuration": {
+      "count": 113,
+      "description": "ACL/firewall rule configuration for traffic filtering",
+      "tasks_dir": "property_types/acl_configuration/tasks/"
+    },
+    "firewall_rules": {
+      "count": 101,
+      "description": "Firewall rules controlling reachability between zones",
+      "tasks_dir": "property_types/firewall_rules/tasks/"
+    },
+    "route_redistribution": {
+      "count": 100,
+      "description": "Route redistribution between routing protocols",
+      "tasks_dir": "property_types/route_redistribution/tasks/"
+    },
+    "mixed_platform": {
+      "count": 98,
+      "description": "Tasks with multiple platforms (FRR, Nokia, Arista, Cisco)",
+      "tasks_dir": "property_types/mixed_platform/tasks/"
     }
   },
   "topology_patterns": {

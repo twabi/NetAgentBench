@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from topology_generator import TopologyGenerator
 
 
-def generate_bgp_tasks() -> List[Dict[str, Any]]:
+def generate_bgp_tasks(platform: str = "frr") -> List[Dict[str, Any]]:
     """
     Generate all BGP configuration task variations.
     
@@ -22,7 +22,7 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
     Returns:
         List of task dictionaries
     """
-    generator = TopologyGenerator()
+    generator = TopologyGenerator(default_platform=platform)
     tasks = []
 
     # eBGP linear topologies (different AS per node) - expanded
@@ -35,7 +35,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ebgp_linear_{node_count}as",
             description=f"eBGP linear {node_count}-AS topology - establish sessions",
             scenario_type="ebgp_linear",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -49,7 +50,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ibgp_rr_{node_count}n",
             description=f"iBGP route reflector topology with {node_count} routers",
             scenario_type="ibgp_rr",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -63,7 +65,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ebgp_mesh_{node_count}as",
             description=f"eBGP full mesh {node_count}-AS topology",
             scenario_type="ebgp_mesh",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -77,7 +80,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ibgp_mesh_{node_count}n",
             description=f"iBGP full mesh {node_count} routers in single AS",
             scenario_type="ibgp_mesh",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -91,7 +95,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ebgp_ring_{node_count}as",
             description=f"eBGP ring {node_count}-AS topology",
             scenario_type="ebgp_ring",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -105,7 +110,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ibgp_ring_{node_count}n",
             description=f"iBGP ring {node_count}-router topology in single AS",
             scenario_type="ibgp_ring",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -122,7 +128,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
                 task_id=f"bgp_ebgp_tree_d{depth}_b{branch}",
                 description=f"eBGP tree topology depth {depth} branch {branch}",
                 scenario_type="ebgp_tree",
-                node_count=node_count
+                node_count=node_count,
+                platform=platform
             )
             tasks.append(task)
             
@@ -132,7 +139,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
                 task_id=f"bgp_ibgp_tree_d{depth}_b{branch}",
                 description=f"iBGP tree topology depth {depth} branch {branch}",
                 scenario_type="ibgp_tree",
-                node_count=node_count
+                node_count=node_count,
+                platform=platform
             )
             tasks.append(task)
 
@@ -148,7 +156,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
                 task_id=f"bgp_mixed_tree_d{depth}_b{branch}",
                 description=f"Mixed eBGP/iBGP tree depth {depth} branch {branch}",
                 scenario_type="mixed",
-                node_count=node_count
+                node_count=node_count,
+                platform=platform
             )
             tasks.append(task)
 
@@ -162,7 +171,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ebgp_linear_{node_count}as",
             description=f"eBGP linear {node_count}-AS topology - large scale",
             scenario_type="ebgp_linear",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -176,7 +186,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ibgp_rr_{node_count}n",
             description=f"iBGP RR topology {node_count} routers - large scale",
             scenario_type="ibgp_rr",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -190,7 +201,8 @@ def generate_bgp_tasks() -> List[Dict[str, Any]]:
             task_id=f"bgp_ebgp_ring_{node_count}as",
             description=f"eBGP ring {node_count}-AS topology - large scale",
             scenario_type="ebgp_ring",
-            node_count=node_count
+            node_count=node_count,
+            platform=platform
         )
         tasks.append(task)
 
@@ -202,7 +214,8 @@ def create_bgp_task(
     task_id: str,
     description: str,
     scenario_type: str,
-    node_count: int
+    node_count: int,
+    platform: str = "frr"
 ) -> Dict[str, Any]:
     """
     Create a BGP configuration task.
@@ -213,10 +226,14 @@ def create_bgp_task(
         description: Task description
         scenario_type: Type of BGP scenario
         node_count: Number of nodes
+        platform: Platform type
 
     Returns:
         Task dictionary
     """
+    if platform != "frr":
+        task_id = f"{task_id}_{platform}"
+    
     # Convert topology to dict
     topo_dict = {
         "nodes": [
@@ -284,7 +301,7 @@ def create_bgp_task(
     task = {
         "task_id": task_id,
         "description": description,
-        "platform": "frr",
+        "platform": platform,
         "topology": topo_dict,
         "intent": {
             "properties": properties
