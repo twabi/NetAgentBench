@@ -1,0 +1,81 @@
+{
+  "task_id": "multiturn_test_simple",
+  "description": "Simple 2-node multi-turn test: configure IP addresses and verify reachability",
+  "platform": "frr",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": ["R1:eth1", "R2:eth1"]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "interface_r1_eth1_up",
+        "type": "interface_up",
+        "description": "R1 eth1 interface is up with IP configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ip addr show eth1",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10.0.0.1"
+          }
+        }
+      },
+      {
+        "id": "interface_r2_eth1_up",
+        "type": "interface_up",
+        "description": "R2 eth1 interface is up with IP configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "ip addr show eth1",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10.0.0.2"
+          }
+        }
+      },
+      {
+        "id": "reachability_r1_to_r2",
+        "type": "reachability",
+        "description": "R1 can ping R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 2 -W 1 10.0.0.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "2 packets transmitted, 2 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 4,
+    "description": "Configure IP 10.0.0.1/24 on R1 eth1, IP 10.0.0.2/24 on R2 eth1"
+  }
+}

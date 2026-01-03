@@ -287,6 +287,8 @@ class InteractiveSession:
 
         # Log command to history
         self._context.executed_commands.append((node, command, command_type))
+        # Track execution result for syntactic validity scoring
+        self._context.execution_results.append((node, command, success))
 
         # Increment turn counter for CONFIG commands only
         if command_type == CommandType.CONFIG:
@@ -397,6 +399,21 @@ class InteractiveSession:
             raise SessionNotActiveError("No session has been started")
 
         return self._context.get_approach()
+
+    def get_execution_log(self) -> List[Tuple[str, str, bool]]:
+        """
+        Get the execution log with success/failure for each command.
+
+        Returns:
+            List of (node, command, success) tuples
+
+        Raises:
+            SessionNotActiveError: If no session has been started
+        """
+        if self._context is None:
+            raise SessionNotActiveError("No session has been started")
+
+        return self._context.execution_results
 
     def teardown(self) -> bool:
         """

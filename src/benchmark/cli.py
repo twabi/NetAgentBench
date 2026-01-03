@@ -274,6 +274,115 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
         sys.exit(1)
 
 
+@main.command()
+@click.argument("task_file", type=click.Path(exists=True))
+@click.option("--dagent-endpoint", default=None, help="Dagent HTTP endpoint to trigger (e.g., http://localhost:8000)")
+@click.option("--turn-limit", type=int, default=50, help="Max config commands (default: 50)")
+@click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds (default: 600)")
+@click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
+@click.option("--wait-for-submit", is_flag=True, help="Wait for agent to call submit (manual mode)")
+def run_task(task_file, dagent_endpoint, turn_limit, time_limit, output_dir, wait_for_submit):
+    """
+    Run a single task file in multi-turn interactive mode.
+    
+    This command provisions the lab, starts an MCP server, and runs
+    the interactive benchmark controller for a specific task.
+    
+    Examples:
+    
+        \\b
+        # Run with dagent (triggers dagent automatically)
+        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000
+        
+        \\b
+        # Run with custom limits
+        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000 --turn-limit 20 --time-limit 120
+        
+        \\b
+        # Wait for external agent (manual mode)
+        benchmark run-task tasks/multiturn_test_simple.json --wait-for-submit
+    """
+    try:
+        from benchmark.interactive_controller import InteractiveBenchmarkController
+        from benchmark.storage import ResultsStorage
+        import asyncio
+
+        # Load task
+        with open(task_file, "r") as f:
+            task_data = json.load(f)
+        task = TaskDefinition(**task_data)
+
+        testee_id = "manual_agent"
+        if dagent_endpoint:
+            testee_id = f"dagent_{dagent_endpoint.replace('http://', '').replace(':', '_')}"
+
+        click.echo(f"\n{'='*80}")
+        click.echo(f"Multi-Turn Task: {task.task_id}")
+        click.echo(f"{'='*80}")
+        click.echo(f"Description: {task.description}")
+        click.echo(f"Nodes: {len(task.topology.nodes)}")
+        click.echo(f"Properties: {len(task.intent.properties)}")
+        click.echo(f"Turn Limit: {turn_limit}")
+        click.echo(f"Time Limit: {time_limit}s")
+        if dagent_endpoint:
+            click.echo(f"Dagent Endpoint: {dagent_endpoint}")
+        else:
+            click.echo(f"Wait for Submit: {wait_for_submit}")
+        click.echo(f"{'='*80}\n")
+
+        controller = InteractiveBenchmarkController()
+        storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+
+        # Run async controller
+        async def run():
+            return controller.run_interactive(
+                task=task,
+                testee_id=testee_id,
+                testee_type="dagent" if dagent_endpoint else "manual",
+                turn_limit=turn_limit,
+                time_limit=time_limit,
+                wait_for_submit=wait_for_submit,
+                dagent_endpoint=dagent_endpoint,
+            )
+        
+        result = asyncio.run(run())
+
+        storage.save_result(result)
+
+        # Auto-update leaderboards if they exist
+        try:
+            manager = storage.get_leaderboard_manager()
+            if manager.list_leaderboard_ids():
+                updated = manager.add_single_result(result)
+                manager.save_leaderboards()
+                if updated:
+                    click.echo(f"\nUpdated {len(updated)} leaderboards")
+        except Exception as lb_err:
+            logger.debug(f"Leaderboard update skipped: {lb_err}")
+
+        # Display summary
+        click.echo(f"\n{'='*80}")
+        click.echo("Multi-Turn Result")
+        click.echo(f"{'='*80}")
+        click.echo(f"Task: {result.task_id}")
+        click.echo(f"Success: {result.success}")
+        click.echo(f"Final Score: {result.scoring.final_score:.3f}")
+        click.echo(f"Run ID: {result.run_id}")
+        click.echo(f"Provision Time: {result.metrics.infrastructure_provision_time:.2f}s")
+        click.echo(f"Total Time: {result.metrics.total_time:.2f}s")
+        click.echo(f"\nResults saved to: {storage.base_dir / 'runs' / result.run_id}.json")
+
+        if not result.success:
+            sys.exit(1)
+
+    except Exception as e:
+        logger.error(f"Multi-turn benchmark failed: {e}")
+        click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
 # ============================================================================
 # Property-Based Execution Commands
 # ============================================================================
@@ -287,7 +396,10 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @click.option("--platform", type=click.Choice(TaskRepository.VALID_PLATFORMS, case_sensitive=False), help="Filter by platform")
 @click.option("--limit", type=int, help="Limit number of tasks to run")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
-def run_llm(property_type, provider, model, base_url, platform, limit, output_dir):
+@click.option("--mode", type=click.Choice(["single", "multi"]), default="single", help="Benchmark mode: single (default) or multi-turn")
+@click.option("--turn-limit", type=int, default=50, help="Max config commands for multi-turn mode (default: 50)")
+@click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds for multi-turn mode (default: 600)")
+def run_llm(property_type, provider, model, base_url, platform, limit, output_dir, mode, turn_limit, time_limit):
     """
     Run all tasks for a property type using an LLM testee.
     
@@ -295,15 +407,19 @@ def run_llm(property_type, provider, model, base_url, platform, limit, output_di
     
     Examples:
     
-        \b
-        # Run reachability tasks with OpenAI (default model)
+        \\b
+        # Run reachability tasks with OpenAI (default model, single-turn)
         benchmark run-llm reachability --provider openai
         
-        \b
+        \\b
         # Run 3 BGP tasks with specific Gemini model
         benchmark run-llm bgp_configuration --provider gemini --model gemini-2.5-pro --limit 3
         
-        \b
+        \\b
+        # Run with multi-turn mode (interactive session)
+        benchmark run-llm reachability --provider openai --mode multi --turn-limit 30
+        
+        \\b
         # Run with Ollama on custom host
         benchmark run-llm reachability --provider ollama --base-url http://myserver:11434
     """
@@ -378,15 +494,22 @@ def run_llm(property_type, provider, model, base_url, platform, limit, output_di
         testee = LLMTestee(provider=provider_instance, testee_id=f"llm_{provider}_{model}")
 
         click.echo(f"Using LLM: {provider} ({model})")
+        click.echo(f"Mode: {mode}-turn" + (f" (turn_limit={turn_limit}, time_limit={time_limit}s)" if mode == "multi" else ""))
 
-        # Run property tasks
-        _run_property_execution(
-            property_type=property_type,
-            testee=testee,
-            limit=limit,
-            platform=platform,
-            output_dir=output_dir,
-        )
+        if mode == "multi":
+            # Multi-turn interactive mode
+            click.echo("Multi-turn mode not yet implemented for LLM testees.")
+            click.echo("Use run-dagent for multi-turn interactive sessions.")
+            sys.exit(1)
+        else:
+            # Single-turn mode (existing behavior)
+            _run_property_execution(
+                property_type=property_type,
+                testee=testee,
+                limit=limit,
+                platform=platform,
+                output_dir=output_dir,
+            )
 
     except ImportError as e:
         click.echo(f"Error: LLM components not available: {e}", err=True)
@@ -406,7 +529,10 @@ def run_llm(property_type, provider, model, base_url, platform, limit, output_di
 @click.option("--platform", type=click.Choice(TaskRepository.VALID_PLATFORMS, case_sensitive=False), help="Filter by platform")
 @click.option("--limit", type=int, help="Limit number of tasks to run")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
-def run_dagent(property_type, endpoint, platform, limit, output_dir):
+@click.option("--mode", type=click.Choice(["single", "multi"]), default="single", help="Benchmark mode: single (default) or multi-turn")
+@click.option("--turn-limit", type=int, default=50, help="Max config commands for multi-turn mode (default: 50)")
+@click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds for multi-turn mode (default: 600)")
+def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit):
     """
     Run all tasks for a property type using dagent multi-agent system.
     
@@ -418,7 +544,7 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir):
     Examples:
     
         \\b
-        # Run reachability tasks with dagent (default localhost)
+        # Run reachability tasks with dagent (default localhost, single-turn)
         benchmark run-dagent reachability
         
         \\b
@@ -426,30 +552,81 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir):
         benchmark run-dagent bgp_configuration --endpoint http://myserver:8000 --limit 5
         
         \\b
+        # Run with multi-turn interactive mode
+        benchmark run-dagent reachability --mode multi --turn-limit 30 --time-limit 300
+        
+        \\b
         # Run on specific platform
         benchmark run-dagent ospf_configuration --platform cisco_ios_xe --limit 10
     """
     try:
-        # Import dagent adapter
-        from benchmark.testee.dagent_adapter import DagentAdapter
-
-        testee = DagentAdapter(
-            endpoint=endpoint,
-            testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}",
-        )
-
         click.echo(f"Using dagent at: {endpoint}")
+        click.echo(f"Mode: {mode}-turn" + (f" (turn_limit={turn_limit}, time_limit={time_limit}s)" if mode == "multi" else ""))
 
-        _run_property_execution(
-            property_type=property_type,
-            testee=testee,
-            limit=limit,
-            platform=platform,
-            output_dir=output_dir,
-        )
+        if mode == "multi":
+            # Multi-turn interactive mode using InteractiveBenchmarkController
+            from benchmark.interactive_controller import InteractiveBenchmarkController
+            from benchmark.task_repository import TaskRepository
+            from benchmark.storage import ResultsStorage
+            
+            repo = TaskRepository()
+            tasks = repo.load_tasks_by_property(property_type, platform=platform)
+            if limit:
+                tasks = tasks[:limit]
+            
+            if not tasks:
+                click.echo("No tasks found for the specified criteria.")
+                return
+            
+            controller = InteractiveBenchmarkController()
+            storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+            
+            click.echo(f"\nRunning {len(tasks)} tasks in multi-turn mode")
+            click.echo(f"{'='*80}\n")
+            
+            results = []
+            for task in tasks:
+                click.echo(f"Task: {task.task_id}")
+                result = controller.run_interactive(
+                    task=task,
+                    testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}",
+                    testee_type="dagent",
+                    turn_limit=turn_limit,
+                    time_limit=time_limit,
+                    wait_for_submit=False,  # Don't wait for interactive submission
+                )
+                storage.save_result(result)
+                results.append(result)
+                click.echo(f"  Score: {result.scoring.final_score:.3f} | Success: {result.success}")
+            
+            # Summary
+            avg_score = sum(r.scoring.final_score for r in results) / len(results) if results else 0
+            successes = sum(1 for r in results if r.success)
+            click.echo(f"\n{'='*80}")
+            click.echo(f"Multi-turn Execution Complete: {property_type}")
+            click.echo(f"{'='*80}")
+            click.echo(f"Total Tasks: {len(results)}")
+            click.echo(f"Successful: {successes}/{len(results)}")
+            click.echo(f"Average Score: {avg_score:.3f}")
+        else:
+            # Single-turn mode (existing behavior)
+            from benchmark.testee.dagent_adapter import DagentAdapter
+
+            testee = DagentAdapter(
+                endpoint=endpoint,
+                testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}",
+            )
+
+            _run_property_execution(
+                property_type=property_type,
+                testee=testee,
+                limit=limit,
+                platform=platform,
+                output_dir=output_dir,
+            )
 
     except ImportError as e:
-        click.echo(f"Error: Dagent adapter not available: {e}", err=True)
+        click.echo(f"Error: Required components not available: {e}", err=True)
         sys.exit(1)
     except ConnectionError as e:
         click.echo(f"Error: Could not connect to dagent: {e}", err=True)
@@ -672,6 +849,248 @@ def run_all(provider, model, base_url, testee_type, limit, output_dir):
         click.echo(f"Error: {e}", err=True)
         import traceback
         traceback.print_exc()
+        sys.exit(1)
+
+
+# ============================================================================
+# Leaderboard Commands
+# ============================================================================
+
+
+@main.group()
+def leaderboard():
+    """Manage benchmark leaderboards."""
+    pass
+
+
+@leaderboard.command()
+@click.option("--output-dir", type=click.Path(), default=None, help="Custom output directory for results")
+def init(output_dir):
+    """Initialize standard leaderboards.
+    
+    Creates 14 standard leaderboards for tracking testee performance:
+    - Overall (single-turn, multi-turn)
+    - Per-metric (completeness, robustness, syntactic_validity × modes)
+    - Per-property (reachability, BGP, OSPF × modes)
+    """
+    try:
+        from benchmark.analysis.leaderboard import LeaderboardManager
+        
+        storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+        manager = storage.get_leaderboard_manager()
+        
+        if manager.list_leaderboard_ids():
+            click.echo("Leaderboards already exist. Use other commands to manage them.")
+            click.echo(f"Loaded {len(manager.list_leaderboard_ids())} existing leaderboards.")
+            return
+        
+        manager.initialize_leaderboards()
+        manager.save_leaderboards()
+        
+        click.echo(f"Initialized {len(manager.list_leaderboard_ids())} standard leaderboards.")
+        click.echo(f"Saved to: {storage.leaderboards_path}")
+        
+    except Exception as e:
+        logger.error(f"Failed to initialize leaderboards: {e}")
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@leaderboard.command("list")
+@click.option("--output-dir", type=click.Path(), default=None, help="Custom output directory for results")
+def list_leaderboards(output_dir):
+    """List all available leaderboards."""
+    try:
+        storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+        manager = storage.get_leaderboard_manager()
+        
+        ids = manager.list_leaderboard_ids()
+        
+        if not ids:
+            click.echo("No leaderboards found. Run 'benchmark leaderboard init' first.")
+            return
+        
+        click.echo(f"Available leaderboards ({len(ids)}):")
+        for lb_id in sorted(ids):
+            lb = manager.get_leaderboard(lb_id)
+            entry_count = len(lb.entries) if lb else 0
+            click.echo(f"  {lb_id}: {entry_count} entries")
+            
+    except Exception as e:
+        logger.error(f"Failed to list leaderboards: {e}")
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@leaderboard.command()
+@click.argument("leaderboard_id")
+@click.option("--limit", type=int, default=10, help="Number of entries to show (default: 10)")
+@click.option("--output-dir", type=click.Path(), default=None, help="Custom output directory for results")
+def show(leaderboard_id, limit, output_dir):
+    """Display a leaderboard's top entries.
+    
+    LEADERBOARD_ID: The leaderboard to display (e.g., 'overall_single_turn')
+    """
+    try:
+        storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+        manager = storage.get_leaderboard_manager()
+        
+        lb = manager.get_leaderboard(leaderboard_id)
+        
+        if not lb:
+            click.echo(f"Leaderboard not found: {leaderboard_id}", err=True)
+            click.echo("Run 'benchmark leaderboard list' to see available leaderboards.")
+            sys.exit(1)
+        
+        click.echo(f"\n{'='*70}")
+        click.echo(f"{lb.name}")
+        click.echo(f"{'='*70}")
+        click.echo(f"Mode: {lb.evaluation_mode} | Metric: {lb.metric_name}")
+        if lb.property_type:
+            click.echo(f"Property: {lb.property_type}")
+        click.echo(f"Last Updated: {lb.last_updated.strftime('%Y-%m-%d %H:%M:%S')}")
+        click.echo(f"{'='*70}\n")
+        
+        entries = lb.get_top_n(limit)
+        
+        if not entries:
+            click.echo("No entries yet.")
+            return
+        
+        # Header
+        click.echo(f"{'Rank':<5}{'Testee':<20}{'Model':<18}{'Score':<8}{'Tasks':<6}{'Run ID':<20}")
+        click.echo("-" * 77)
+        
+        # Entries
+        for rank, entry in enumerate(entries, 1):
+            testee = entry.testee_id
+            if len(testee) > 19:
+                testee = testee[:16] + "..."
+            
+            model = entry.model_version or "-"
+            if len(model) > 17:
+                model = model[:14] + "..."
+            
+            run_id = entry.run_id
+            if len(run_id) > 19:
+                run_id = run_id[:16] + "..."
+            
+            click.echo(f"{rank:<5}{testee:<20}{model:<18}{entry.score:<8.3f}{entry.num_tasks:<6}{run_id:<20}")
+            
+    except Exception as e:
+        logger.error(f"Failed to show leaderboard: {e}")
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@leaderboard.command()
+@click.option("--run-id", required=True, help="Benchmark run ID to add")
+@click.option("--output-dir", type=click.Path(), default=None, help="Custom output directory for results")
+def update(run_id, output_dir):
+    """Add a benchmark run to appropriate leaderboards.
+    
+    Updates leaderboards based on the run's evaluation mode and property types.
+    """
+    try:
+        storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+        manager = storage.get_leaderboard_manager()
+        
+        if not manager.list_leaderboard_ids():
+            click.echo("No leaderboards found. Run 'benchmark leaderboard init' first.", err=True)
+            sys.exit(1)
+        
+        # Load the benchmark run
+        run_result = storage.load_benchmark_run(run_id)
+        
+        if not run_result:
+            click.echo(f"Benchmark run not found: {run_id}", err=True)
+            click.echo("Make sure the run was saved using 'save_benchmark_run()'.")
+            sys.exit(1)
+        
+        updated = manager.add_benchmark_run(run_result)
+        manager.save_leaderboards()
+        
+        click.echo(f"Updated {len(updated)} leaderboards for run: {run_id}")
+        for lb_id in updated:
+            click.echo(f"  - {lb_id}")
+            
+    except Exception as e:
+        logger.error(f"Failed to update leaderboards: {e}")
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@leaderboard.command("update-testee")
+@click.option("--testee-id", required=True, help="Testee ID to add runs for")
+@click.option("--output-dir", type=click.Path(), default=None, help="Custom output directory for results")
+def update_testee(testee_id, output_dir):
+    """Add all runs for a testee to leaderboards.
+    
+    Finds all benchmark runs for the specified testee and adds them to
+    the appropriate leaderboards (keeps most recent per leaderboard).
+    """
+    try:
+        storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+        manager = storage.get_leaderboard_manager()
+        
+        if not manager.list_leaderboard_ids():
+            click.echo("No leaderboards found. Run 'benchmark leaderboard init' first.", err=True)
+            sys.exit(1)
+        
+        # Find all benchmark runs for this testee
+        run_ids = storage.list_benchmark_runs()
+        testee_runs = []
+        
+        for run_id in run_ids:
+            run_result = storage.load_benchmark_run(run_id)
+            if run_result and run_result.testee_id == testee_id:
+                testee_runs.append(run_result)
+        
+        if not testee_runs:
+            click.echo(f"No benchmark runs found for testee: {testee_id}", err=True)
+            sys.exit(1)
+        
+        click.echo(f"Found {len(testee_runs)} runs for testee: {testee_id}")
+        
+        all_updated = set()
+        for run_result in testee_runs:
+            updated = manager.add_benchmark_run(run_result)
+            all_updated.update(updated)
+        
+        manager.save_leaderboards()
+        
+        click.echo(f"Updated {len(all_updated)} leaderboards.")
+            
+    except Exception as e:
+        logger.error(f"Failed to update testee leaderboards: {e}")
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@leaderboard.command()
+@click.option("--output", "-o", type=click.Path(), required=True, help="Output path for JSON export")
+@click.option("--output-dir", type=click.Path(), default=None, help="Custom input directory for results")
+def export(output, output_dir):
+    """Export all leaderboards to a JSON file.
+    
+    Exports the complete LeaderboardCollection to the specified path.
+    """
+    try:
+        storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
+        manager = storage.get_leaderboard_manager()
+        
+        if not manager.list_leaderboard_ids():
+            click.echo("No leaderboards found. Run 'benchmark leaderboard init' first.", err=True)
+            sys.exit(1)
+        
+        # Export to specified path
+        manager.save_leaderboards(output)
+        
+        click.echo(f"Exported {len(manager.list_leaderboard_ids())} leaderboards to: {output}")
+            
+    except Exception as e:
+        logger.error(f"Failed to export leaderboards: {e}")
+        click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
 

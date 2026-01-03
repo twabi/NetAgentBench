@@ -293,19 +293,68 @@ class BenchmarkAnalyzer:
     def _compute_execution_metrics(
         self, runs: List[BenchmarkResult]
     ) -> AggregateExecutionMetrics:
-        """Compute aggregate execution metrics from runs"""
+        """Compute aggregate execution metrics from runs, including multi-turn aggregates."""
         if not runs:
             raise ValueError("Cannot compute execution metrics for empty runs")
 
         n = len(runs)
+        
+        # Base metrics (always computed)
+        base_metrics = {
+            "avg_infrastructure_provision_time": sum(r.metrics.infrastructure_provision_time for r in runs) / n,
+            "avg_config_execution_time": sum(r.metrics.config_execution_time for r in runs) / n,
+            "avg_convergence_time": sum(r.metrics.convergence_time for r in runs) / n,
+            "avg_evaluation_time": sum(r.metrics.evaluation_time for r in runs) / n,
+            "avg_total_time": sum(r.metrics.total_time for r in runs) / n,
+        }
+        
+        # Multi-turn metrics (only computed if multi-turn runs exist)
+        multi_turn_runs = [r for r in runs if r.metrics.is_multi_turn]
+        
+        if multi_turn_runs:
+            mt_n = len(multi_turn_runs)
+            
+            # Average turns to complete
+            turns_values = [r.metrics.turns_to_complete for r in multi_turn_runs if r.metrics.turns_to_complete is not None]
+            avg_turns = sum(turns_values) / len(turns_values) if turns_values else None
+            
+            # Average time to complete
+            time_values = [r.metrics.time_to_complete for r in multi_turn_runs if r.metrics.time_to_complete is not None]
+            avg_time = sum(time_values) / len(time_values) if time_values else None
+            
+            # Termination breakdown
+            termination_breakdown = {}
+            for r in multi_turn_runs:
+                if r.metrics.termination_reason:
+                    reason = r.metrics.termination_reason
+                    termination_breakdown[reason] = termination_breakdown.get(reason, 0) + 1
+            
+            # Average tool usage
+            tool_usage_totals: Dict[str, float] = {}
+            tool_usage_counts: Dict[str, int] = {}
+            for r in multi_turn_runs:
+                if r.metrics.tool_usage:
+                    for tool, count in r.metrics.tool_usage.items():
+                        tool_usage_totals[tool] = tool_usage_totals.get(tool, 0) + count
+                        tool_usage_counts[tool] = tool_usage_counts.get(tool, 0) + 1
+            avg_tool_usage = {
+                tool: total / tool_usage_counts[tool]
+                for tool, total in tool_usage_totals.items()
+            } if tool_usage_totals else None
+            
+            # Turn success rate (fraction of multi-turn runs that succeeded)
+            successful_mt = sum(1 for r in multi_turn_runs if r.success)
+            turn_success_rate = successful_mt / mt_n if mt_n > 0 else None
+            
+            base_metrics.update({
+                "avg_turns_to_complete": avg_turns,
+                "avg_time_to_complete": avg_time,
+                "termination_breakdown": termination_breakdown if termination_breakdown else None,
+                "avg_tool_usage": avg_tool_usage,
+                "turn_success_rate": turn_success_rate,
+            })
 
-        return AggregateExecutionMetrics(
-            avg_infrastructure_provision_time=sum(r.metrics.infrastructure_provision_time for r in runs) / n,
-            avg_config_execution_time=sum(r.metrics.config_execution_time for r in runs) / n,
-            avg_convergence_time=sum(r.metrics.convergence_time for r in runs) / n,
-            avg_evaluation_time=sum(r.metrics.evaluation_time for r in runs) / n,
-            avg_total_time=sum(r.metrics.total_time for r in runs) / n,
-        )
+        return AggregateExecutionMetrics(**base_metrics)
 
     def _compute_property_breakdown_comparison(
         self,

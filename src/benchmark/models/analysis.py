@@ -35,7 +35,12 @@ class AggregateScores(BaseModel):
 
 
 class AggregateExecutionMetrics(BaseModel):
-    """Aggregate execution timing metrics across multiple runs"""
+    """
+    Aggregate execution timing metrics across multiple runs.
+    
+    Multi-turn fields are optional and only populated when analyzing
+    multi-turn benchmark runs.
+    """
 
     avg_infrastructure_provision_time: float = Field(
         ..., ge=0.0, description="Average infrastructure provision time (seconds)"
@@ -51,6 +56,23 @@ class AggregateExecutionMetrics(BaseModel):
     )
     avg_total_time: float = Field(
         ..., ge=0.0, description="Average total time (seconds)"
+    )
+    
+    # Multi-turn specific aggregates
+    avg_turns_to_complete: Optional[float] = Field(
+        None, ge=0.0, description="Average number of config commands used (multi-turn only)"
+    )
+    avg_time_to_complete: Optional[float] = Field(
+        None, ge=0.0, description="Average session duration in seconds (multi-turn only)"
+    )
+    termination_breakdown: Optional[Dict[str, int]] = Field(
+        None, description="Count by termination reason: {'submitted': N, 'timeout': M, 'turn_limit': K}"
+    )
+    avg_tool_usage: Optional[Dict[str, float]] = Field(
+        None, description="Average tool usage per session: {'exec_command': 10.5, 'get_nodes': 1.2}"
+    )
+    turn_success_rate: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="Fraction of multi-turn runs that succeeded"
     )
 
 

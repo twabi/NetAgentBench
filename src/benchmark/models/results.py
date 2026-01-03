@@ -87,6 +87,8 @@ class ExecutionMetrics(BaseModel):
     
     Captures the time taken for each phase of the benchmark,
     useful for research and performance analysis.
+    
+    Multi-turn fields are optional and only populated for multi-turn runs.
     """
 
     infrastructure_provision_time: float = Field(
@@ -102,6 +104,26 @@ class ExecutionMetrics(BaseModel):
         ..., description="Time to evaluate all properties (seconds)"
     )
     total_time: float = Field(..., description="Total benchmark execution time (seconds)")
+    
+    # Multi-turn specific fields
+    is_multi_turn: bool = Field(
+        False, description="Whether this was a multi-turn session"
+    )
+    turns_to_complete: Optional[int] = Field(
+        None, description="Number of config commands used (multi-turn only)"
+    )
+    time_to_complete: Optional[float] = Field(
+        None, description="Actual session duration in seconds (multi-turn only)"
+    )
+    termination_reason: Optional[str] = Field(
+        None, description="How session ended: 'submitted', 'timeout', 'turn_limit' (multi-turn only)"
+    )
+    tool_usage: Optional[Dict[str, int]] = Field(
+        None, description="Tool usage counts e.g. {'exec_command': 5, 'get_nodes': 1} (multi-turn only)"
+    )
+    failed_commands: Optional[int] = Field(
+        None, description="Number of commands that returned non-zero exit code (multi-turn only)"
+    )
 
 
 # ============================================================================
@@ -160,6 +182,12 @@ class BenchmarkResult(BaseModel):
     task_id: str = Field(..., description="Task that was evaluated")
     testee_id: str = Field(..., description="Testee who submitted the solution")
     testee_type: str = Field(..., description="Type of testee (llm, human, baseline)")
+    evaluation_mode: str = Field(
+        "single_turn", description="Evaluation mode: 'single_turn' or 'multi_turn'"
+    )
+    model_version: Optional[str] = Field(
+        None, description="Model version or identifier (e.g., 'gpt-4-0125-preview')"
+    )
     success: bool = Field(
         ..., description="Whether the benchmark completed without errors"
     )
@@ -227,6 +255,15 @@ class BenchmarkRunResult(BaseModel):
     testee_id: str = Field(..., description="Testee identifier")
     testee_type: str = Field(
         ..., description="Type of testee (llm, human, ml_model, baseline)"
+    )
+    evaluation_mode: str = Field(
+        "single_turn", description="Evaluation mode: 'single_turn' or 'multi_turn'"
+    )
+    benchmark_suite_id: Optional[str] = Field(
+        None, description="Benchmark suite identifier for grouping related runs"
+    )
+    model_version: Optional[str] = Field(
+        None, description="Model version or identifier (e.g., 'gpt-4-0125-preview')"
     )
     timestamp: datetime = Field(..., description="When the benchmark run started")
     property_results: Dict[str, PropertyExecutionResult] = Field(

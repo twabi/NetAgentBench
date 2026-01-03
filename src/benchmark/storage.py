@@ -618,3 +618,137 @@ class ResultsStorage:
                 matched_runs[task_id] = testee_dict
         
         return matched_runs
+
+    # =========================================================================
+    # Leaderboard Persistence
+    # =========================================================================
+
+    @property
+    def leaderboards_path(self) -> Path:
+        """
+        Get the path to the leaderboards JSON file.
+        
+        Returns:
+            Path to leaderboards.json in base_dir
+        """
+        return self.base_dir / "leaderboards.json"
+
+    def save_leaderboards(self, collection: "LeaderboardCollection") -> str:
+        """
+        Save a LeaderboardCollection to disk.
+        
+        Args:
+            collection: LeaderboardCollection to save
+            
+        Returns:
+            Absolute path to the saved file
+        """
+        from benchmark.models.leaderboard import LeaderboardCollection
+        
+        # Ensure base directory exists
+        self.base_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Save collection as JSON
+        with open(self.leaderboards_path, "w") as f:
+            f.write(collection.model_dump_json(indent=2))
+        
+        return str(self.leaderboards_path.absolute())
+
+    def load_leaderboards(self) -> Optional["LeaderboardCollection"]:
+        """
+        Load a LeaderboardCollection from disk.
+        
+        Returns:
+            LeaderboardCollection if file exists, None otherwise
+        """
+        from benchmark.models.leaderboard import LeaderboardCollection
+        
+        if not self.leaderboards_path.exists():
+            return None
+        
+        with open(self.leaderboards_path, "r") as f:
+            data = f.read()
+        
+        return LeaderboardCollection.model_validate_json(data)
+
+    def get_leaderboard_manager(self) -> "LeaderboardManager":
+        """
+        Get a LeaderboardManager configured with this storage.
+        
+        If leaderboards exist, loads them. Otherwise, returns an
+        empty manager ready for initialization.
+        
+        Returns:
+            LeaderboardManager instance
+        """
+        from benchmark.analysis.leaderboard import LeaderboardManager
+        
+        manager = LeaderboardManager(leaderboards_path=str(self.leaderboards_path))
+        return manager
+
+    def load_benchmark_run(self, run_id: str) -> Optional[BenchmarkRunResult]:
+        """
+        Load a BenchmarkRunResult by run_id.
+        
+        Args:
+            run_id: Unique identifier for the benchmark run
+            
+        Returns:
+            BenchmarkRunResult if found, None otherwise
+        """
+        runs_dir = self.base_dir / "benchmark_runs"
+        
+        if not runs_dir.exists():
+            return None
+        
+        run_file = runs_dir / f"{run_id}.json"
+        if not run_file.exists():
+            return None
+        
+        try:
+            with open(run_file, "r") as f:
+                data = json.load(f)
+            
+            # Convert ISO timestamp back to datetime
+            if "timestamp" in data:
+                data["timestamp"] = datetime.fromisoformat(data["timestamp"])
+            
+            # Convert timestamps in property results
+            if "property_results" in data:
+                for prop_type, prop_result in data["property_results"].items():
+                    if "results" in prop_result:
+                        for benchmark_result in prop_result["results"]:
+                            if "timestamp" in benchmark_result:
+                                benchmark_result["timestamp"] = datetime.fromisoformat(
+                                    benchmark_result["timestamp"]
+                                )
+                            if "property_results" in benchmark_result:
+                                for pr in benchmark_result["property_results"]:
+                                    if "timestamp" in pr:
+                                        pr["timestamp"] = datetime.fromisoformat(
+                                            pr["timestamp"]
+                                        )
+            
+            return BenchmarkRunResult.model_validate(data)
+        except (json.JSONDecodeError, ValueError, Exception):
+            return None
+
+    def list_benchmark_runs(self) -> List[str]:
+        """
+        List all BenchmarkRunResult run_ids.
+        
+        Returns:
+            List of run_ids
+        """
+        runs_dir = self.base_dir / "benchmark_runs"
+        
+        if not runs_dir.exists():
+            return []
+        
+        run_ids = []
+        for run_file in runs_dir.glob("*.json"):
+            if run_file.is_file():
+                run_ids.append(run_file.stem)
+        
+        return sorted(run_ids)
+

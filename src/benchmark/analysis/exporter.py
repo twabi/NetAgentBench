@@ -92,7 +92,7 @@ class AnalysisExporter:
         with open(file_path, 'w', newline='') as f:
             writer = csv.writer(f)
 
-            # Header
+            # Header (including multi-turn columns)
             writer.writerow([
                 "property_type",
                 "total_tasks",
@@ -102,6 +102,10 @@ class AnalysisExporter:
                 "syntactic_validity",
                 "efficiency",
                 "final_score",
+                # Multi-turn columns
+                "avg_turns",
+                "avg_session_time",
+                "turn_success_rate",
             ])
 
             # Property breakdown rows
@@ -115,7 +119,17 @@ class AnalysisExporter:
                     stats.aggregate_scores.syntactic_validity,
                     stats.aggregate_scores.efficiency if stats.aggregate_scores.efficiency else "",
                     stats.aggregate_scores.final_score,
+                    # Multi-turn values (empty for property breakdown, only at overall level)
+                    "",
+                    "",
+                    "",
                 ])
+
+            # Get multi-turn metrics from execution_metrics
+            exec_metrics = testee_analysis.execution_metrics
+            avg_turns = exec_metrics.avg_turns_to_complete if exec_metrics.avg_turns_to_complete else ""
+            avg_time = exec_metrics.avg_time_to_complete if exec_metrics.avg_time_to_complete else ""
+            turn_rate = exec_metrics.turn_success_rate if exec_metrics.turn_success_rate else ""
 
             # Overall aggregate row
             writer.writerow([
@@ -127,6 +141,9 @@ class AnalysisExporter:
                 testee_analysis.aggregate_scores.syntactic_validity,
                 testee_analysis.aggregate_scores.efficiency if testee_analysis.aggregate_scores.efficiency else "",
                 testee_analysis.aggregate_scores.final_score,
+                avg_turns,
+                avg_time,
+                turn_rate,
             ])
 
     def _export_comparison_csv(self, analysis: AnalysisResult, file_path: Path):

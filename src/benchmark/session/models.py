@@ -69,6 +69,8 @@ class SessionContext:
     start_time: datetime
     # Command history: (node, command, command_type) for approach reconstruction
     executed_commands: List[Tuple[str, str, CommandType]] = field(default_factory=list)
+    # Execution results: (node, command, success) for syntactic validity
+    execution_results: List[Tuple[str, str, bool]] = field(default_factory=list)
 
     def get_approach(self) -> List[Tuple[str, str]]:
         """

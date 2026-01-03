@@ -252,6 +252,21 @@ class BenchmarkMCPServer:
         """
         self._mcp.run(transport=transport)
 
+    def close(self) -> None:
+        """
+        Close the MCP server and clean up resources.
+
+        This should be called when the session ends to properly
+        release any resources held by the server.
+        """
+        try:
+            # Clear the session reference
+            self.session = None
+            self._session_context = None
+            logger.info("MCP server closed")
+        except Exception as e:
+            logger.error(f"Error closing MCP server: {e}")
+
     def streamable_http_app(self):
         """
         Get the Starlette app for mounting in an ASGI server.
