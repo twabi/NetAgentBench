@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from topology_generator import TopologyGenerator
 
 
-def generate_firewall_tasks(platform: str = "frr") -> List[Dict[str, Any]]:
+def generate_firewall_tasks(platform: str = "linux") -> List[Dict[str, Any]]:
     """
     Generate all firewall rule task variations.
     
@@ -300,7 +300,7 @@ def create_firewall_task(
     description: str,
     scenario_type: str,
     node_count: int,
-    platform: str = "frr",
+    platform: str = "linux",
     rule_name: str = None,
     action: str = None,
     from_zone: str = None,
@@ -341,7 +341,7 @@ def create_firewall_task(
     Returns:
         Task dictionary
     """
-    if platform != "frr":
+    if platform != "linux":
         task_id = f"{task_id}_{platform}"
 
     # Convert topology to dict
@@ -366,6 +366,40 @@ def create_firewall_task(
     
     properties = []
     
+    target_node = topology.nodes[0].name
+    
+    properties = []
+    
+    # Determine platform specific commands
+    if platform == "nokia_srl":
+        fw_cmd = "sr_cli -e 'info acl'"
+        fw_expect = rule_name
+        ping_cmd = f"sr_cli -e 'ping 192.168.1.2 count 2'"
+        ping_expect = "0% packet loss"
+        deny_cmd = "sr_cli -e 'info acl'" # Check counters if possible, or just config
+        deny_expect = "deny" 
+    elif platform == "arista_eos":
+        fw_cmd = "Cli -c 'show ip access-lists'"
+        fw_expect = rule_name
+        ping_cmd = "ping 192.168.1.2 repeat 2"
+        ping_expect = "0% packet loss"
+        deny_cmd = "Cli -c 'show ip access-lists'" 
+        deny_expect = "deny"
+    elif platform == "cisco_ios_xe":
+        fw_cmd = "cli -c 'show ip access-lists'"
+        fw_expect = rule_name
+        ping_cmd = "ping 192.168.1.2 repeat 2"
+        ping_expect = "!!!"
+        deny_cmd = "cli -c 'show ip access-lists'"
+        deny_expect = "deny"
+    else: # linux (alpine) - use iptables
+        fw_cmd = "iptables -L FORWARD -n"
+        fw_expect = rule_name if rule_name else "ACCEPT"
+        ping_cmd = "ping -c 2 192.168.1.2"
+        ping_expect = "2 packets transmitted, 2 packets received"
+        deny_cmd = "iptables -L FORWARD -n"
+        deny_expect = "DROP"
+
     # Primary property: Firewall rule exists
     fw_prop = {
         "id": f"fw_{rule_name}_exists",
@@ -374,10 +408,10 @@ def create_firewall_task(
         "evaluation": {
             "method": "exec_and_parse",
             "target_node": target_node,
-            "command": "vtysh -c 'show ip firewall'",
+            "command": fw_cmd,
             "parser": "text",
             "success_condition": {
-                "contains_text": rule_name
+                "contains_text": fw_expect
             }
         }
     }
@@ -392,10 +426,10 @@ def create_firewall_task(
             "evaluation": {
                 "method": "exec_and_parse",
                 "target_node": target_node,
-                "command": f"ping -c 2 192.168.1.2",
+                "command": ping_cmd,
                 "parser": "text",
                 "success_condition": {
-                    "contains_text": "2 packets transmitted"
+                    "contains_text": ping_expect
                 }
             }
         }
@@ -409,10 +443,10 @@ def create_firewall_task(
             "evaluation": {
                 "method": "exec_and_parse",
                 "target_node": target_node,
-                "command": "vtysh -c 'show ip firewall counters'",
+                "command": deny_cmd,
                 "parser": "text",
                 "success_condition": {
-                    "contains_text": "deny"
+                    "contains_text": deny_expect
                 }
             }
         }

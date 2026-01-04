@@ -1,0 +1,200 @@
+{
+  "task_id": "ospf_area0_linear_7n_arista_eos",
+  "description": "OSPF area 0 linear 7-node topology",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth4",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth5",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth6",
+          "R7:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_R1_R2",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R2_R3",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R3_R4",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R3 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R4_R5",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R4 and R5",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R5_R6",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R5 and R6",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R5",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R6_R7",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R6 and R7",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R6",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "routing_table_complete",
+        "type": "route_exists",
+        "description": "Routing table has OSPF routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "O"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 42,
+    "description": "Configure OSPF on all 7 routers with appropriate area and network statements"
+  }
+}

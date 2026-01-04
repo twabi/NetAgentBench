@@ -228,6 +228,22 @@ def create_reachability_task(
     }
 
     # Create reachability property
+    # Create reachability property
+    
+    # Platform specific ping commands
+    if platform == "nokia_srl":
+        ping_cmd = f"sr_cli -e 'ping {dest_ip} count 3'"
+        ping_expect = "0% packet loss"
+    elif platform == "cisco_ios_xe":
+        ping_cmd = f"ping {dest_ip} repeat 3"
+        ping_expect = "!!!"
+    elif platform == "arista_eos":
+        ping_cmd = f"ping {dest_ip} repeat 3"
+        ping_expect = "0% packet loss"
+    else: # frr / linux
+        ping_cmd = f"ping -c 3 {dest_ip}"
+        ping_expect = "3 packets transmitted, 3 packets received"
+
     property_def = {
         "id": f"reachability_{source}_to_{destination}",
         "type": "reachability",
@@ -235,10 +251,10 @@ def create_reachability_task(
         "evaluation": {
             "method": "exec_and_parse",
             "target_node": source,
-            "command": f"ping -c 3 {dest_ip}",
+            "command": ping_cmd,
             "parser": "text",
             "success_condition": {
-                "contains_text": "3 packets transmitted, 3 packets received"
+                "contains_text": ping_expect
             }
         }
     }

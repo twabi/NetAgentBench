@@ -4,8 +4,8 @@
   "platform": "frr",
   "mixed_platforms": [
     "cisco_ios_xe",
-    "arista_eos",
     "frr",
+    "arista_eos",
     "nokia_srl"
   ],
   "topology": {

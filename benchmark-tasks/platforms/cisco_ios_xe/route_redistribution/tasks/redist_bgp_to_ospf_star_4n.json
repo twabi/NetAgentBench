@@ -60,7 +60,7 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "vtysh -c 'show running-config' | grep redistribute",
+          "command": "cli -c 'show running-config | include redistribute'",
           "parser": "text",
           "success_condition": {
             "contains_text": "redistribute bgp"
@@ -74,7 +74,7 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "vtysh -c 'show ip ospf' 2>/dev/null || vtysh -c 'show ip route ospf'",
+          "command": "cli -c 'show ip route ospf'",
           "parser": "text",
           "success_condition": {
             "contains_text": "B"

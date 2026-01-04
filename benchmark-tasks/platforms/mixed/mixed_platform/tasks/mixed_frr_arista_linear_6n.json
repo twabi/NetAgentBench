@@ -3,8 +3,8 @@
   "description": "Linear 6-node: FRR and Arista cEOS mixed topology",
   "platform": "frr",
   "mixed_platforms": [
-    "arista_eos",
-    "frr"
+    "frr",
+    "arista_eos"
   ],
   "topology": {
     "nodes": [

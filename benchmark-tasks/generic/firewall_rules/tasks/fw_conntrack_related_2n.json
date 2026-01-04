@@ -1,0 +1,70 @@
+{
+  "task_id": "fw_conntrack_related_2n",
+  "description": "Linear 2-node: Allow related connections",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "fw_TRACK_RELATED_exists",
+        "type": "firewall_rule",
+        "description": "Firewall rule TRACK_RELATED is configured with permit",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "iptables -L FORWARD -n",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "TRACK_RELATED"
+          }
+        }
+      },
+      {
+        "id": "reach_allowed_by_TRACK_RELATED",
+        "type": "reachability",
+        "description": "Traffic is allowed through firewall",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 2 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "2 packets transmitted, 2 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 10,
+    "description": "Configure firewall rule TRACK_RELATED on 2 nodes"
+  }
+}

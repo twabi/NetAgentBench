@@ -1,0 +1,119 @@
+{
+  "task_id": "small_campus_baseline",
+  "description": "15-node FRR ring topology with OSPF underlay and reachability verification. Baseline task for RQ1 (architectural comparison) - minimal expected difference between single/multi-agent.",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "research_context": {
+    "research_question": "RQ1: Architectural Effectiveness",
+    "hypothesis": "At low complexity (15 nodes), multi-agent ≈ single-agent performance",
+    "expected_turns": "10-20",
+    "expected_time_minutes": 15,
+    "expected_exploration_efficiency": "0.6-0.8"
+  },
+  "topology": {
+    "nodes": [
+      {"name": "R1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R5", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R6", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R7", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R8", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R9", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R10", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R11", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R12", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R13", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R14", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R15", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["R1:eth1", "R2:eth1"]},
+      {"endpoints": ["R2:eth2", "R3:eth1"]},
+      {"endpoints": ["R3:eth2", "R4:eth1"]},
+      {"endpoints": ["R4:eth2", "R5:eth1"]},
+      {"endpoints": ["R5:eth2", "R6:eth1"]},
+      {"endpoints": ["R6:eth2", "R7:eth1"]},
+      {"endpoints": ["R7:eth2", "R8:eth1"]},
+      {"endpoints": ["R8:eth2", "R9:eth1"]},
+      {"endpoints": ["R9:eth2", "R10:eth1"]},
+      {"endpoints": ["R10:eth2", "R11:eth1"]},
+      {"endpoints": ["R11:eth2", "R12:eth1"]},
+      {"endpoints": ["R12:eth2", "R13:eth1"]},
+      {"endpoints": ["R13:eth2", "R14:eth1"]},
+      {"endpoints": ["R14:eth2", "R15:eth1"]},
+      {"endpoints": ["R15:eth2", "R1:eth2"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_neighbor_r1_r2",
+        "type": "ospf_configuration",
+        "description": "R1 has OSPF neighbor relationship with R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Full"
+          }
+        }
+      },
+      {
+        "id": "ospf_neighbor_r8_both",
+        "type": "ospf_configuration",
+        "description": "R8 (middle router) has OSPF neighbors on both sides",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R8",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "match_count": 2,
+            "pattern": "Full"
+          }
+        }
+      },
+      {
+        "id": "reachability_r1_to_r8",
+        "type": "reachability",
+        "description": "R1 can reach R8 (halfway around ring via OSPF)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 -W 2 10.0.0.8",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "reachability_r1_to_r15",
+        "type": "reachability",
+        "description": "R1 can reach R15 (adjacent in ring)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 -W 2 10.0.0.15",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 60,
+    "description": "Configure loopback + OSPF on each router. 4 commands per router (loopback IP, OSPF enable, network statements)."
+  }
+}

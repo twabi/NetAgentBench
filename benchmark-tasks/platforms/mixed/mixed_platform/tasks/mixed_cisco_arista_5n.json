@@ -3,8 +3,8 @@
   "description": "Linear 5-node: Cisco and Arista mixed",
   "platform": "frr",
   "mixed_platforms": [
-    "cisco_ios_xe",
-    "arista_eos"
+    "arista_eos",
+    "cisco_ios_xe"
   ],
   "topology": {
     "nodes": [

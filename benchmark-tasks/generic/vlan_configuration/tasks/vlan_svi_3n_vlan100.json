@@ -1,0 +1,82 @@
+{
+  "task_id": "vlan_svi_3n_vlan100",
+  "description": "Linear 3-node: Create VLAN 100 SVI with IP",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "vlan_100_exists",
+        "type": "vlan_configuration",
+        "description": "VLAN 100 exists on all nodes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'ip -d link show | grep \"vlan\" | grep \"id 100\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "100"
+          }
+        }
+      },
+      {
+        "id": "svi_vlan100",
+        "type": "svi_configuration",
+        "description": "SVI for VLAN 100 has correct IP",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'ip addr show | grep 192.168.100.1'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "192.168.100.1"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 9,
+    "description": "Configure VLANs on 3 nodes"
+  }
+}

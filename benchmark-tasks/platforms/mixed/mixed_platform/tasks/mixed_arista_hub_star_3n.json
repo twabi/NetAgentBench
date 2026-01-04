@@ -3,8 +3,8 @@
   "description": "Star 3-node: Arista hub, FRR spokes",
   "platform": "frr",
   "mixed_platforms": [
-    "arista_eos",
-    "frr"
+    "frr",
+    "arista_eos"
   ],
   "topology": {
     "nodes": [

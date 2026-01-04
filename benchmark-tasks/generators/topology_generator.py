@@ -99,13 +99,18 @@ class TopologyGenerator:
         # Create sequential links: R1-R2, R2-R3, etc.
         for i in range(1, node_count):
             # Determine interface numbers
+            # In a linear topology:
+            # - R1 uses eth1 to connect to R2
+            # - R2 uses eth1 (to R1) and eth2 (to R3)
+            # - R3 uses eth1 (to R2) and eth2 (to R4)
+            # - etc.
             if i == 1:
                 # First link: R1:eth1 - R2:eth1
                 intf1 = "eth1"
                 intf2 = "eth1"
             else:
-                # Subsequent links: R2:eth2 - R3:eth1, etc.
-                intf1 = f"eth{i}"
+                # Subsequent links: R{i}:eth2 - R{i+1}:eth1
+                intf1 = "eth2"
                 intf2 = "eth1"
 
             link = self._create_link(f"R{i}", intf1, f"R{i+1}", intf2)

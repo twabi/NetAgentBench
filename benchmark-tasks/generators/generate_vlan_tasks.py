@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from topology_generator import TopologyGenerator
 
 
-def generate_vlan_tasks(platform: str = "frr") -> List[Dict[str, Any]]:
+def generate_vlan_tasks(platform: str = "linux") -> List[Dict[str, Any]]:
     """
     Generate all VLAN configuration task variations.
     
@@ -189,7 +189,7 @@ def create_vlan_task(
     description: str,
     vlan_config: Dict[str, Any],
     scenario: str,
-    platform: str = "frr"
+    platform: str = "linux"
 ) -> Dict[str, Any]:
     """
     Create a VLAN configuration task.
@@ -236,6 +236,26 @@ def create_vlan_task(
     
     properties = []
     
+    # Platform specific commands
+    if platform == "nokia_srl":
+        # Nokia uses mac-vrf or interface configuration for VLANs
+        vlan_cmd = "sr_cli -e 'info network-instance'" # Checks for instance presence
+        vlan_expect = f"mac-vrf" # Simplistic check, or specific vlan id if possible
+    elif platform == "arista_eos":
+        vlan_cmd = "Cli -c 'show vlan'"
+        vlan_expect = str(vlan_id)
+    elif platform == "cisco_ios_xe":
+        vlan_cmd = "cli -c 'show vlan brief'"
+        vlan_expect = str(vlan_id)
+    elif platform == "linux":
+        # Check for VLAN interface or Bridge VLAN
+        # Using simple ip link check for presence of vlan interface or master
+        vlan_cmd = f"sh -c 'ip -d link show | grep \"vlan\" | grep \"id {vlan_id}\"'" 
+        vlan_expect = str(vlan_id)
+    else: # frr (fallback, though disabled in plan)
+        vlan_cmd = "vtysh -c 'show vlan brief'"
+        vlan_expect = str(vlan_id)
+
     # Primary property: VLAN exists
     vlan_prop = {
         "id": f"vlan_{vlan_id}_exists",
@@ -244,10 +264,10 @@ def create_vlan_task(
         "evaluation": {
             "method": "exec_and_parse",
             "target_node": topology.nodes[0].name,
-            "command": "vtysh -c 'show vlan brief'",
+            "command": vlan_cmd,
             "parser": "text",
             "success_condition": {
-                "contains_text": str(vlan_id)
+                "contains_text": vlan_expect
             }
         }
     }
@@ -262,10 +282,10 @@ def create_vlan_task(
             "evaluation": {
                 "method": "exec_and_parse",
                 "target_node": topology.nodes[0].name,
-                "command": "vtysh -c 'show interface trunk'",
+                "command": "vtysh -c 'show interface trunk'" if platform != "linux" else f"sh -c 'bridge vlan show | grep {vlan_id}'",
                 "parser": "text",
                 "success_condition": {
-                    "contains_text": "trunk"
+                    "contains_text": "trunk" if platform != "linux" else str(vlan_id) # Simplify for linux
                 }
             }
         }
@@ -280,7 +300,7 @@ def create_vlan_task(
             "evaluation": {
                 "method": "exec_and_parse",
                 "target_node": topology.nodes[0].name,
-                "command": f"vtysh -c 'show ip interface vlan{vlan_id}'",
+                "command": f"sh -c 'ip addr show | grep {svi_ip.split('/')[0]}'" if platform == "linux" else f"vtysh -c 'show ip interface vlan{vlan_id}'",
                 "parser": "text",
                 "success_condition": {
                     "contains_text": svi_ip.split('/')[0]

@@ -72,11 +72,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R2\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R2'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -87,11 +86,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R3'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -102,11 +100,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R4\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R4'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -117,25 +114,24 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R5\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R5'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
       {
         "id": "route_exchange_R1_to_R5",
         "type": "route_exists",
-        "description": "Route from R1 to R5 exists",
+        "description": "Route from R1 to R5 exists via BGP",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'Route to R5 exists'",
+          "command": "cli -c 'show ip route bgp'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "Route to R5 exists"
+            "contains_text": "B"
           }
         }
       }

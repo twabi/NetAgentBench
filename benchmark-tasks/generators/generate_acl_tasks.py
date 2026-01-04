@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from topology_generator import TopologyGenerator
 
 
-def generate_acl_tasks(platform: str = "frr") -> List[Dict[str, Any]]:
+def generate_acl_tasks(platform: str = "linux") -> List[Dict[str, Any]]:
     """
     Generate all ACL configuration task variations.
     
@@ -216,7 +216,7 @@ def create_acl_task(
     acl_name: str,
     description: str,
     acl_rules: List[Dict[str, Any]],
-    platform: str = "frr",
+    platform: str = "linux",
     apply_node: str = None,
 ) -> Dict[str, Any]:
     """
@@ -259,6 +259,29 @@ def create_acl_task(
     
     properties = []
     
+    # Platform specific commands
+    if platform == "nokia_srl":
+        acl_cmd = "sr_cli -e 'info acl'"
+        acl_expect = acl_name
+    elif platform == "arista_eos":
+        acl_cmd = "Cli -c 'show ip access-lists'"
+        acl_expect = acl_name
+    elif platform == "cisco_ios_xe":
+        acl_cmd = "cli -c 'show ip access-lists'"
+        acl_expect = acl_name
+    elif platform == "linux":
+        # Check iptables chain or rule existence
+        # Using concise list. Assuming ACL name maps to a Chain or just checking rules in INPUT/FORWARD
+        # Simplified: Check if rules exist in FORWARD chain that match the intent
+        # iptables uses ACCEPT/DROP, not PERMIT/DENY
+        action_map = {"permit": "ACCEPT", "deny": "DROP"}
+        target_action = action_map.get(acl_rules[0]['action'].lower(), "ACCEPT")
+        acl_cmd = f"sh -c 'iptables -L FORWARD -n | grep \"{target_action}\"'" 
+        acl_expect = target_action 
+    else: # frr
+        acl_cmd = f"vtysh -c 'show running-config' | grep '{acl_name}'"
+        acl_expect = acl_name
+
     # Primary property: ACL exists
     acl_prop = {
         "id": f"acl_{acl_name}_exists",
@@ -267,10 +290,10 @@ def create_acl_task(
         "evaluation": {
             "method": "exec_and_parse",
             "target_node": target_node,
-            "command": "vtysh -c 'show access-list'",
+            "command": acl_cmd,
             "parser": "text",
             "success_condition": {
-                "contains_text": acl_name
+                "contains_text": acl_expect
             }
         }
     }
@@ -302,10 +325,10 @@ def create_acl_task(
             "evaluation": {
                 "method": "exec_and_parse",
                 "target_node": target_node,
-                "command": "vtysh -c 'show access-list'",
+                "command": f"sh -c 'iptables -L FORWARD -n | grep \"{dest_port or protocol.lower()}\"'" if platform == "linux" else f"vtysh -c 'show running-config' | grep '{acl_name}'",
                 "parser": "text",
                 "success_condition": {
-                    "contains_text": action
+                    "contains_text": str(dest_port) if (platform == "linux" and dest_port) else (protocol.lower() if platform == "linux" else action)
                 }
             }
         }
@@ -319,10 +342,10 @@ def create_acl_task(
         "evaluation": {
             "method": "exec_and_parse",
             "target_node": target_node,
-            "command": "vtysh -c 'show running-config'",
+            "command": "sh -c 'iptables -L FORWARD -n'" if platform == "linux" else "vtysh -c 'show running-config'",
             "parser": "text",
             "success_condition": {
-                "contains_text": f"access-group {acl_name}"
+                "contains_text": "Chain FORWARD" if platform == "linux" else f"access-group {acl_name}"
             }
         }
     }

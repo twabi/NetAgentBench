@@ -36,7 +36,7 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "vtysh -c 'show access-list'",
+          "command": "cli -c 'show ip access-lists'",
           "parser": "text",
           "success_condition": {
             "contains_text": "EXT_ACL_8080"

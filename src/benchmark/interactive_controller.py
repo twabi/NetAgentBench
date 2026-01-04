@@ -38,6 +38,10 @@ from benchmark.session.models import SubmitResult
 # Setup logging
 logger = logging.getLogger(__name__)
 
+# Suppress noisy MCP library errors (ClosedResourceError on normal session close)
+logging.getLogger("mcp.server.streamable_http").setLevel(logging.CRITICAL)
+
+
 
 class InteractiveBenchmarkController:
     """
@@ -99,18 +103,12 @@ class InteractiveBenchmarkController:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         short_uuid = str(uuid.uuid4())[:8]
 
-        # Build descriptive prefix
-        if model_name:
-            # Normalize model name (replace special chars)
-            safe_model = model_name.replace("-", "").replace(".", "").replace(" ", "_")
-            prefix = f"{testee_id}_{safe_model}"
-        else:
-            prefix = testee_id
-
         # Add mode suffix
         mode_suffix = "mt" if mode == "multi" else "st"
-
-        return f"{prefix}_{mode_suffix}_{timestamp}_{short_uuid}"
+        
+        # testee_id already contains provider+model (e.g., "gemini_gemini25flash")
+        # so just use it directly without appending model_name again
+        return f"{testee_id}_{mode_suffix}_{timestamp}_{short_uuid}"
 
     def run_interactive(
         self,
@@ -123,6 +121,9 @@ class InteractiveBenchmarkController:
         mcp_port: int = 8001,
         wait_for_submit: bool = True,
         dagent_endpoint: Optional[str] = None,
+        dagent_provider: Optional[str] = None,
+        dagent_model: Optional[str] = None,
+        verbose: bool = False,
     ) -> BenchmarkResult:
         """
         Run an interactive benchmark session.
@@ -146,7 +147,9 @@ class InteractiveBenchmarkController:
             mcp_port: Port for MCP server
             wait_for_submit: Wait for agent to call submit
             dagent_endpoint: Optional dagent HTTP endpoint to trigger
-            wait_for_submit: If True, wait for agent to submit; if False, return after setup
+            dagent_provider: LLM provider for dagent (openai, gemini, anthropic, ollama)
+            dagent_model: Model name for dagent (e.g., gpt-4o, gemini-2.0-flash)
+            verbose: Print each agent action as it executes
 
         Returns:
             BenchmarkResult with evaluation and scores
@@ -247,6 +250,9 @@ class InteractiveBenchmarkController:
                     "mcp_url": f"http://localhost:{mcp_port}/mcp",
                     "turn_limit": turn_limit,
                     "time_limit": time_limit,
+                    # Pass provider and model to dagent
+                    "provider": dagent_provider or "openai",
+                    "model": dagent_model,
                 }
                 
                 try:
@@ -260,6 +266,27 @@ class InteractiveBenchmarkController:
                         model_name = dagent_result.get("model_version", "unknown")
                         logger.info(f"Dagent response: {dagent_result}")
                         logger.info(f"Agent model: {model_name}")
+                        
+                        # Verbose: print each action
+                        if verbose:
+                            actions = dagent_result.get("actions", [])
+                            print(f"\n{'='*60}")
+                            print(f"Agent Actions ({len(actions)} total)")
+                            print(f"{'='*60}")
+                            for i, action in enumerate(actions, 1):
+                                act_type = action.get("action", "unknown")
+                                inp = action.get("input", {})
+                                res = action.get("result", {})
+                                node = inp.get("node", "?")
+                                cmd = inp.get("command", "?")[:60]
+                                success = "✓" if res.get("success") else "✗"
+                                cmd_type = inp.get("command_type", "config")[:4]
+                                print(f"{i:3}. [{success}] {node} ({cmd_type}) {cmd}")
+                                # Show error or first line of output for failures
+                                if not res.get("success") and res.get("stdout"):
+                                    first_line = res["stdout"].split("\n")[0][:50]
+                                    print(f"     └─ {first_line}")
+                            print(f"{'='*60}\n")
                 except Exception as e:
                     logger.error(f"Dagent call failed: {e}")
                     errors.append(f"Dagent call failed: {e}")
@@ -301,7 +328,14 @@ class InteractiveBenchmarkController:
             # ============================================================
             # STEP 4: Evaluate Properties
             # ============================================================
-            logger.info("Step 4: Evaluating properties")
+            # Wait for protocol convergence before evaluation (especially for BGP/OSPF)
+            convergence_wait = getattr(task.convergence, 'timeout_seconds', 10) if task.convergence else 10
+            # For multi-turn, use a portion of the convergence timeout after agent submits
+            pre_eval_wait = min(convergence_wait, 30)  # Cap at 30 seconds
+            logger.info(f"Step 4: Waiting {pre_eval_wait}s for protocol convergence before evaluation")
+            time.sleep(pre_eval_wait)
+            
+            logger.info("Step 4.5: Evaluating properties")
             try:
                 evaluation_start = time.time()
                 property_results = self.property_evaluator.evaluate_all_properties(

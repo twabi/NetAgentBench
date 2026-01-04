@@ -1,0 +1,96 @@
+{
+  "task_id": "acl_bidir_3n_arista_eos",
+  "description": "Linear 3-node: Bidirectional traffic filtering",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_BIDIR_FILTER_exists",
+        "type": "acl_configuration",
+        "description": "ACL BIDIR_FILTER is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip access-lists'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "BIDIR_FILTER"
+          }
+        }
+      },
+      {
+        "id": "acl_BIDIR_FILTER_rule_0",
+        "type": "acl_rule",
+        "description": "ACL BIDIR_FILTER contains rule: permit tcp (bidirectional)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_BIDIR_FILTER_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group BIDIR_FILTER"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 12,
+    "description": "Configure ACL BIDIR_FILTER with permit tcp on 3 nodes"
+  }
+}

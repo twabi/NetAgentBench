@@ -36,25 +36,24 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R2\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "sr_cli -e 'show network-instance default protocols bgp neighbor'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R2'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
       {
         "id": "route_exchange_R1_to_R2",
         "type": "route_exists",
-        "description": "Route from R1 to R2 exists",
+        "description": "Route from R1 to R2 exists via BGP",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'Route to R2 exists'",
+          "command": "sr_cli -e 'show network-instance default route-table ipv4'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "Route to R2 exists"
+            "contains_text": "bgp"
           }
         }
       }

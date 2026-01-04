@@ -1,0 +1,226 @@
+{
+  "task_id": "vlan_tree_d3_b2",
+  "description": "Tree d3b2 (15 nodes): VLAN propagation",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R14",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R15",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth1",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth1",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth1",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth1",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth1",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R13:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth1",
+          "R14:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth2",
+          "R15:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "vlan_50_exists",
+        "type": "vlan_configuration",
+        "description": "VLAN 50 exists on all nodes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'ip -d link show | grep \"vlan\" | grep \"id 50\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "50"
+          }
+        }
+      },
+      {
+        "id": "trunk_configured",
+        "type": "trunk_configuration",
+        "description": "Trunk ports configured correctly",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'bridge vlan show | grep 50'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "50"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 60,
+    "description": "Configure VLANs on 15 nodes"
+  }
+}

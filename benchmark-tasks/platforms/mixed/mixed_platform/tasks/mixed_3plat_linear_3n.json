@@ -3,8 +3,8 @@
   "description": "Linear 3-node: FRR, Nokia, Arista mixed topology",
   "platform": "frr",
   "mixed_platforms": [
-    "arista_eos",
     "frr",
+    "arista_eos",
     "nokia_srl"
   ],
   "topology": {

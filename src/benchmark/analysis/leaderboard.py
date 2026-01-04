@@ -217,6 +217,9 @@ class LeaderboardManager:
         This is a convenience method for adding individual task results
         (e.g., from run-task command) rather than aggregated BenchmarkRunResult.
         
+        For multi-turn mode, also creates/updates per-task leaderboards
+        since different tasks aren't directly comparable.
+        
         Args:
             result: BenchmarkResult to add
             
@@ -276,6 +279,26 @@ class LeaderboardManager:
             prop_lb_id = f"{property_type}_{mode}"
             if self._add_entry(prop_lb_id, entry):
                 updated.append(prop_lb_id)
+        
+        # For multi-turn mode, also add to per-task leaderboard
+        # This allows fair comparison of same task across different agents
+        if mode == "multi_turn":
+            task_lb_id = f"task_{result.task_id}"
+            
+            # Create leaderboard if it doesn't exist
+            if self._collection.get_leaderboard(task_lb_id) is None:
+                task_name = result.task_id.replace("_", " ").title()
+                task_lb = Leaderboard(
+                    leaderboard_id=task_lb_id,
+                    name=f"Task: {task_name}",
+                    description=f"Ranks agents on multi-turn task: {result.task_id}",
+                    evaluation_mode="multi_turn",
+                    metric_name="overall",
+                )
+                self._collection.add_leaderboard(task_lb)
+            
+            if self._add_entry(task_lb_id, entry):
+                updated.append(task_lb_id)
         
         return updated
 

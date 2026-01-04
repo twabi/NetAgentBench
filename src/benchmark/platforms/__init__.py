@@ -76,6 +76,19 @@ PLATFORM_PROFILES: Dict[str, PlatformProfile] = {
             "show_interfaces": "show ip interface brief",
         }
     ),
+    "linux": PlatformProfile(
+        name="linux",
+        display_name="Linux (Alpine)",
+        image="alpine:latest",
+        command_wrapper="{}",
+        config_mode="sh", # No specific config mode
+        commands={
+            "show_bgp": "ip route", # Fallback
+            "show_ospf": "ip route", # Fallback
+            "show_routes": "ip route",
+            "show_interfaces": "ip addr",
+        }
+    ),
 }
 
 

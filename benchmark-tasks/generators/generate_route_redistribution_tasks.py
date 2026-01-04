@@ -469,6 +469,37 @@ def create_redistribution_task(
     
     properties = []
     
+    # Determine commands based on platform
+    if platform == "nokia_srl":
+        # Nokia check: check for export policy in protocol context
+        redist_cmd = "sr_cli -e 'info network-instance default protocols'"
+        redist_expect = "export-policy" # or policy name, but generic check for now
+        
+        route_cmd = "sr_cli -e 'show network-instance default route-table ipv4'"
+        # Expected protocol code in Nokia route table (e.g. "bgp", "ospf")
+        route_expect = to_protocol.lower()
+        if to_protocol == "bgp": route_expect = "bgp"
+        if to_protocol == "ospf": route_expect = "ospf"
+        
+    elif platform == "arista_eos":
+        redist_cmd = "Cli -c 'show running-config | section redistribute'"
+        redist_expect = f"redistribute {from_protocol}"
+        route_cmd = f"Cli -c 'show ip route {to_protocol}'"
+        route_expect = from_protocol[0].upper() # e.g. "O" or "B" (Arista uses B, O)
+
+    elif platform == "cisco_ios_xe":
+        redist_cmd = "cli -c 'show running-config | include redistribute'"
+        redist_expect = f"redistribute {from_protocol}"
+        route_cmd = f"cli -c 'show ip route {to_protocol}'"
+        route_expect = from_protocol[0].upper() # e.g. "O" or "B"
+
+    else: # frr
+        redist_cmd = f"vtysh -c 'show running-config' | grep redistribute"
+        redist_expect = f"redistribute {from_protocol}"
+        route_cmd = f"vtysh -c 'show ip {to_protocol}' 2>/dev/null || vtysh -c 'show ip route {to_protocol}'"
+        route_expect = from_protocol[0].upper()
+
+    
     # Primary property: Redistribution is configured
     redist_prop = {
         "id": f"redist_{from_protocol}_to_{to_protocol}",
@@ -477,10 +508,10 @@ def create_redistribution_task(
         "evaluation": {
             "method": "exec_and_parse",
             "target_node": target_node,
-            "command": f"vtysh -c 'show running-config' | grep redistribute",
+            "command": redist_cmd,
             "parser": "text",
             "success_condition": {
-                "contains_text": f"redistribute {from_protocol}"
+                "contains_text": redist_expect
             }
         }
     }
@@ -494,10 +525,10 @@ def create_redistribution_task(
         "evaluation": {
             "method": "exec_and_parse",
             "target_node": target_node,
-            "command": f"vtysh -c 'show ip {to_protocol}' 2>/dev/null || vtysh -c 'show ip route {to_protocol}'",
+            "command": route_cmd,
             "parser": "text",
             "success_condition": {
-                "contains_text": from_protocol[0].upper()  # First letter as route type
+                "contains_text": route_expect
             }
         }
     }

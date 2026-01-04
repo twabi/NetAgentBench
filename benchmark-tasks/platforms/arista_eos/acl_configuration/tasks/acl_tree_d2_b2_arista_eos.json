@@ -1,0 +1,144 @@
+{
+  "task_id": "acl_tree_d2_b2_arista_eos",
+  "description": "Tree d2b2 (7 nodes): ACL at root",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth1",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth1",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R7:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_TREE_FILTER_exists",
+        "type": "acl_configuration",
+        "description": "ACL TREE_FILTER is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip access-lists'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "TREE_FILTER"
+          }
+        }
+      },
+      {
+        "id": "acl_TREE_FILTER_rule_0",
+        "type": "acl_rule",
+        "description": "ACL TREE_FILTER contains rule: permit tcp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_TREE_FILTER_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group TREE_FILTER"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 17,
+    "description": "Configure ACL TREE_FILTER with permit tcp on 7 nodes"
+  }
+}

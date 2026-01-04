@@ -1,0 +1,96 @@
+{
+  "task_id": "acl_srcip_linear_3n_172_16_0_0_linux",
+  "description": "Linear 3-node: Permit traffic from 172.16.0.0/12",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_FILTER_SRC_exists",
+        "type": "acl_configuration",
+        "description": "ACL FILTER_SRC is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"ACCEPT\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "ACCEPT"
+          }
+        }
+      },
+      {
+        "id": "acl_FILTER_SRC_rule_0",
+        "type": "acl_rule",
+        "description": "ACL FILTER_SRC contains rule: permit ip from 172.16.0.0/12",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"ip\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "ip"
+          }
+        }
+      },
+      {
+        "id": "acl_FILTER_SRC_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Chain FORWARD"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 9,
+    "description": "Configure ACL FILTER_SRC with permit ip on 3 nodes"
+  }
+}

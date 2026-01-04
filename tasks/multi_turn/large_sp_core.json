@@ -1,0 +1,251 @@
+{
+  "task_id": "large_sp_core",
+  "description": "50-node service provider core topology with full protocol stack. Tests RQ3: parallelism and scaling benefits for multi-agent systems.",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "research_context": {
+    "research_question": "RQ3: Parallelism and Scaling",
+    "hypothesis": "Multi-agent systems achieve speedup through parallel configuration of independent segments",
+    "expected_turns": "60-100",
+    "expected_time_minutes": 60,
+    "expected_speedup": "1.5-2x for multi-agent",
+    "parallel_decomposition": [
+      "OSPF underlay (all 50 nodes) - foundation",
+      "BGP sessions (spine-leaf) - can parallelize with BFD",
+      "Route reflectors (3 nodes) - depends on BGP",
+      "ECMP verification - final validation"
+    ]
+  },
+  "topology": {
+    "nodes": [
+      {"name": "CORE1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "core"},
+      {"name": "CORE2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "core"},
+      {"name": "SPE1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPE2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPE3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPE4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPE5", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPE6", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPE7", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPE8", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "PE1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE5", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE6", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE7", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE8", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE9", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE10", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE11", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE12", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE13", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE14", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE15", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE16", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE17", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE18", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE19", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE20", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE21", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE22", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE23", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE24", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE25", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE26", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE27", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE28", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE29", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE30", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE31", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE32", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE33", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE34", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE35", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE36", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE37", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE38", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE39", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"},
+      {"name": "PE40", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "pe"}
+    ],
+    "links": [
+      {"endpoints": ["CORE1:eth1", "SPE1:eth1"]},
+      {"endpoints": ["CORE1:eth2", "SPE2:eth1"]},
+      {"endpoints": ["CORE1:eth3", "SPE3:eth1"]},
+      {"endpoints": ["CORE1:eth4", "SPE4:eth1"]},
+      {"endpoints": ["CORE2:eth1", "SPE5:eth1"]},
+      {"endpoints": ["CORE2:eth2", "SPE6:eth1"]},
+      {"endpoints": ["CORE2:eth3", "SPE7:eth1"]},
+      {"endpoints": ["CORE2:eth4", "SPE8:eth1"]},
+      {"endpoints": ["CORE1:eth10", "CORE2:eth10"]},
+      {"endpoints": ["SPE1:eth2", "PE1:eth1"]},
+      {"endpoints": ["SPE1:eth3", "PE2:eth1"]},
+      {"endpoints": ["SPE1:eth4", "PE3:eth1"]},
+      {"endpoints": ["SPE1:eth5", "PE4:eth1"]},
+      {"endpoints": ["SPE1:eth6", "PE5:eth1"]},
+      {"endpoints": ["SPE2:eth2", "PE6:eth1"]},
+      {"endpoints": ["SPE2:eth3", "PE7:eth1"]},
+      {"endpoints": ["SPE2:eth4", "PE8:eth1"]},
+      {"endpoints": ["SPE2:eth5", "PE9:eth1"]},
+      {"endpoints": ["SPE2:eth6", "PE10:eth1"]},
+      {"endpoints": ["SPE3:eth2", "PE11:eth1"]},
+      {"endpoints": ["SPE3:eth3", "PE12:eth1"]},
+      {"endpoints": ["SPE3:eth4", "PE13:eth1"]},
+      {"endpoints": ["SPE3:eth5", "PE14:eth1"]},
+      {"endpoints": ["SPE3:eth6", "PE15:eth1"]},
+      {"endpoints": ["SPE4:eth2", "PE16:eth1"]},
+      {"endpoints": ["SPE4:eth3", "PE17:eth1"]},
+      {"endpoints": ["SPE4:eth4", "PE18:eth1"]},
+      {"endpoints": ["SPE4:eth5", "PE19:eth1"]},
+      {"endpoints": ["SPE4:eth6", "PE20:eth1"]},
+      {"endpoints": ["SPE5:eth2", "PE21:eth1"]},
+      {"endpoints": ["SPE5:eth3", "PE22:eth1"]},
+      {"endpoints": ["SPE5:eth4", "PE23:eth1"]},
+      {"endpoints": ["SPE5:eth5", "PE24:eth1"]},
+      {"endpoints": ["SPE5:eth6", "PE25:eth1"]},
+      {"endpoints": ["SPE6:eth2", "PE26:eth1"]},
+      {"endpoints": ["SPE6:eth3", "PE27:eth1"]},
+      {"endpoints": ["SPE6:eth4", "PE28:eth1"]},
+      {"endpoints": ["SPE6:eth5", "PE29:eth1"]},
+      {"endpoints": ["SPE6:eth6", "PE30:eth1"]},
+      {"endpoints": ["SPE7:eth2", "PE31:eth1"]},
+      {"endpoints": ["SPE7:eth3", "PE32:eth1"]},
+      {"endpoints": ["SPE7:eth4", "PE33:eth1"]},
+      {"endpoints": ["SPE7:eth5", "PE34:eth1"]},
+      {"endpoints": ["SPE7:eth6", "PE35:eth1"]},
+      {"endpoints": ["SPE8:eth2", "PE36:eth1"]},
+      {"endpoints": ["SPE8:eth3", "PE37:eth1"]},
+      {"endpoints": ["SPE8:eth4", "PE38:eth1"]},
+      {"endpoints": ["SPE8:eth5", "PE39:eth1"]},
+      {"endpoints": ["SPE8:eth6", "PE40:eth1"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_underlay_core1",
+        "type": "ospf_configuration",
+        "description": "CORE1 has OSPF neighbors with all connected spines",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "CORE1",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "match_count": 4,
+            "pattern": "Full"
+          }
+        }
+      },
+      {
+        "id": "ospf_underlay_spe4",
+        "type": "ospf_configuration",
+        "description": "SPE4 has OSPF neighbors (1 core + 5 PEs)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "SPE4",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "match_count": 6,
+            "pattern": "Full"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_core1",
+        "type": "bgp_configuration",
+        "description": "CORE1 (route reflector) has BGP sessions with spines",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "CORE1",
+          "command": "vtysh -c 'show bgp summary'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_pe20",
+        "type": "bgp_configuration",
+        "description": "PE20 has BGP session established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "PE20",
+          "command": "vtysh -c 'show bgp summary'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "route_reflector_core1",
+        "type": "bgp_configuration",
+        "description": "CORE1 is configured as route reflector",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "CORE1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "route-reflector-client"
+          }
+        }
+      },
+      {
+        "id": "reachability_pe1_to_pe40",
+        "type": "reachability",
+        "description": "PE1 can reach PE40 across entire network",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "PE1",
+          "command": "ping -c 3 -W 2 10.0.0.50",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "reachability_pe20_to_pe21",
+        "type": "reachability",
+        "description": "PE20 can reach PE21 (cross-core path)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "PE20",
+          "command": "ping -c 3 -W 2 10.0.0.31",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "route_exists_pe1_loopback",
+        "type": "route_exists",
+        "description": "PE1's loopback is reachable from PE40",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "PE40",
+          "command": "vtysh -c 'show ip route 10.255.0.11'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10.255.0.11"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 120,
+    "check_interval_seconds": 10
+  },
+  "optimal_solution": {
+    "command_count": 300,
+    "description": "Configure OSPF underlay, BGP overlay with route reflectors on CORE1/CORE2, loopback advertisements on all PEs."
+  }
+}

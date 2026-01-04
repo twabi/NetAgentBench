@@ -1,0 +1,84 @@
+{
+  "task_id": "acl_extended_2n_port443_arista_eos",
+  "description": "Linear 2-node: Extended ACL for TCP/443",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_EXT_ACL_443_exists",
+        "type": "acl_configuration",
+        "description": "ACL EXT_ACL_443 is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip access-lists'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "EXT_ACL_443"
+          }
+        }
+      },
+      {
+        "id": "acl_EXT_ACL_443_rule_0",
+        "type": "acl_rule",
+        "description": "ACL EXT_ACL_443 contains rule: permit tcp from 10.0.0.0/24 to 192.168.0.0/24 port 443",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show access-list'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "permit"
+          }
+        }
+      },
+      {
+        "id": "acl_EXT_ACL_443_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show running-config'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "access-group EXT_ACL_443"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 7,
+    "description": "Configure ACL EXT_ACL_443 with permit tcp on 2 nodes"
+  }
+}

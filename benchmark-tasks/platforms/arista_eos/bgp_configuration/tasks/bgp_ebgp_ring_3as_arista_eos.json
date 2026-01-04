@@ -1,0 +1,116 @@
+{
+  "task_id": "bgp_ebgp_ring_3as_arista_eos",
+  "description": "eBGP ring 3-AS topology",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R1:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "bgp_session_R1_R2",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R2_R3",
+        "type": "bgp_configuration",
+        "description": "BGP session between R2 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R3_R1",
+        "type": "bgp_configuration",
+        "description": "BGP session between R3 and R1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "route_exchange_R1_to_R3",
+        "type": "route_exists",
+        "description": "Route from R1 to R3 exists via BGP",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip route bgp'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "B"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 24,
+    "description": "Configure BGP on all 3 routers with appropriate AS and neighbors"
+  }
+}

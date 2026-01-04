@@ -30,6 +30,7 @@ class Platform(str, Enum):
     NOKIA_SRL = "nokia_srl"
     ARISTA_EOS = "arista_eos"
     CISCO_IOS_XE = "cisco_ios_xe"
+    LINUX = "linux"
 
     # Richer platform options (commented out for future use)
     # # Open Source

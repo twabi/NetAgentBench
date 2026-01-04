@@ -144,10 +144,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "ping -c 3 192.168.1.11",
+          "command": "sr_cli -e 'ping 192.168.1.11 count 3'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "3 packets transmitted, 3 packets received"
+            "contains_text": "0% packet loss"
           }
         }
       }

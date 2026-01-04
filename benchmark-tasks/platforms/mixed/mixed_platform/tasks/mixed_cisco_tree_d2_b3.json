@@ -3,8 +3,8 @@
   "description": "Tree d2b3 (13 nodes): Cisco root",
   "platform": "frr",
   "mixed_platforms": [
-    "cisco_ios_xe",
-    "arista_eos"
+    "arista_eos",
+    "cisco_ios_xe"
   ],
   "topology": {
     "nodes": [

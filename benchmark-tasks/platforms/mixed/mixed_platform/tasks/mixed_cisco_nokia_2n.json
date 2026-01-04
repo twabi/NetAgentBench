@@ -3,8 +3,8 @@
   "description": "Linear 2-node: Cisco and Nokia mixed",
   "platform": "frr",
   "mixed_platforms": [
-    "cisco_ios_xe",
-    "nokia_srl"
+    "nokia_srl",
+    "cisco_ios_xe"
   ],
   "topology": {
     "nodes": [

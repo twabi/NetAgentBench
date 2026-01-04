@@ -54,11 +54,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R2\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "sr_cli -e 'show network-instance default protocols bgp neighbor'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R2'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -69,11 +68,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "sr_cli -e 'show network-instance default protocols bgp neighbor'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R3'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -84,25 +82,24 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "sr_cli -e 'show network-instance default protocols bgp neighbor'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R3'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
       {
         "id": "route_exchange_R1_to_R3",
         "type": "route_exists",
-        "description": "Route from R1 to R3 exists",
+        "description": "Route from R1 to R3 exists via BGP",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'Route to R3 exists'",
+          "command": "sr_cli -e 'show network-instance default route-table ipv4'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "Route to R3 exists"
+            "contains_text": "bgp"
           }
         }
       }

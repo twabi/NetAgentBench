@@ -36,7 +36,7 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "vtysh -c 'show access-list'",
+          "command": "sr_cli -e 'info acl'",
           "parser": "text",
           "success_condition": {
             "contains_text": "PERMIT_PORT5432"

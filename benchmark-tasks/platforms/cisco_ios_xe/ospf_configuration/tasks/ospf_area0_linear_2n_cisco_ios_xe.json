@@ -1,0 +1,70 @@
+{
+  "task_id": "ospf_area0_linear_2n_cisco_ios_xe",
+  "description": "OSPF area 0 linear 2-node topology",
+  "platform": "cisco_ios_xe",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "cisco-iosxe:latest",
+        "platform": "cisco_ios_xe"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_R1_R2",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "routing_table_complete",
+        "type": "route_exists",
+        "description": "Routing table has OSPF routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "cli -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "O"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 12,
+    "description": "Configure OSPF on all 2 routers with appropriate area and network statements"
+  }
+}

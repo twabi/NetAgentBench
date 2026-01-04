@@ -3,8 +3,8 @@
   "description": "Mesh 5-node: FRR and Arista mixed",
   "platform": "frr",
   "mixed_platforms": [
-    "arista_eos",
-    "frr"
+    "frr",
+    "arista_eos"
   ],
   "topology": {
     "nodes": [

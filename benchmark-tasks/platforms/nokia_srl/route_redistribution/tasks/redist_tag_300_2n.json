@@ -36,10 +36,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "vtysh -c 'show running-config' | grep redistribute",
+          "command": "sr_cli -e 'info network-instance default protocols'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "redistribute ospf"
+            "contains_text": "export-policy"
           }
         }
       },
@@ -50,10 +50,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "vtysh -c 'show ip bgp' 2>/dev/null || vtysh -c 'show ip route bgp'",
+          "command": "sr_cli -e 'show network-instance default route-table ipv4'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "O"
+            "contains_text": "bgp"
           }
         }
       }

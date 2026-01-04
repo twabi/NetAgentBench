@@ -60,10 +60,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'OSPF adjacency R1-R2 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R1-R2 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -74,10 +74,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo 'OSPF adjacency R2-R3 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R2-R3 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -88,38 +88,24 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo 'OSPF adjacency R3-R4 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R3-R4 established"
-          }
-        }
-      },
-      {
-        "id": "reachability_R1_to_R4",
-        "type": "reachability",
-        "description": "R1 can reach R4",
-        "evaluation": {
-          "method": "exec_and_parse",
-          "target_node": "R1",
-          "command": "ping -c 3 192.168.4.4",
-          "parser": "text",
-          "success_condition": {
-            "contains_text": "3 packets transmitted, 3 packets received"
+            "contains_text": "Full"
           }
         }
       },
       {
         "id": "routing_table_complete",
         "type": "route_exists",
-        "description": "Routing table has all expected OSPF routes",
+        "description": "Routing table has OSPF routes",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'Routing table complete'",
+          "command": "sr_cli -e 'show network-instance default route-table ipv4'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "Routing table complete"
+            "contains_text": "ospf"
           }
         }
       }

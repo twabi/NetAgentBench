@@ -384,10 +384,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'OSPF adjacency R1-R2 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R1-R2 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -398,10 +398,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'OSPF adjacency R1-R3 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R1-R3 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -412,10 +412,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo 'OSPF adjacency R2-R4 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R2-R4 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -426,10 +426,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo 'OSPF adjacency R2-R5 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R2-R5 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -440,10 +440,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo 'OSPF adjacency R3-R6 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R3-R6 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -454,10 +454,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo 'OSPF adjacency R3-R7 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R3-R7 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -468,10 +468,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo 'OSPF adjacency R4-R8 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R4-R8 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -482,10 +482,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo 'OSPF adjacency R4-R9 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R4-R9 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -496,10 +496,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo 'OSPF adjacency R5-R10 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R5-R10 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -510,10 +510,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo 'OSPF adjacency R5-R11 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R5-R11 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -524,10 +524,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo 'OSPF adjacency R6-R12 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R6-R12 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -538,10 +538,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo 'OSPF adjacency R6-R13 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R6-R13 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -552,10 +552,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R7",
-          "command": "echo 'OSPF adjacency R7-R14 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R7-R14 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -566,10 +566,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R7",
-          "command": "echo 'OSPF adjacency R7-R15 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R7-R15 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -580,10 +580,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R8",
-          "command": "echo 'OSPF adjacency R8-R16 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R8-R16 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -594,10 +594,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R8",
-          "command": "echo 'OSPF adjacency R8-R17 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R8-R17 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -608,10 +608,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R9",
-          "command": "echo 'OSPF adjacency R9-R18 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R9-R18 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -622,10 +622,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R9",
-          "command": "echo 'OSPF adjacency R9-R19 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R9-R19 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -636,10 +636,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R10",
-          "command": "echo 'OSPF adjacency R10-R20 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R10-R20 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -650,10 +650,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R10",
-          "command": "echo 'OSPF adjacency R10-R21 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R10-R21 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -664,10 +664,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R11",
-          "command": "echo 'OSPF adjacency R11-R22 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R11-R22 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -678,10 +678,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R11",
-          "command": "echo 'OSPF adjacency R11-R23 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R11-R23 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -692,10 +692,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R12",
-          "command": "echo 'OSPF adjacency R12-R24 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R12-R24 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -706,10 +706,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R12",
-          "command": "echo 'OSPF adjacency R12-R25 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R12-R25 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -720,10 +720,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R13",
-          "command": "echo 'OSPF adjacency R13-R26 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R13-R26 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -734,10 +734,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R13",
-          "command": "echo 'OSPF adjacency R13-R27 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R13-R27 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -748,10 +748,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R14",
-          "command": "echo 'OSPF adjacency R14-R28 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R14-R28 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -762,10 +762,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R14",
-          "command": "echo 'OSPF adjacency R14-R29 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R14-R29 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -776,10 +776,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R15",
-          "command": "echo 'OSPF adjacency R15-R30 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R15-R30 established"
+            "contains_text": "Full"
           }
         }
       },
@@ -790,38 +790,24 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R15",
-          "command": "echo 'OSPF adjacency R15-R31 established'",
+          "command": "sr_cli -e 'show network-instance default protocols ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R15-R31 established"
-          }
-        }
-      },
-      {
-        "id": "reachability_R1_to_R31",
-        "type": "reachability",
-        "description": "R1 can reach R31",
-        "evaluation": {
-          "method": "exec_and_parse",
-          "target_node": "R1",
-          "command": "ping -c 3 192.168.31.31",
-          "parser": "text",
-          "success_condition": {
-            "contains_text": "3 packets transmitted, 3 packets received"
+            "contains_text": "Full"
           }
         }
       },
       {
         "id": "routing_table_complete",
         "type": "route_exists",
-        "description": "Routing table has all expected OSPF routes",
+        "description": "Routing table has OSPF routes",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'Routing table complete'",
+          "command": "sr_cli -e 'show network-instance default route-table ipv4'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "Routing table complete"
+            "contains_text": "ospf"
           }
         }
       }

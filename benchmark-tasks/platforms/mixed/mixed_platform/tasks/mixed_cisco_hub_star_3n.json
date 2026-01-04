@@ -3,8 +3,8 @@
   "description": "Star 3-node: Cisco hub, FRR spokes",
   "platform": "frr",
   "mixed_platforms": [
-    "cisco_ios_xe",
-    "frr"
+    "frr",
+    "cisco_ios_xe"
   ],
   "topology": {
     "nodes": [

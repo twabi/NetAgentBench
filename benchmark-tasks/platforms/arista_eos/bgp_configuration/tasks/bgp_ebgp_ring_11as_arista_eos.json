@@ -1,0 +1,324 @@
+{
+  "task_id": "bgp_ebgp_ring_11as_arista_eos",
+  "description": "eBGP ring 11-AS topology",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth2",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth2",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth2",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth2",
+          "R1:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "bgp_session_R1_R2",
+        "type": "bgp_configuration",
+        "description": "BGP session between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R2_R3",
+        "type": "bgp_configuration",
+        "description": "BGP session between R2 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R3_R4",
+        "type": "bgp_configuration",
+        "description": "BGP session between R3 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R4_R5",
+        "type": "bgp_configuration",
+        "description": "BGP session between R4 and R5",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R5_R6",
+        "type": "bgp_configuration",
+        "description": "BGP session between R5 and R6",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R5",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R6_R7",
+        "type": "bgp_configuration",
+        "description": "BGP session between R6 and R7",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R6",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R7_R8",
+        "type": "bgp_configuration",
+        "description": "BGP session between R7 and R8",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R7",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R8_R9",
+        "type": "bgp_configuration",
+        "description": "BGP session between R8 and R9",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R8",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R9_R10",
+        "type": "bgp_configuration",
+        "description": "BGP session between R9 and R10",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R9",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R10_R11",
+        "type": "bgp_configuration",
+        "description": "BGP session between R10 and R11",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R10",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_R11_R1",
+        "type": "bgp_configuration",
+        "description": "BGP session between R11 and R1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R11",
+          "command": "Cli -c 'show ip bgp neighbors'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "route_exchange_R1_to_R11",
+        "type": "route_exists",
+        "description": "Route from R1 to R11 exists via BGP",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip route bgp'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "B"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 88,
+    "description": "Configure BGP on all 11 routers with appropriate AS and neighbors"
+  }
+}

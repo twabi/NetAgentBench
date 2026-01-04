@@ -1,0 +1,96 @@
+{
+  "task_id": "acl_dstip_linear_3n_linux",
+  "description": "Linear 3-node: Deny traffic to 192.168.100.0/24",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_FILTER_DST_exists",
+        "type": "acl_configuration",
+        "description": "ACL FILTER_DST is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"DROP\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "DROP"
+          }
+        }
+      },
+      {
+        "id": "acl_FILTER_DST_rule_0",
+        "type": "acl_rule",
+        "description": "ACL FILTER_DST contains rule: deny ip to 192.168.100.0/24",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"ip\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "ip"
+          }
+        }
+      },
+      {
+        "id": "acl_FILTER_DST_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Chain FORWARD"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 9,
+    "description": "Configure ACL FILTER_DST with deny ip on 3 nodes"
+  }
+}

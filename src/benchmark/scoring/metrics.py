@@ -106,8 +106,9 @@ class ScoringCalculator:
             Syntactic validity score in [0.0, 1.0]
         """
         if not execution_log:
-            # No commands executed = no failures = 100% syntactic validity
-            return 1.0
+            # No commands executed = no data = 0% syntactic validity
+            # (prevents inflated scores for agents that fail to run)
+            return 0.0
         
         successful_count = sum(1 for entry in execution_log if entry.success)
         total_count = len(execution_log)

@@ -492,10 +492,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "ping -c 3 192.168.1.40",
+          "command": "ping 192.168.1.40 repeat 3",
           "parser": "text",
           "success_condition": {
-            "contains_text": "3 packets transmitted, 3 packets received"
+            "contains_text": "!!!"
           }
         }
       }

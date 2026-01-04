@@ -72,7 +72,7 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "vtysh -c 'show vlan brief'",
+          "command": "cli -c 'show vlan brief'",
           "parser": "text",
           "success_condition": {
             "contains_text": "999"

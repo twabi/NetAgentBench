@@ -3,8 +3,8 @@
   "description": "Ring 3-node: Mixed FRR, Nokia, Arista",
   "platform": "frr",
   "mixed_platforms": [
-    "arista_eos",
     "frr",
+    "arista_eos",
     "nokia_srl"
   ],
   "topology": {

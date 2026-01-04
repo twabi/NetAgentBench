@@ -3,8 +3,8 @@
   "description": "Linear 5-node: FRR and Cisco IOS-XE mixed topology",
   "platform": "frr",
   "mixed_platforms": [
-    "cisco_ios_xe",
-    "frr"
+    "frr",
+    "cisco_ios_xe"
   ],
   "topology": {
     "nodes": [

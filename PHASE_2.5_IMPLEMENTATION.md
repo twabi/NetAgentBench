@@ -337,10 +337,10 @@ This plan consolidates implementation tasks from:
   ```
 
 **Phase 3 Exit Criteria**:
-- [ ] All unit tests passing (`pytest tests/unit/test_leaderboard*.py -v`)
-- [ ] Leaderboard manager correctly handles duplicates
-- [ ] CLI commands work end-to-end
-- [ ] Leaderboards persist and reload correctly
+- [X] All unit tests passing (`pytest tests/unit/test_leaderboard*.py -v`)
+- [X] Leaderboard manager correctly handles duplicates
+- [X] CLI commands work end-to-end
+- [X] Leaderboards persist and reload correctly
 
 ---
 

@@ -1,0 +1,3164 @@
+{
+  "task_id": "ospf_multiarea_tree_d4_b3_arista_eos",
+  "description": "OSPF multi-area tree depth 4 branching 3",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R14",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R15",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R16",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R17",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R18",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R19",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R20",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R21",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R22",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R23",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R24",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R25",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R26",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R27",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R28",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R29",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R30",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R31",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R32",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R33",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R34",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R35",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R36",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R37",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R38",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R39",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R40",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R41",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R42",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R43",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R44",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R45",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R46",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R47",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R48",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R49",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R50",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R51",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R52",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R53",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R54",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R55",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R56",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R57",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R58",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R59",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R60",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R61",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R62",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R63",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R64",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R65",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R66",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R67",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R68",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R69",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R70",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R71",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R72",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R73",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R74",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R75",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R76",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R77",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R78",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R79",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R80",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R81",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R82",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R83",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R84",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R85",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R86",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R87",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R88",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R89",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R90",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R91",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R92",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R93",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R94",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R95",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R96",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R97",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R98",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R99",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R100",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R101",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R102",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R103",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R104",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R105",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R106",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R107",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R108",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R109",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R110",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R111",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R112",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R113",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R114",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R115",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R116",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R117",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R118",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R119",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R120",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R121",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth1",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth3",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth1",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth1",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth3",
+          "R13:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth1",
+          "R14:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R15:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth3",
+          "R16:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth1",
+          "R17:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R18:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth3",
+          "R19:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth1",
+          "R20:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth2",
+          "R21:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth3",
+          "R22:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth1",
+          "R23:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth2",
+          "R24:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth3",
+          "R25:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth1",
+          "R26:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth2",
+          "R27:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth3",
+          "R28:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth1",
+          "R29:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth2",
+          "R30:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth3",
+          "R31:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth1",
+          "R32:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth2",
+          "R33:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth3",
+          "R34:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth1",
+          "R35:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth2",
+          "R36:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth3",
+          "R37:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth1",
+          "R38:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth2",
+          "R39:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth3",
+          "R40:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R14:eth1",
+          "R41:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R14:eth2",
+          "R42:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R14:eth3",
+          "R43:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R15:eth1",
+          "R44:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R15:eth2",
+          "R45:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R15:eth3",
+          "R46:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R16:eth1",
+          "R47:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R16:eth2",
+          "R48:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R16:eth3",
+          "R49:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R17:eth1",
+          "R50:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R17:eth2",
+          "R51:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R17:eth3",
+          "R52:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R18:eth1",
+          "R53:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R18:eth2",
+          "R54:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R18:eth3",
+          "R55:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R19:eth1",
+          "R56:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R19:eth2",
+          "R57:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R19:eth3",
+          "R58:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R20:eth1",
+          "R59:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R20:eth2",
+          "R60:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R20:eth3",
+          "R61:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R21:eth1",
+          "R62:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R21:eth2",
+          "R63:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R21:eth3",
+          "R64:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R22:eth1",
+          "R65:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R22:eth2",
+          "R66:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R22:eth3",
+          "R67:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R23:eth1",
+          "R68:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R23:eth2",
+          "R69:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R23:eth3",
+          "R70:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R24:eth1",
+          "R71:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R24:eth2",
+          "R72:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R24:eth3",
+          "R73:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R25:eth1",
+          "R74:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R25:eth2",
+          "R75:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R25:eth3",
+          "R76:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R26:eth1",
+          "R77:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R26:eth2",
+          "R78:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R26:eth3",
+          "R79:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R27:eth1",
+          "R80:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R27:eth2",
+          "R81:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R27:eth3",
+          "R82:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R28:eth1",
+          "R83:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R28:eth2",
+          "R84:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R28:eth3",
+          "R85:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R29:eth1",
+          "R86:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R29:eth2",
+          "R87:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R29:eth3",
+          "R88:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R30:eth1",
+          "R89:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R30:eth2",
+          "R90:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R30:eth3",
+          "R91:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R31:eth1",
+          "R92:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R31:eth2",
+          "R93:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R31:eth3",
+          "R94:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R32:eth1",
+          "R95:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R32:eth2",
+          "R96:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R32:eth3",
+          "R97:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R33:eth1",
+          "R98:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R33:eth2",
+          "R99:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R33:eth3",
+          "R100:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R34:eth1",
+          "R101:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R34:eth2",
+          "R102:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R34:eth3",
+          "R103:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R35:eth1",
+          "R104:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R35:eth2",
+          "R105:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R35:eth3",
+          "R106:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R36:eth1",
+          "R107:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R36:eth2",
+          "R108:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R36:eth3",
+          "R109:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R37:eth1",
+          "R110:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R37:eth2",
+          "R111:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R37:eth3",
+          "R112:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R38:eth1",
+          "R113:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R38:eth2",
+          "R114:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R38:eth3",
+          "R115:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R39:eth1",
+          "R116:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R39:eth2",
+          "R117:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R39:eth3",
+          "R118:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R40:eth1",
+          "R119:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R40:eth2",
+          "R120:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R40:eth3",
+          "R121:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_R1_R2",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R1_R3",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R1_R4",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R1 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R2_R5",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R5",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R2_R6",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R6",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R2_R7",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R7",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R3_R8",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R3 and R8",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R3_R9",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R3 and R9",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R3_R10",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R3 and R10",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R4_R11",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R4 and R11",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R4_R12",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R4 and R12",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R4_R13",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R4 and R13",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R5_R14",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R5 and R14",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R5",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R5_R15",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R5 and R15",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R5",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R5_R16",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R5 and R16",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R5",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R6_R17",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R6 and R17",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R6",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R6_R18",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R6 and R18",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R6",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R6_R19",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R6 and R19",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R6",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R7_R20",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R7 and R20",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R7",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R7_R21",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R7 and R21",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R7",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R7_R22",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R7 and R22",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R7",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R8_R23",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R8 and R23",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R8",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R8_R24",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R8 and R24",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R8",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R8_R25",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R8 and R25",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R8",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R9_R26",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R9 and R26",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R9",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R9_R27",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R9 and R27",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R9",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R9_R28",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R9 and R28",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R9",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R10_R29",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R10 and R29",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R10",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R10_R30",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R10 and R30",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R10",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R10_R31",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R10 and R31",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R10",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R11_R32",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R11 and R32",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R11",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R11_R33",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R11 and R33",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R11",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R11_R34",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R11 and R34",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R11",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R12_R35",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R12 and R35",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R12",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R12_R36",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R12 and R36",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R12",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R12_R37",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R12 and R37",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R12",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R13_R38",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R13 and R38",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R13",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R13_R39",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R13 and R39",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R13",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R13_R40",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R13 and R40",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R13",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R14_R41",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R14 and R41",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R14",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R14_R42",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R14 and R42",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R14",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R14_R43",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R14 and R43",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R14",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R15_R44",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R15 and R44",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R15",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R15_R45",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R15 and R45",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R15",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R15_R46",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R15 and R46",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R15",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R16_R47",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R16 and R47",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R16",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R16_R48",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R16 and R48",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R16",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R16_R49",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R16 and R49",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R16",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R17_R50",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R17 and R50",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R17",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R17_R51",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R17 and R51",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R17",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R17_R52",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R17 and R52",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R17",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R18_R53",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R18 and R53",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R18",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R18_R54",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R18 and R54",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R18",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R18_R55",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R18 and R55",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R18",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R19_R56",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R19 and R56",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R19",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R19_R57",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R19 and R57",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R19",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R19_R58",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R19 and R58",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R19",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R20_R59",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R20 and R59",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R20",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R20_R60",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R20 and R60",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R20",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R20_R61",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R20 and R61",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R20",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R21_R62",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R21 and R62",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R21",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R21_R63",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R21 and R63",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R21",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R21_R64",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R21 and R64",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R21",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R22_R65",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R22 and R65",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R22",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R22_R66",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R22 and R66",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R22",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R22_R67",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R22 and R67",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R22",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R23_R68",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R23 and R68",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R23",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R23_R69",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R23 and R69",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R23",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R23_R70",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R23 and R70",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R23",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R24_R71",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R24 and R71",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R24",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R24_R72",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R24 and R72",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R24",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R24_R73",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R24 and R73",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R24",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R25_R74",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R25 and R74",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R25",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R25_R75",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R25 and R75",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R25",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R25_R76",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R25 and R76",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R25",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R26_R77",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R26 and R77",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R26",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R26_R78",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R26 and R78",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R26",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R26_R79",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R26 and R79",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R26",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R27_R80",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R27 and R80",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R27",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R27_R81",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R27 and R81",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R27",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R27_R82",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R27 and R82",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R27",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R28_R83",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R28 and R83",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R28",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R28_R84",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R28 and R84",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R28",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R28_R85",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R28 and R85",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R28",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R29_R86",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R29 and R86",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R29",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R29_R87",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R29 and R87",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R29",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R29_R88",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R29 and R88",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R29",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R30_R89",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R30 and R89",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R30",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R30_R90",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R30 and R90",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R30",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R30_R91",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R30 and R91",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R30",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R31_R92",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R31 and R92",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R31",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R31_R93",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R31 and R93",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R31",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R31_R94",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R31 and R94",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R31",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R32_R95",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R32 and R95",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R32",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R32_R96",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R32 and R96",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R32",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R32_R97",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R32 and R97",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R32",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R33_R98",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R33 and R98",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R33",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R33_R99",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R33 and R99",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R33",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R33_R100",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R33 and R100",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R33",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R34_R101",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R34 and R101",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R34",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R34_R102",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R34 and R102",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R34",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R34_R103",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R34 and R103",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R34",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R35_R104",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R35 and R104",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R35",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R35_R105",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R35 and R105",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R35",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R35_R106",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R35 and R106",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R35",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R36_R107",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R36 and R107",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R36",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R36_R108",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R36 and R108",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R36",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R36_R109",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R36 and R109",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R36",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R37_R110",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R37 and R110",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R37",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R37_R111",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R37 and R111",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R37",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R37_R112",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R37 and R112",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R37",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R38_R113",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R38 and R113",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R38",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R38_R114",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R38 and R114",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R38",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R38_R115",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R38 and R115",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R38",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R39_R116",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R39 and R116",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R39",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R39_R117",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R39 and R117",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R39",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R39_R118",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R39 and R118",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R39",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R40_R119",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R40 and R119",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R40",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R40_R120",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R40 and R120",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R40",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "ospf_adjacency_R40_R121",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R40 and R121",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R40",
+          "command": "Cli -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "FULL"
+          }
+        }
+      },
+      {
+        "id": "routing_table_complete",
+        "type": "route_exists",
+        "description": "Routing table has OSPF routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "O"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 726,
+    "description": "Configure OSPF on all 121 routers with appropriate area and network statements"
+  }
+}

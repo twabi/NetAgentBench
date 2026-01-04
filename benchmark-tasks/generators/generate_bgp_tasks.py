@@ -255,10 +255,26 @@ def create_bgp_task(
     properties = []
 
     # Add BGP session properties for each link
+    # Add BGP session properties for each link
     for i, link in enumerate(topology.links):
         node1 = link.endpoints[0].split(':')[0]
         node2 = link.endpoints[1].split(':')[0]
         
+        # Determine verification command
+        if platform == "nokia_srl":
+            bgp_cmd = "sr_cli -e 'show network-instance default protocols bgp neighbor'"
+            bgp_expect = "Established"
+        elif platform == "arista_eos":
+            bgp_cmd = "Cli -c 'show ip bgp neighbors'"
+            bgp_expect = "Established"
+        elif platform == "cisco_ios_xe":
+            bgp_cmd = "cli -c 'show ip bgp neighbors'"
+            bgp_expect = "Established"
+        else: # frr
+            # Use 'show ip bgp neighbors' for reliable state check (summary can be ambiguous)
+            bgp_cmd = "vtysh -c 'show ip bgp neighbors'"
+            bgp_expect = "Established"
+
         # BGP session property
         prop = {
             "id": f"bgp_session_{node1}_{node2}",
@@ -267,11 +283,10 @@ def create_bgp_task(
             "evaluation": {
                 "method": "exec_and_parse",
                 "target_node": node1,
-                "command": f"echo '{{\"peers\": {{\"{node2}\": {{\"state\": \"Established\"}}}}}}'",
-                "parser": "json",
+                "command": bgp_cmd,
+                "parser": "text",
                 "success_condition": {
-                    "json_path": f"$.peers['{node2}'].state",
-                    "expected_value": "Established"
+                    "contains_text": bgp_expect
                 }
             }
         }
@@ -282,17 +297,30 @@ def create_bgp_task(
         first_node = topology.nodes[0].name
         last_node = topology.nodes[-1].name
         
+        if platform == "nokia_srl":
+            route_cmd = "sr_cli -e 'show network-instance default route-table ipv4'"
+            route_expect = "bgp"
+        elif platform == "arista_eos":
+            route_cmd = "Cli -c 'show ip route bgp'"
+            route_expect = "B"
+        elif platform == "cisco_ios_xe":
+            route_cmd = "cli -c 'show ip route bgp'"
+            route_expect = "B"
+        else: # frr
+            route_cmd = "vtysh -c 'show ip route bgp'"
+            route_expect = "B>"
+
         route_prop = {
             "id": f"route_exchange_{first_node}_to_{last_node}",
             "type": "route_exists",
-            "description": f"Route from {first_node} to {last_node} exists",
+            "description": f"Route from {first_node} to {last_node} exists via BGP",
             "evaluation": {
                 "method": "exec_and_parse",
                 "target_node": first_node,
-                "command": f"echo 'Route to {last_node} exists'",
+                "command": route_cmd,
                 "parser": "text",
                 "success_condition": {
-                    "contains_text": f"Route to {last_node} exists"
+                    "contains_text": route_expect
                 }
             }
         }

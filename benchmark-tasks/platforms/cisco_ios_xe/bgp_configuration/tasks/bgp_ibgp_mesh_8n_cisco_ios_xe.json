@@ -234,11 +234,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R2\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R2'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -249,11 +248,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R3'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -264,11 +262,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R4\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R4'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -279,11 +276,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R5\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R5'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -294,11 +290,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R6\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R6'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -309,11 +304,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R7'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -324,11 +318,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R8'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -339,11 +332,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo '{\"peers\": {\"R3\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R3'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -354,11 +346,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo '{\"peers\": {\"R4\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R4'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -369,11 +360,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo '{\"peers\": {\"R5\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R5'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -384,11 +374,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo '{\"peers\": {\"R6\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R6'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -399,11 +388,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R7'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -414,11 +402,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R8'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -429,11 +416,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo '{\"peers\": {\"R4\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R4'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -444,11 +430,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo '{\"peers\": {\"R5\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R5'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -459,11 +444,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo '{\"peers\": {\"R6\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R6'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -474,11 +458,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R7'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -489,11 +472,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R8'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -504,11 +486,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo '{\"peers\": {\"R5\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R5'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -519,11 +500,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo '{\"peers\": {\"R6\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R6'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -534,11 +514,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R7'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -549,11 +528,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R8'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -564,11 +542,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo '{\"peers\": {\"R6\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R6'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -579,11 +556,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R7'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -594,11 +570,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R8'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -609,11 +584,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo '{\"peers\": {\"R7\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R7'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -624,11 +598,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R8'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
@@ -639,25 +612,24 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R7",
-          "command": "echo '{\"peers\": {\"R8\": {\"state\": \"Established\"}}}'",
-          "parser": "json",
+          "command": "cli -c 'show ip bgp neighbors'",
+          "parser": "text",
           "success_condition": {
-            "json_path": "$.peers['R8'].state",
-            "expected_value": "Established"
+            "contains_text": "Established"
           }
         }
       },
       {
         "id": "route_exchange_R1_to_R8",
         "type": "route_exists",
-        "description": "Route from R1 to R8 exists",
+        "description": "Route from R1 to R8 exists via BGP",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'Route to R8 exists'",
+          "command": "cli -c 'show ip route bgp'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "Route to R8 exists"
+            "contains_text": "B"
           }
         }
       }

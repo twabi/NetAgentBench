@@ -1,0 +1,70 @@
+{
+  "task_id": "redist_kernel_to_ospf_linear_2n",
+  "description": "Linear 2-node: Redistribute kernel routes into OSPF",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "redist_kernel_to_ospf",
+        "type": "route_redistribution",
+        "description": "Routes from kernel are redistributed into ospf",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show running-config | section redistribute'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "redistribute kernel"
+          }
+        }
+      },
+      {
+        "id": "routes_in_ospf",
+        "type": "route_exists",
+        "description": "Redistributed routes appear in ospf table",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "Cli -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "K"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 14,
+    "description": "Configure kernel\u2192ospf redistribution on 2 nodes"
+  }
+}

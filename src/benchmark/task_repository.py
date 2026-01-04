@@ -18,7 +18,7 @@ class TaskRepository:
     """Load and manage benchmark tasks organized by property type."""
 
     VALID_PROPERTY_TYPES = ["reachability", "bgp_configuration", "ospf_configuration", "vlan_configuration", "acl_configuration", "firewall_rules", "route_redistribution", "mixed_platform"]
-    VALID_PLATFORMS = ["frr", "cisco_ios_xe", "nokia_srl", "mixed"]
+    VALID_PLATFORMS = ["frr", "cisco_ios_xe", "nokia_srl", "mixed", "generic"]
 
     def __init__(self, tasks_dir: Path = Path("benchmark-tasks")):
         """
@@ -84,7 +84,11 @@ class TaskRepository:
         
         # If platform is specified, only scan that platform directory
         if platform:
-            task_path = self.tasks_dir / "platforms" / platform / property_type / "tasks"
+            if platform == "generic":
+                # Generic folder is at tasks_dir/generic/<property_type>/tasks
+                task_path = self.tasks_dir / "generic" / property_type / "tasks"
+            else:
+                task_path = self.tasks_dir / "platforms" / platform / property_type / "tasks"
             tasks.extend(self._scan_dir(task_path))
         else:
             # 1. Legacy path: property_types/<prop>/tasks
@@ -98,6 +102,10 @@ class TaskRepository:
                     if platform_dir.is_dir():
                         task_path = platform_dir / property_type / "tasks"
                         tasks.extend(self._scan_dir(task_path))
+            
+            # 3. Generic path: generic/<prop>/tasks
+            generic_path = self.tasks_dir / "generic" / property_type / "tasks"
+            tasks.extend(self._scan_dir(generic_path))
         
         return tasks
 
@@ -225,6 +233,11 @@ class TaskRepository:
                     for prop_type in self.VALID_PROPERTY_TYPES:
                         path = platform_dir / prop_type / "tasks" / f"{task_id}.json"
                         candidates.append(path)
+        
+        # Generic
+        for prop_type in self.VALID_PROPERTY_TYPES:
+            generic_path = self.tasks_dir / "generic" / prop_type / "tasks" / f"{task_id}.json"
+            candidates.append(generic_path)
                         
         for path in candidates:
             if path.exists():

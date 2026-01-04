@@ -1,0 +1,120 @@
+{
+  "task_id": "acl_permit_icmp_linear_5n_linux",
+  "description": "Linear 5-node: Permit ICMP traffic",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth4",
+          "R5:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_PERMIT_ICMP_exists",
+        "type": "acl_configuration",
+        "description": "ACL PERMIT_ICMP is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"ACCEPT\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "ACCEPT"
+          }
+        }
+      },
+      {
+        "id": "acl_PERMIT_ICMP_rule_0",
+        "type": "acl_rule",
+        "description": "ACL PERMIT_ICMP contains rule: permit icmp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"icmp\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "icmp"
+          }
+        }
+      },
+      {
+        "id": "acl_PERMIT_ICMP_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Chain FORWARD"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 13,
+    "description": "Configure ACL PERMIT_ICMP with permit icmp on 5 nodes"
+  }
+}

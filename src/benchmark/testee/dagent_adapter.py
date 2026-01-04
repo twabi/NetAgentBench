@@ -32,8 +32,8 @@ class DagentAdapter(BaseTestee):
     def __init__(
         self,
         endpoint: str = "http://localhost:8000",
-        user_id: str = "benchmark",
-        topic_type: Optional[str] = None,
+        provider: str = "openai",
+        model: Optional[str] = None,
         timeout: float = 300.0,
         testee_id: str = "dagent",
     ):
@@ -42,9 +42,9 @@ class DagentAdapter(BaseTestee):
         
         Args:
             endpoint: Dagent HTTP endpoint (default: localhost:8000)
-            user_id: User ID for dagent conversations
-            topic_type: Optional initial topic type for routing
-            timeout: Request timeout in seconds (default: 300s for complex tasks)
+            provider: LLM provider (openai, anthropic, etc.)
+            model: Model name
+            timeout: Request timeout in seconds
             testee_id: Unique identifier for this testee
         """
         try:
@@ -56,176 +56,131 @@ class DagentAdapter(BaseTestee):
             )
         
         self.endpoint = endpoint.rstrip("/")
-        self.user_id = user_id
-        self.topic_type = topic_type
+        self.provider = provider
+        self.model = model
         self.timeout = timeout
         self.testee_id = testee_id
         self.httpx = httpx
         
-        # Reuse LLM components for task formatting and response parsing
-        self.presenter = LLMTaskPresenter()
-        self.parser = LLMResponseParser()
-        
         # Tracking
         self.requests_made = 0
-        self.conversation_id: Optional[str] = None
 
     def generate_submission(self, task: TaskDefinition) -> Submission:
         """
-        Generate a configuration submission using dagent multi-agent system.
-        
-        Args:
-            task: TaskDefinition specifying the network configuration problem
-        
-        Returns:
-            Submission containing the dagent-generated configuration
-        
-        Raises:
-            ConnectionError: If dagent is not reachable
-            ValueError: If response cannot be parsed
+        Generate a configuration submission using dagent one-shot API.
         """
         logger.info(f"Generating submission for task {task.task_id} using dagent")
         
-        # Format task as prompt using the same presenter as LLM testee
-        prompt = self.presenter.format_task_for_llm(task)
-        logger.debug(f"Prompt length: {len(prompt)} characters")
-        
-        # Send to dagent
         try:
-            response_content = self._call_dagent(prompt, task)
+            response_data = self._call_dagent_generate(task)
             self.requests_made += 1
             
+            # Convert response actions to Submission
+            actions = response_data.get("actions", [])
+            
+            # Group commands by node
+            from collections import defaultdict
+            node_commands = defaultdict(list)
+            
+            for action in actions:
+                if action.get("action") == "exec_command":
+                    node_input = action.get("input", {})
+                    # Handle both structure formats just in case
+                    node = node_input.get("node")
+                    cmd = node_input.get("command")
+                    
+                    if node and cmd:
+                        node_commands[node].append(cmd)
+            
+            # Create CommandSequence objects
+            submission_commands = []
+            for node, cmds in node_commands.items():
+                submission_commands.append({
+                    "node": node,
+                    "commands": cmds
+                })
+            
             logger.info(
-                f"Received dagent response ({len(response_content)} characters) "
+                f"Received dagent response: {len(actions)} actions -> "
+                f"{len(submission_commands)} node sequences "
                 f"for task {task.task_id}"
+            )
+            
+            # Create Submission object
+            from benchmark.models.submission import Submission, Approach
+            
+            return Submission(
+                task_id=task.task_id,
+                testee_id=self.testee_id,
+                testee_type="dagent",
+                approach=Approach(commands=submission_commands),
+                model_info={
+                    "provider": self.provider,
+                    "model": response_data.get("model_version", "unknown")
+                }
             )
             
         except Exception as e:
             logger.error(f"Dagent API call failed for task {task.task_id}: {e}")
             raise
-        
-        # Parse response into submission using same parser as LLM testee
-        try:
-            submission = self.parser.parse_response(
-                response=response_content,
-                task_id=task.task_id,
-                testee_id=self.testee_id,
-            )
-            
-            logger.info(
-                f"Successfully parsed submission for task {task.task_id}: "
-                f"{len(submission.approach.commands)} node configurations"
-            )
-            
-            return submission
-            
-        except ValueError as e:
-            logger.error(f"Failed to parse dagent response for task {task.task_id}: {e}")
-            raise
 
-    def _call_dagent(self, prompt: str, task: TaskDefinition) -> str:
-        """
-        Call dagent HTTP API.
-        
-        Args:
-            prompt: Formatted task prompt
-            task: Original task (passed as external metadata)
-        
-        Returns:
-            Response content string from dagent
-        """
+    def _call_dagent_generate(self, task: TaskDefinition) -> Dict[str, Any]:
+        """Call dagent /benchmark/generate endpoint."""
         timeout_config = self.httpx.Timeout(
-            connect=10.0,
-            read=self.timeout,
-            write=10.0,
-            pool=10.0
+            connect=10.0, read=self.timeout, write=10.0, pool=10.0
         )
         
-        url = f"{self.endpoint}/conversation/"
+        url = f"{self.endpoint}/benchmark/generate"
         logger.debug(f"DagentAdapter: Connecting to {url}")
         
-        with self.httpx.Client(
-            timeout=timeout_config,
-            follow_redirects=True
-        ) as client:
-            try:
-                # Build request body matching ConversationMessageDTO
-                request_body = {
-                    "user_id": self.user_id,
-                    "content": prompt,
-                    "external": {
-                        "task_id": task.task_id,
-                        "source": "benchmark",
-                    }
+        # Prepare request payload matching GenerateTaskRequest
+        # Include topology links so LLM knows interface connections
+        payload = {
+            "task_id": task.task_id,
+            "description": task.description,
+            "nodes": [n.name for n in task.topology.nodes],
+            "links": [
+                {"endpoints": link.endpoints}
+                for link in task.topology.links
+            ],
+            "platform": task.platform if hasattr(task, "platform") else "frr",
+            "properties": [
+                {
+                    "id": p.id,
+                    "type": p.type.value if hasattr(p.type, "value") else str(p.type),
+                    "description": p.description,
+                    "evaluation": p.evaluation.model_dump() if hasattr(p.evaluation, "model_dump") else p.evaluation.dict()
                 }
-                
-                # Add topic_type if specified
-                if self.topic_type:
-                    request_body["topic_type"] = self.topic_type
-                
-                # Add conversation_id for multi-turn if available
-                if self.conversation_id:
-                    request_body["conversation_id"] = self.conversation_id
-                
-                response = client.post(url, json=request_body)
+                for p in task.intent.properties
+            ],
+            "provider": self.provider,
+            "model": self.model
+        }
+        
+        with self.httpx.Client(timeout=timeout_config) as client:
+            try:
+                response = client.post(url, json=payload)
                 response.raise_for_status()
-                json_response = response.json()
+                return response.json()
                 
-                # Extract response from dagent's Res wrapper
-                # Structure: {"code": 0, "msg": "success", "data": {...}}
-                if "data" in json_response:
-                    data = json_response["data"]
-                    
-                    # Store conversation_id for potential multi-turn
-                    if "conversation_id" in data:
-                        self.conversation_id = str(data["conversation_id"])
-                    
-                    # Return content
-                    content = data.get("content", "")
-                    if not content:
-                        logger.warning(
-                            f"Dagent returned empty content. "
-                            f"Response keys: {list(data.keys())}"
-                        )
-                    return content
-                else:
-                    # Fallback: check for direct content
-                    logger.warning(
-                        f"Unexpected dagent response structure: {list(json_response.keys())}"
-                    )
-                    return json_response.get("content", str(json_response))
-                    
-            except self.httpx.ConnectError as e:
-                logger.error(f"Dagent connection error to {url}: {e}")
+            except self.httpx.ConnectError:
                 raise ConnectionError(
                     f"Failed to connect to dagent at {self.endpoint}. "
-                    f"Please verify the server is running: uvicorn dagent.main:app --reload"
+                    "Make sure it is running."
                 )
-            except self.httpx.TimeoutException as e:
-                logger.error(f"Dagent request timeout to {url}: {e}")
+            except self.httpx.TimeoutException:
                 raise TimeoutError(
-                    f"Request to dagent at {self.endpoint} timed out after {self.timeout}s"
+                    f"Request to dagent timed out after {self.timeout}s"
                 )
 
     def get_testee_info(self) -> Dict[str, Any]:
-        """
-        Return metadata about this dagent testee.
-        
-        Returns:
-            Dictionary with testee information
-        """
+        """Return metadata."""
         return {
             "testee_id": self.testee_id,
             "testee_type": "dagent",
-            "framework": "dagent",
             "endpoint": self.endpoint,
-            "user_id": self.user_id,
-            "topic_type": self.topic_type,
+            "provider": self.provider,
+            "model": self.model,
             "requests_made": self.requests_made,
-            "conversation_id": self.conversation_id,
         }
 
-    def reset_conversation(self):
-        """Reset conversation state for a new session."""
-        self.conversation_id = None
-        self.requests_made = 0

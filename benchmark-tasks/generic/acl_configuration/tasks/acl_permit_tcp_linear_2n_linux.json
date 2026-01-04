@@ -1,0 +1,84 @@
+{
+  "task_id": "acl_permit_tcp_linear_2n_linux",
+  "description": "Linear 2-node: Permit TCP traffic",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "acl_PERMIT_TCP_exists",
+        "type": "acl_configuration",
+        "description": "ACL PERMIT_TCP is configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"ACCEPT\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "ACCEPT"
+          }
+        }
+      },
+      {
+        "id": "acl_PERMIT_TCP_rule_0",
+        "type": "acl_rule",
+        "description": "ACL PERMIT_TCP contains rule: permit tcp",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n | grep \"tcp\"'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "tcp"
+          }
+        }
+      },
+      {
+        "id": "acl_PERMIT_TCP_applied",
+        "type": "acl_interface_binding",
+        "description": "ACL is applied to interface",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "sh -c 'iptables -L FORWARD -n'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Chain FORWARD"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 7,
+    "description": "Configure ACL PERMIT_TCP with permit tcp on 2 nodes"
+  }
+}

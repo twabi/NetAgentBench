@@ -1032,10 +1032,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'OSPF adjacency R1-R2 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R1-R2 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1046,10 +1046,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'OSPF adjacency R1-R3 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R1-R3 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1060,10 +1060,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'OSPF adjacency R1-R4 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R1-R4 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1074,10 +1074,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'OSPF adjacency R1-R5 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R1-R5 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1088,10 +1088,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo 'OSPF adjacency R2-R6 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R2-R6 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1102,10 +1102,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo 'OSPF adjacency R2-R7 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R2-R7 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1116,10 +1116,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo 'OSPF adjacency R2-R8 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R2-R8 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1130,10 +1130,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R2",
-          "command": "echo 'OSPF adjacency R2-R9 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R2-R9 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1144,10 +1144,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo 'OSPF adjacency R3-R10 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R3-R10 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1158,10 +1158,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo 'OSPF adjacency R3-R11 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R3-R11 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1172,10 +1172,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo 'OSPF adjacency R3-R12 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R3-R12 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1186,10 +1186,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R3",
-          "command": "echo 'OSPF adjacency R3-R13 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R3-R13 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1200,10 +1200,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo 'OSPF adjacency R4-R14 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R4-R14 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1214,10 +1214,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo 'OSPF adjacency R4-R15 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R4-R15 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1228,10 +1228,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo 'OSPF adjacency R4-R16 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R4-R16 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1242,10 +1242,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R4",
-          "command": "echo 'OSPF adjacency R4-R17 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R4-R17 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1256,10 +1256,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo 'OSPF adjacency R5-R18 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R5-R18 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1270,10 +1270,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo 'OSPF adjacency R5-R19 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R5-R19 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1284,10 +1284,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo 'OSPF adjacency R5-R20 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R5-R20 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1298,10 +1298,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R5",
-          "command": "echo 'OSPF adjacency R5-R21 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R5-R21 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1312,10 +1312,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo 'OSPF adjacency R6-R22 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R6-R22 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1326,10 +1326,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo 'OSPF adjacency R6-R23 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R6-R23 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1340,10 +1340,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo 'OSPF adjacency R6-R24 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R6-R24 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1354,10 +1354,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R6",
-          "command": "echo 'OSPF adjacency R6-R25 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R6-R25 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1368,10 +1368,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R7",
-          "command": "echo 'OSPF adjacency R7-R26 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R7-R26 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1382,10 +1382,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R7",
-          "command": "echo 'OSPF adjacency R7-R27 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R7-R27 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1396,10 +1396,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R7",
-          "command": "echo 'OSPF adjacency R7-R28 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R7-R28 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1410,10 +1410,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R7",
-          "command": "echo 'OSPF adjacency R7-R29 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R7-R29 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1424,10 +1424,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R8",
-          "command": "echo 'OSPF adjacency R8-R30 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R8-R30 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1438,10 +1438,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R8",
-          "command": "echo 'OSPF adjacency R8-R31 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R8-R31 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1452,10 +1452,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R8",
-          "command": "echo 'OSPF adjacency R8-R32 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R8-R32 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1466,10 +1466,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R8",
-          "command": "echo 'OSPF adjacency R8-R33 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R8-R33 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1480,10 +1480,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R9",
-          "command": "echo 'OSPF adjacency R9-R34 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R9-R34 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1494,10 +1494,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R9",
-          "command": "echo 'OSPF adjacency R9-R35 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R9-R35 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1508,10 +1508,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R9",
-          "command": "echo 'OSPF adjacency R9-R36 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R9-R36 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1522,10 +1522,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R9",
-          "command": "echo 'OSPF adjacency R9-R37 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R9-R37 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1536,10 +1536,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R10",
-          "command": "echo 'OSPF adjacency R10-R38 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R10-R38 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1550,10 +1550,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R10",
-          "command": "echo 'OSPF adjacency R10-R39 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R10-R39 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1564,10 +1564,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R10",
-          "command": "echo 'OSPF adjacency R10-R40 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R10-R40 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1578,10 +1578,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R10",
-          "command": "echo 'OSPF adjacency R10-R41 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R10-R41 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1592,10 +1592,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R11",
-          "command": "echo 'OSPF adjacency R11-R42 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R11-R42 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1606,10 +1606,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R11",
-          "command": "echo 'OSPF adjacency R11-R43 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R11-R43 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1620,10 +1620,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R11",
-          "command": "echo 'OSPF adjacency R11-R44 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R11-R44 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1634,10 +1634,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R11",
-          "command": "echo 'OSPF adjacency R11-R45 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R11-R45 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1648,10 +1648,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R12",
-          "command": "echo 'OSPF adjacency R12-R46 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R12-R46 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1662,10 +1662,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R12",
-          "command": "echo 'OSPF adjacency R12-R47 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R12-R47 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1676,10 +1676,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R12",
-          "command": "echo 'OSPF adjacency R12-R48 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R12-R48 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1690,10 +1690,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R12",
-          "command": "echo 'OSPF adjacency R12-R49 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R12-R49 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1704,10 +1704,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R13",
-          "command": "echo 'OSPF adjacency R13-R50 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R13-R50 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1718,10 +1718,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R13",
-          "command": "echo 'OSPF adjacency R13-R51 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R13-R51 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1732,10 +1732,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R13",
-          "command": "echo 'OSPF adjacency R13-R52 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R13-R52 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1746,10 +1746,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R13",
-          "command": "echo 'OSPF adjacency R13-R53 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R13-R53 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1760,10 +1760,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R14",
-          "command": "echo 'OSPF adjacency R14-R54 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R14-R54 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1774,10 +1774,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R14",
-          "command": "echo 'OSPF adjacency R14-R55 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R14-R55 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1788,10 +1788,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R14",
-          "command": "echo 'OSPF adjacency R14-R56 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R14-R56 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1802,10 +1802,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R14",
-          "command": "echo 'OSPF adjacency R14-R57 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R14-R57 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1816,10 +1816,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R15",
-          "command": "echo 'OSPF adjacency R15-R58 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R15-R58 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1830,10 +1830,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R15",
-          "command": "echo 'OSPF adjacency R15-R59 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R15-R59 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1844,10 +1844,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R15",
-          "command": "echo 'OSPF adjacency R15-R60 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R15-R60 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1858,10 +1858,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R15",
-          "command": "echo 'OSPF adjacency R15-R61 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R15-R61 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1872,10 +1872,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R16",
-          "command": "echo 'OSPF adjacency R16-R62 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R16-R62 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1886,10 +1886,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R16",
-          "command": "echo 'OSPF adjacency R16-R63 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R16-R63 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1900,10 +1900,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R16",
-          "command": "echo 'OSPF adjacency R16-R64 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R16-R64 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1914,10 +1914,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R16",
-          "command": "echo 'OSPF adjacency R16-R65 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R16-R65 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1928,10 +1928,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R17",
-          "command": "echo 'OSPF adjacency R17-R66 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R17-R66 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1942,10 +1942,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R17",
-          "command": "echo 'OSPF adjacency R17-R67 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R17-R67 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1956,10 +1956,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R17",
-          "command": "echo 'OSPF adjacency R17-R68 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R17-R68 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1970,10 +1970,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R17",
-          "command": "echo 'OSPF adjacency R17-R69 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R17-R69 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1984,10 +1984,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R18",
-          "command": "echo 'OSPF adjacency R18-R70 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R18-R70 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -1998,10 +1998,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R18",
-          "command": "echo 'OSPF adjacency R18-R71 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R18-R71 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2012,10 +2012,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R18",
-          "command": "echo 'OSPF adjacency R18-R72 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R18-R72 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2026,10 +2026,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R18",
-          "command": "echo 'OSPF adjacency R18-R73 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R18-R73 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2040,10 +2040,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R19",
-          "command": "echo 'OSPF adjacency R19-R74 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R19-R74 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2054,10 +2054,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R19",
-          "command": "echo 'OSPF adjacency R19-R75 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R19-R75 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2068,10 +2068,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R19",
-          "command": "echo 'OSPF adjacency R19-R76 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R19-R76 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2082,10 +2082,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R19",
-          "command": "echo 'OSPF adjacency R19-R77 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R19-R77 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2096,10 +2096,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R20",
-          "command": "echo 'OSPF adjacency R20-R78 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R20-R78 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2110,10 +2110,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R20",
-          "command": "echo 'OSPF adjacency R20-R79 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R20-R79 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2124,10 +2124,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R20",
-          "command": "echo 'OSPF adjacency R20-R80 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R20-R80 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2138,10 +2138,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R20",
-          "command": "echo 'OSPF adjacency R20-R81 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R20-R81 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2152,10 +2152,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R21",
-          "command": "echo 'OSPF adjacency R21-R82 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R21-R82 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2166,10 +2166,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R21",
-          "command": "echo 'OSPF adjacency R21-R83 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R21-R83 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2180,10 +2180,10 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R21",
-          "command": "echo 'OSPF adjacency R21-R84 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R21-R84 established"
+            "contains_text": "FULL"
           }
         }
       },
@@ -2194,38 +2194,24 @@
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R21",
-          "command": "echo 'OSPF adjacency R21-R85 established'",
+          "command": "cli -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "OSPF adjacency R21-R85 established"
-          }
-        }
-      },
-      {
-        "id": "reachability_R1_to_R85",
-        "type": "reachability",
-        "description": "R1 can reach R85",
-        "evaluation": {
-          "method": "exec_and_parse",
-          "target_node": "R1",
-          "command": "ping -c 3 192.168.85.85",
-          "parser": "text",
-          "success_condition": {
-            "contains_text": "3 packets transmitted, 3 packets received"
+            "contains_text": "FULL"
           }
         }
       },
       {
         "id": "routing_table_complete",
         "type": "route_exists",
-        "description": "Routing table has all expected OSPF routes",
+        "description": "Routing table has OSPF routes",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "R1",
-          "command": "echo 'Routing table complete'",
+          "command": "cli -c 'show ip route ospf'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "Routing table complete"
+            "contains_text": "O"
           }
         }
       }

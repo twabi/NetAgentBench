@@ -1,0 +1,212 @@
+{
+  "task_id": "reachability_linear_15n_R7_to_R15_arista_eos",
+  "description": "Linear 15-node topology: R7 to R15 reachability",
+  "platform": "arista_eos",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R14",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      },
+      {
+        "name": "R15",
+        "type": "router",
+        "image": "ceos:latest",
+        "platform": "arista_eos"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth3",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth4",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth5",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth6",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth7",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth8",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth9",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth10",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth11",
+          "R12:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:eth12",
+          "R13:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:eth13",
+          "R14:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R14:eth14",
+          "R15:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "reachability_R7_to_R15",
+        "type": "reachability",
+        "description": "R7 can reach R15 via ping",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R7",
+          "command": "ping 192.168.15.15 repeat 3",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "0% packet loss"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 30,
+    "description": "Configure IP addresses and bring up interfaces on all 15 nodes"
+  }
+}

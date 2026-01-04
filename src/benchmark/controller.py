@@ -27,13 +27,14 @@ from benchmark.executor.observation import ObservationExecutor
 from benchmark.evaluator.property import PropertyEvaluator
 from benchmark.scoring.metrics import ScoringCalculator
 from benchmark.scoring.validity import ValidityChecker
-from benchmark.models.task import TaskDefinition
-from benchmark.models.submission import Submission
+from benchmark.models.task import TaskDefinition, Platform
+from benchmark.models.submission import Submission, Approach, CommandSequence
 from benchmark.models.results import (
     BenchmarkResult,
     ExecutionMetrics,
     PropertyEvaluationResult,
 )
+from benchmark.platforms import get_platform_profile
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -77,6 +78,108 @@ class BenchmarkController:
         self.property_evaluator = property_evaluator or PropertyEvaluator()
         self.scoring_calculator = scoring_calculator or ScoringCalculator()
         self.validity_checker = validity_checker or ValidityChecker()
+
+    def _prepare_execution_approach(
+        self, task: TaskDefinition, original_approach: Approach
+    ) -> Approach:
+        """
+        Prepare approach for execution by batching/wrapping commands.
+        
+        Many platforms (like FRR, Nokia SR Linux) require stateful CLI sessions
+        (e.g., 'configure terminal' context) which adheres poorly to stateless
+        'docker exec' commands. This method transforms the approach to batch
+        commands into single shell executions where necessary.
+        
+        Args:
+            task: Task definition containing node platforms
+            original_approach: The original submission approach
+            
+        Returns:
+            New Approach object with platform-appropriate command structures
+        """
+        # Create a map of node info
+        node_platforms = {node.name: node.platform for node in task.topology.nodes}
+        
+        new_sequences = []
+        
+        for seq in original_approach.commands:
+            platform = node_platforms.get(seq.node)
+            
+            # Default: preserve original structure
+            if not platform:
+                new_sequences.append(seq)
+                continue
+                
+            # Handle specific platforms
+            if platform == "frr" or platform == Platform.FRR:
+                # Batch FRR commands into a single vtysh execution via pipe
+                # Command: /bin/sh -c "printf 'conf t\ncmd1\ncmd2...' | vtysh"
+                
+                # Filter out empty commands
+                cmds = [c for c in seq.commands if c.strip()]
+                if not cmds:
+                    continue
+                    
+                # Create batched command payload
+                # Escape single quotes in commands for shell safety? 
+                # Simplification: assume simple commands for now.
+                # Use double quotes for printf, so escape double quotes in commands.
+                # Actually, python list -> string mapping is tricky.
+                # Construct payload for printf
+                
+                # Check if first command is already 'configure terminal' or 'conf t'
+                if "conf" not in cmds[0]:
+                    cmds.insert(0, "configure terminal")
+                    
+                # Join with newlines
+                payload = "\\n".join(cmds)
+                # Escape for shell
+                payload = payload.replace('"', '\\"')
+                
+                # Construct the single shell command
+                full_cmd = f'/bin/sh -c "printf \'{payload}\' | vtysh"'
+                
+                new_sequences.append(CommandSequence(
+                    node=seq.node,
+                    commands=[full_cmd]
+                ))
+            
+            elif platform == "nokia_srl" or platform == Platform.NOKIA_SRL:
+                # Nokia SR Linux usually needs specific wrapping or batching
+                # sr_cli -e "cmd"
+                # But for config, we need 'enter candidate' ... 'commit now'
+                # Batching is best here too.
+                # sr_cli reads from stdin? yes, usually.
+                
+                cmds = [c for c in seq.commands if c.strip()]
+                if not cmds:
+                    continue
+                    
+                # Ensure enter candidate and commit
+                if "enter candidate" not in cmds[0]:
+                    cmds.insert(0, "enter candidate")
+                if "commit now" not in cmds[-1]:
+                    cmds.append("commit now")
+                    
+                payload = "\\n".join(cmds)
+                payload = payload.replace('"', '\\"')
+                
+                # sr_cli typically located in path
+                full_cmd = f'/bin/sh -c "printf \'{payload}\' | sr_cli"'
+                
+                new_sequences.append(CommandSequence(
+                    node=seq.node,
+                    commands=[full_cmd]
+                ))
+                
+            else:
+                # Default behavior for unknown or simple platforms
+                # Still might need wrapping from PlatformProfile
+                # But PlatformProfile usage was missing from Executor anyway.
+                # For now, pass through.
+                new_sequences.append(seq)
+                
+        return Approach(commands=new_sequences)
 
     def run(
         self, task: TaskDefinition, submission: Submission
@@ -202,10 +305,14 @@ class BenchmarkController:
             logger.info("Step 4: Applying configuration approach")
             try:
                 config_start = time.time()
+                
+                # Prepare execution approach (batch commands where needed)
+                execution_approach = self._prepare_execution_approach(task, submission.approach)
+                
                 execution_log = self.command_executor.apply_approach(
                     infrastructure=self.infrastructure,
                     topology_id=topology_id,
-                    approach=submission.approach,
+                    approach=execution_approach,
                     convergence_timeout=0,  # We handle convergence separately
                 )
                 config_time = time.time() - config_start

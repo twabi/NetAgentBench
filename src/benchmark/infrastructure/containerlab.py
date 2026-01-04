@@ -35,7 +35,7 @@ class ContainerlabProvider(InfrastructureProvider):
                                    from previous runs on initialization
         """
         self.docker_client = None
-        self.temp_files = {}  # Track temp files for cleanup
+        self.temp_dirs = {}  # Track temp dirs for cleanup
         
         # Clean up stale networks from previous runs
         if cleanup_stale_networks:
@@ -53,7 +53,7 @@ class ContainerlabProvider(InfrastructureProvider):
         return f"bench_{timestamp}_{unique_id}"
 
     def _generate_clab_yaml(
-        self, topology: TopologySpecification, topology_id: str
+        self, topology: TopologySpecification, topology_id: str, config_dir: str
     ) -> str:
         """
         Generate Containerlab YAML configuration from TopologySpecification.
@@ -61,6 +61,7 @@ class ContainerlabProvider(InfrastructureProvider):
         Args:
             topology: TopologySpecification model
             topology_id: Unique topology identifier
+            config_dir: Directory where config files are stored
             
         Returns:
             YAML configuration as string
@@ -83,10 +84,35 @@ class ContainerlabProvider(InfrastructureProvider):
 
         # Add nodes
         for node in topology.nodes:
-            clab_config["topology"]["nodes"][node.name] = {
-                "kind": "linux",  # Containerlab node kind
+            node_config = {
                 "image": node.image,
             }
+
+            # Determine kind and binds based on platform
+            if node.platform == "nokia_srl":
+                node_config["kind"] = "nokia_srlinux"
+            elif node.platform == "arista_eos":
+                node_config["kind"] = "arista_ceos"
+            elif node.platform == "cisco_ios_xe":
+                node_config["kind"] = "vr-cisco_csr1000v" # Supported VRNetLab kind for IOS-XE
+            elif node.platform == "frr":
+                node_config["kind"] = "linux"
+                # Add binds for FRR configuration
+                node_config["binds"] = [
+                    f"{config_dir}/daemons:/etc/frr/daemons:ro",
+                    f"{config_dir}/vtysh.conf:/etc/frr/vtysh.conf:ro"
+                ]
+                # Default cmd to start nothing or let image handle it? 
+                # FRR image usually starts zebra/bgpd if daemons enabled.
+            else:
+                node_config["kind"] = "linux"
+                # For generic linux (alpine), ensure basic tools are present
+                if "alpine" in node.image:
+                    node_config["exec"] = [
+                        "apk add --no-cache iptables iproute2"
+                    ]
+        
+            clab_config["topology"]["nodes"][node.name] = node_config
 
         # Add links
         for link in topology.links:
@@ -98,11 +124,41 @@ class ContainerlabProvider(InfrastructureProvider):
         yaml_content = yaml.dump(clab_config, default_flow_style=False, sort_keys=False)
         return yaml_content
 
+    def _create_frr_configs(self, config_dir: str) -> None:
+        """Create default FRR configuration files."""
+        # Create daemons file
+        daemons_content = """
+bgpd=yes
+ospfd=yes
+ospf6d=yes
+ripd=yes
+ripngd=yes
+isisd=yes
+pimd=yes
+ldpd=yes
+nhrpd=yes
+eigrpd=yes
+babeld=yes
+sharpd=yes
+pbrd=yes
+bfdd=yes
+fabricd=yes
+vrrpd=yes
+pathd=yes
+"""
+        with open(f"{config_dir}/daemons", "w") as f:
+            f.write(daemons_content.strip())
+
+        # Create vtysh.conf
+        vtysh_content = """
+service integrated-vtysh-config
+"""
+        with open(f"{config_dir}/vtysh.conf", "w") as f:
+            f.write(vtysh_content.strip())
+
     def provision(self, topology: TopologySpecification) -> str:
         """
         Provision a topology using Containerlab.
-        
-        Generates a .clab.yml file and executes 'clab deploy' command.
         
         Args:
             topology: TopologySpecification model
@@ -116,23 +172,26 @@ class ContainerlabProvider(InfrastructureProvider):
         # Generate unique topology ID
         topology_id = self._generate_topology_id()
 
-        # Generate YAML configuration
-        yaml_content = self._generate_clab_yaml(topology, topology_id)
-
-        # Write to temporary file
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".clab.yml", delete=False
-        ) as f:
-            f.write(yaml_content)
-            temp_file_path = f.name
-
-        # Store temp file path for cleanup
-        self.temp_files[topology_id] = temp_file_path
+        # Create temporary directory
+        temp_dir = tempfile.mkdtemp(prefix=f"clab_{topology_id}_")
+        self.temp_dirs[topology_id] = temp_dir
 
         try:
+            # Create aux config files if needed (e.g. for FRR)
+            # We create them regardless of platform presence to be safe/simple, 
+            # or check if any node is FRR. Optimizing: just create them.
+            self._create_frr_configs(temp_dir)
+
+            # Generate YAML configuration
+            yaml_content = self._generate_clab_yaml(topology, topology_id, temp_dir)
+
+            # Write config to file
+            clab_file = f"{temp_dir}/{topology_id}.clab.yml"
+            with open(clab_file, "w") as f:
+                f.write(yaml_content)
+
             # Execute containerlab deploy command
-            # Try without sudo first (works in most setups)
-            cmd = ["clab", "deploy", "-t", temp_file_path]
+            cmd = ["clab", "deploy", "-t", clab_file]
 
             result = subprocess.run(
                 cmd,
@@ -143,7 +202,7 @@ class ContainerlabProvider(InfrastructureProvider):
             
             # If permission denied, try with sudo
             if result.returncode != 0 and "permission denied" in result.stderr.lower():
-                cmd = ["sudo", "-n", "clab", "deploy", "-t", temp_file_path]
+                cmd = ["sudo", "-n", "clab", "deploy", "-t", clab_file]
                 result = subprocess.run(
                     cmd,
                     capture_output=True,
@@ -151,30 +210,25 @@ class ContainerlabProvider(InfrastructureProvider):
                     timeout=300,
                 )
 
-
             if result.returncode != 0:
                 error_msg = f"Containerlab deploy failed: {result.stderr}"
-                # Clean up temp file on failure
-                if os.path.exists(temp_file_path):
-                    os.remove(temp_file_path)
-                del self.temp_files[topology_id]
                 raise Exception(error_msg)
 
             return topology_id
 
-        except subprocess.TimeoutExpired:
-            # Clean up temp file on timeout
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-            if topology_id in self.temp_files:
-                del self.temp_files[topology_id]
-            raise Exception("Containerlab deploy timed out after 5 minutes")
         except Exception as e:
-            # Clean up temp file on error
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-            if topology_id in self.temp_files:
-                del self.temp_files[topology_id]
+            # Cleanup will be handled by teardown or caller if they catch it
+            # But we should try to clean up if we failed to return ID
+            # Actually, we register it in self.temp_dirs, so explicit teardown calls will clean it.
+            # But if provision fails, caller might not call teardown with this ID?
+            # Safe to assume caller handles exception.
+            if os.path.exists(temp_dir):
+                try:
+                    shutil.rmtree(temp_dir)
+                except:
+                    pass
+            if topology_id in self.temp_dirs:
+                del self.temp_dirs[topology_id]
             raise Exception(f"Failed to provision topology: {str(e)}")
 
     def is_ready(self, topology_id: str) -> bool:
@@ -228,51 +282,35 @@ class ContainerlabProvider(InfrastructureProvider):
         destroy_success = False
         
         try:
-            # Execute containerlab destroy command using topology name
-            # Try without sudo first
+            # Execute destroy command
+            # Pass full path to clab file if we have it?
+            # Or just name. 'clab destroy --name ...' works if name matches.
             cmd = ["clab", "destroy", "--name", topology_id, "--cleanup"]
-
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=120,  # 2 minutes timeout
-            )
             
-            # If permission denied, try with sudo
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            
             if result.returncode != 0 and "permission denied" in result.stderr.lower():
-                cmd = ["sudo", "-n", "clab", "destroy", "--name", topology_id, "--cleanup"]
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    timeout=120,
-                )
+                 cmd = ["sudo", "-n", "clab", "destroy", "--name", topology_id, "--cleanup"]
+                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
             
             destroy_success = (result.returncode == 0)
 
-        except Exception as e:
-            # Log error but don't raise - teardown should be best-effort
+        except Exception:
             destroy_success = False
         
-        # ALWAYS attempt cleanup, even if destroy failed
+        # Cleanup tasks
         try:
-            # CRITICAL: Clean up Docker networks manually
-            # The --cleanup flag only removes lab directories, not always networks
             self._cleanup_docker_networks(topology_id)
-            
-            # Also try to force remove any containers that might still be running
             self._cleanup_containers(topology_id)
 
-            # Clean up temporary file if it exists
-            if topology_id in self.temp_files:
-                temp_file_path = self.temp_files[topology_id]
-                if os.path.exists(temp_file_path):
-                    os.remove(temp_file_path)
-                del self.temp_files[topology_id]
+            # Clean up temp directory
+            if topology_id in self.temp_dirs:
+                temp_dir = self.temp_dirs[topology_id]
+                if os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir)
+                del self.temp_dirs[topology_id]
 
         except Exception:
-            # Best effort cleanup - continue even if this fails
             pass
         
         return destroy_success

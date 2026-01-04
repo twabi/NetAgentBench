@@ -3,8 +3,8 @@
   "description": "Ring 8-node: FRR-Cisco alternating",
   "platform": "frr",
   "mixed_platforms": [
-    "cisco_ios_xe",
-    "frr"
+    "frr",
+    "cisco_ios_xe"
   ],
   "topology": {
     "nodes": [

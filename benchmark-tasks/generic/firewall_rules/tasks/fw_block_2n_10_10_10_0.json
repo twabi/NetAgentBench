@@ -1,0 +1,70 @@
+{
+  "task_id": "fw_block_2n_10_10_10_0",
+  "description": "Linear 2-node: Block all traffic from 10.10.10.0/24",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "fw_BLOCK_NET_exists",
+        "type": "firewall_rule",
+        "description": "Firewall rule BLOCK_NET is configured with deny",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "iptables -L FORWARD -n",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "BLOCK_NET"
+          }
+        }
+      },
+      {
+        "id": "blocked_by_BLOCK_NET",
+        "type": "firewall_block",
+        "description": "Traffic is blocked by firewall rule",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "iptables -L FORWARD -n",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "DROP"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 8,
+    "description": "Configure firewall rule BLOCK_NET on 2 nodes"
+  }
+}

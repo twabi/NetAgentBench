@@ -277,11 +277,14 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @main.command()
 @click.argument("task_file", type=click.Path(exists=True))
 @click.option("--dagent-endpoint", default=None, help="Dagent HTTP endpoint to trigger (e.g., http://localhost:8000)")
+@click.option("--provider", default="openai", help="LLM provider: openai, anthropic, gemini, ollama (default: openai)")
+@click.option("--model", default=None, help="Model name (e.g., gpt-4o, gemini-2.0-flash, claude-3-5-sonnet)")
 @click.option("--turn-limit", type=int, default=50, help="Max config commands (default: 50)")
 @click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds (default: 600)")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
 @click.option("--wait-for-submit", is_flag=True, help="Wait for agent to call submit (manual mode)")
-def run_task(task_file, dagent_endpoint, turn_limit, time_limit, output_dir, wait_for_submit):
+@click.option("--verbose", "-v", is_flag=True, help="Print each agent action as it executes")
+def run_task(task_file, dagent_endpoint, provider, model, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
     """
     Run a single task file in multi-turn interactive mode.
     
@@ -291,8 +294,16 @@ def run_task(task_file, dagent_endpoint, turn_limit, time_limit, output_dir, wai
     Examples:
     
         \\b
-        # Run with dagent (triggers dagent automatically)
+        # Run with dagent using OpenAI (default)
         benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000
+        
+        \\b
+        # Run with Gemini
+        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000 --provider gemini --model gemini-2.0-flash
+        
+        \\b
+        # Run with Anthropic Claude
+        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000 --provider anthropic --model claude-3-5-sonnet-20241022
         
         \\b
         # Run with custom limits
@@ -312,9 +323,15 @@ def run_task(task_file, dagent_endpoint, turn_limit, time_limit, output_dir, wai
             task_data = json.load(f)
         task = TaskDefinition(**task_data)
 
-        testee_id = "manual_agent"
+        # Build testee_id based on provider/model
         if dagent_endpoint:
-            testee_id = f"dagent_{dagent_endpoint.replace('http://', '').replace(':', '_')}"
+            if model:
+                # Use model name for clearer identification  
+                testee_id = f"{provider}_{model.replace('-', '').replace('.', '')}"
+            else:
+                testee_id = f"{provider}_default"
+        else:
+            testee_id = "manual_agent"
 
         click.echo(f"\n{'='*80}")
         click.echo(f"Multi-Turn Task: {task.task_id}")
@@ -326,6 +343,8 @@ def run_task(task_file, dagent_endpoint, turn_limit, time_limit, output_dir, wai
         click.echo(f"Time Limit: {time_limit}s")
         if dagent_endpoint:
             click.echo(f"Dagent Endpoint: {dagent_endpoint}")
+            click.echo(f"Provider: {provider}")
+            click.echo(f"Model: {model or '(default)'}")
         else:
             click.echo(f"Wait for Submit: {wait_for_submit}")
         click.echo(f"{'='*80}\n")
@@ -339,10 +358,14 @@ def run_task(task_file, dagent_endpoint, turn_limit, time_limit, output_dir, wai
                 task=task,
                 testee_id=testee_id,
                 testee_type="dagent" if dagent_endpoint else "manual",
+                model_name=model,
                 turn_limit=turn_limit,
                 time_limit=time_limit,
                 wait_for_submit=wait_for_submit,
                 dagent_endpoint=dagent_endpoint,
+                dagent_provider=provider,
+                dagent_model=model,
+                verbose=verbose,
             )
         
         result = asyncio.run(run())
@@ -532,7 +555,9 @@ def run_llm(property_type, provider, model, base_url, platform, limit, output_di
 @click.option("--mode", type=click.Choice(["single", "multi"]), default="single", help="Benchmark mode: single (default) or multi-turn")
 @click.option("--turn-limit", type=int, default=50, help="Max config commands for multi-turn mode (default: 50)")
 @click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds for multi-turn mode (default: 600)")
-def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit):
+@click.option("--provider", default="openai", help="LLM provider (default: openai)")
+@click.option("--model", default=None, help="LLM model name")
+def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit, provider, model):
     """
     Run all tasks for a property type using dagent multi-agent system.
     
@@ -543,21 +568,25 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
     
     Examples:
     
-        \\b
+        \b
         # Run reachability tasks with dagent (default localhost, single-turn)
         benchmark run-dagent reachability
         
-        \\b
+        \b
         # Run 5 BGP tasks with dagent on custom endpoint
         benchmark run-dagent bgp_configuration --endpoint http://myserver:8000 --limit 5
         
-        \\b
+        \b
         # Run with multi-turn interactive mode
         benchmark run-dagent reachability --mode multi --turn-limit 30 --time-limit 300
         
-        \\b
+        \b
         # Run on specific platform
         benchmark run-dagent ospf_configuration --platform cisco_ios_xe --limit 10
+        
+        \b
+        # Run with specific model
+        benchmark run-dagent bgp_configuration --provider anthropic --model claude-3-5-sonnet-20241022
     """
     try:
         click.echo(f"Using dagent at: {endpoint}")
@@ -594,6 +623,9 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
                     turn_limit=turn_limit,
                     time_limit=time_limit,
                     wait_for_submit=False,  # Don't wait for interactive submission
+                    dagent_endpoint=endpoint,
+                    dagent_provider=provider,
+                    dagent_model=model,
                 )
                 storage.save_result(result)
                 results.append(result)
@@ -615,6 +647,8 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
             testee = DagentAdapter(
                 endpoint=endpoint,
                 testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}",
+                provider=provider,
+                model=model,
             )
 
             _run_property_execution(
@@ -958,24 +992,26 @@ def show(leaderboard_id, limit, output_dir):
             return
         
         # Header
-        click.echo(f"{'Rank':<5}{'Testee':<20}{'Model':<18}{'Score':<8}{'Tasks':<6}{'Run ID':<20}")
-        click.echo("-" * 77)
+        click.echo(f"{'Rank':<5}{'Testee':<16}{'Model':<14}{'Score':<7}{'Timestamp':<18}{'Run ID':<16}")
+        click.echo("-" * 76)
         
         # Entries
         for rank, entry in enumerate(entries, 1):
             testee = entry.testee_id
-            if len(testee) > 19:
-                testee = testee[:16] + "..."
+            if len(testee) > 15:
+                testee = testee[:12] + "..."
             
             model = entry.model_version or "-"
-            if len(model) > 17:
-                model = model[:14] + "..."
+            if len(model) > 13:
+                model = model[:10] + "..."
             
             run_id = entry.run_id
-            if len(run_id) > 19:
-                run_id = run_id[:16] + "..."
+            if len(run_id) > 15:
+                run_id = run_id[:12] + "..."
             
-            click.echo(f"{rank:<5}{testee:<20}{model:<18}{entry.score:<8.3f}{entry.num_tasks:<6}{run_id:<20}")
+            timestamp_str = entry.timestamp.strftime("%m-%d %H:%M")
+            
+            click.echo(f"{rank:<5}{testee:<16}{model:<14}{entry.score:<7.3f}{timestamp_str:<18}{run_id:<16}")
             
     except Exception as e:
         logger.error(f"Failed to show leaderboard: {e}")
