@@ -165,16 +165,8 @@ def main() -> None:
             tasks = generators[prop_type]()
             # Mixed platform tasks go to specific directory
             output_path = base_dir / "platforms" / "mixed" / prop_type / "tasks"
-        elif prop_type == "firewall_rules" and args.platform == "linux":
-            print(f"Generating {prop_type} tasks for generic linux...")
-            tasks = generators[prop_type](platform="linux")
-            # BIO-334: Firewall tasks moved to generic folder
-            output_path = base_dir / "generic" / prop_type / "tasks"
-        elif prop_type == "vlan_configuration" and args.platform == "linux":
-            print(f"Generating {prop_type} tasks for generic linux...")
-            tasks = generators[prop_type](platform="linux")
-            output_path = base_dir / "generic" / prop_type / "tasks"
-        elif prop_type == "acl_configuration" and args.platform == "linux":
+        elif prop_type in ("firewall_rules", "acl_configuration", "vlan_configuration"):
+            # These are platform-agnostic Linux tasks - always go to generic folder
             print(f"Generating {prop_type} tasks for generic linux...")
             tasks = generators[prop_type](platform="linux")
             output_path = base_dir / "generic" / prop_type / "tasks"

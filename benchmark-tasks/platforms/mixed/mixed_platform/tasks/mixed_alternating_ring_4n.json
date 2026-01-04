@@ -1,10 +1,10 @@
 {
   "task_id": "mixed_alternating_ring_4n",
-  "description": "Ring 4-node: FRR-Cisco alternating",
+  "description": "Ring 4-node: FRR-Nokia alternating",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "cisco_ios_xe"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -17,8 +17,8 @@
       {
         "name": "R2",
         "type": "router",
-        "image": "cisco-iosxe:latest",
-        "platform": "cisco_ios_xe"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       },
       {
         "name": "R3",
@@ -29,32 +29,32 @@
       {
         "name": "R4",
         "type": "router",
-        "image": "cisco-iosxe:latest",
-        "platform": "cisco_ios_xe"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       }
     ],
     "links": [
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
+          "R2:ethernet-1/2",
           "R3:eth1"
         ]
       },
       {
         "endpoints": [
           "R3:eth2",
-          "R4:eth1"
+          "R4:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth2",
+          "R4:ethernet-1/2",
           "R1:eth2"
         ]
       }

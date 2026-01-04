@@ -18,7 +18,7 @@ class TaskRepository:
     """Load and manage benchmark tasks organized by property type."""
 
     VALID_PROPERTY_TYPES = ["reachability", "bgp_configuration", "ospf_configuration", "vlan_configuration", "acl_configuration", "firewall_rules", "route_redistribution", "mixed_platform"]
-    VALID_PLATFORMS = ["frr", "cisco_ios_xe", "nokia_srl", "mixed", "generic"]
+    VALID_PLATFORMS = ["frr", "vyos", "nokia_srl", "mixed", "generic"]
 
     def __init__(self, tasks_dir: Path = Path("benchmark-tasks")):
         """

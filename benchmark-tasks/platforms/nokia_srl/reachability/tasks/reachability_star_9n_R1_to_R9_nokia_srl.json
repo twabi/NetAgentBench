@@ -62,50 +62,50 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:ethernet-1/1",
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth2",
-          "R3:eth1"
+          "R1:ethernet-1/2",
+          "R3:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth3",
-          "R4:eth1"
+          "R1:ethernet-1/3",
+          "R4:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth4",
-          "R5:eth1"
+          "R1:ethernet-1/4",
+          "R5:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth5",
-          "R6:eth1"
+          "R1:ethernet-1/5",
+          "R6:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth6",
-          "R7:eth1"
+          "R1:ethernet-1/6",
+          "R7:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth7",
-          "R8:eth1"
+          "R1:ethernet-1/7",
+          "R8:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth8",
-          "R9:eth1"
+          "R1:ethernet-1/8",
+          "R9:ethernet-1/1"
         ]
       }
     ],

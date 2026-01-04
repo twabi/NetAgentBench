@@ -1,0 +1,529 @@
+{
+  "task_id": "mixed_nokia_tree_d3_b3",
+  "description": "Tree d3b3 (40 nodes): Nokia root",
+  "platform": "frr",
+  "mixed_platforms": [
+    "nokia_srl"
+  ],
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R13",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R14",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R15",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R16",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R17",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R18",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R19",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R20",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R21",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R22",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R23",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R24",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R25",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R26",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R27",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R28",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R29",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R30",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R31",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R32",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R33",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R34",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R35",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R36",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R37",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R38",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R39",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R40",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:ethernet-1/1",
+          "R2:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:ethernet-1/2",
+          "R3:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:ethernet-1/3",
+          "R4:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:ethernet-1/2",
+          "R5:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:ethernet-1/3",
+          "R6:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:ethernet-1/4",
+          "R7:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:ethernet-1/2",
+          "R8:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:ethernet-1/3",
+          "R9:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:ethernet-1/4",
+          "R10:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:ethernet-1/2",
+          "R11:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:ethernet-1/3",
+          "R12:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:ethernet-1/4",
+          "R13:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:ethernet-1/2",
+          "R14:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:ethernet-1/3",
+          "R15:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:ethernet-1/4",
+          "R16:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:ethernet-1/2",
+          "R17:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:ethernet-1/3",
+          "R18:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:ethernet-1/4",
+          "R19:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:ethernet-1/2",
+          "R20:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:ethernet-1/3",
+          "R21:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:ethernet-1/4",
+          "R22:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:ethernet-1/2",
+          "R23:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:ethernet-1/3",
+          "R24:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:ethernet-1/4",
+          "R25:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:ethernet-1/2",
+          "R26:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:ethernet-1/3",
+          "R27:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:ethernet-1/4",
+          "R28:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:ethernet-1/2",
+          "R29:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:ethernet-1/3",
+          "R30:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:ethernet-1/4",
+          "R31:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:ethernet-1/2",
+          "R32:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:ethernet-1/3",
+          "R33:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:ethernet-1/4",
+          "R34:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:ethernet-1/2",
+          "R35:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:ethernet-1/3",
+          "R36:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R12:ethernet-1/4",
+          "R37:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:ethernet-1/2",
+          "R38:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:ethernet-1/3",
+          "R39:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R13:ethernet-1/4",
+          "R40:ethernet-1/1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "mixed_platform_connectivity",
+        "type": "reachability",
+        "description": "Connectivity verified between mixed platforms",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted"
+          }
+        }
+      },
+      {
+        "id": "platform_interop",
+        "type": "interface_up",
+        "description": "Interfaces up across platform boundary",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ip link show",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "state UP"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 45,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 160,
+    "description": "Configure connectivity across 1 platforms"
+  }
+}

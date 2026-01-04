@@ -50,30 +50,17 @@ PLATFORM_PROFILES: Dict[str, PlatformProfile] = {
             "show_interfaces": "show interface",
         }
     ),
-    "arista_eos": PlatformProfile(
-        name="arista_eos",
-        display_name="Arista cEOS",
-        image="ceos:latest",
-        command_wrapper="Cli -c '{}'",
-        config_mode="configure",
-        commands={
-            "show_bgp": "show ip bgp summary | json",
-            "show_ospf": "show ip ospf neighbor",
-            "show_routes": "show ip route | json",
-            "show_interfaces": "show interfaces status",
-        }
-    ),
-    "cisco_ios_xe": PlatformProfile(
-        name="cisco_ios_xe",
-        display_name="Cisco IOS-XE",
-        image="cisco-iosxe:latest",
+    "vyos": PlatformProfile(
+        name="vyos",
+        display_name="VyOS",
+        image="vyos/vyos-build:current",
         command_wrapper="{}",
-        config_mode="configure terminal",
+        config_mode="configure",
         commands={
             "show_bgp": "show ip bgp summary",
             "show_ospf": "show ip ospf neighbor",
             "show_routes": "show ip route",
-            "show_interfaces": "show ip interface brief",
+            "show_interfaces": "show interfaces",
         }
     ),
     "linux": PlatformProfile(

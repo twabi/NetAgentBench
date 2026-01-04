@@ -3,8 +3,8 @@
   "description": "Star 3-node: Cisco hub, FRR spokes",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "cisco_ios_xe"
+    "cisco_ios_xe",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -30,14 +30,14 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
+          "R1:GigabitEthernet1",
           "R2:eth1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth2",
-          "R3:eth1"
+          "R1:GigabitEthernet2",
+          "R3:GigabitEthernet1"
         ]
       }
     ],

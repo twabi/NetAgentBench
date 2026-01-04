@@ -3,8 +3,8 @@
   "description": "Star 4-node: Arista hub, FRR spokes",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "arista_eos"
+    "arista_eos",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -36,19 +36,19 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
+          "R1:Ethernet1",
           "R2:eth1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth2",
-          "R3:eth1"
+          "R1:Ethernet2",
+          "R3:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth3",
+          "R1:Ethernet3",
           "R4:eth1"
         ]
       }

@@ -74,37 +74,37 @@
       },
       {
         "endpoints": [
-          "R3:eth3",
+          "R3:eth2",
           "R4:eth1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth4",
+          "R4:eth2",
           "R5:eth1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth5",
+          "R5:eth2",
           "R6:eth1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth6",
+          "R6:eth2",
           "R7:eth1"
         ]
       },
       {
         "endpoints": [
-          "R7:eth7",
+          "R7:eth2",
           "R8:eth1"
         ]
       },
       {
         "endpoints": [
-          "R8:eth8",
+          "R8:eth2",
           "R9:eth1"
         ]
       }

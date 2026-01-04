@@ -3,8 +3,8 @@
   "description": "Linear 2-node: eBGP between Cisco and FRR",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "cisco_ios_xe"
+    "cisco_ios_xe",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -24,7 +24,7 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
+          "R1:GigabitEthernet1",
           "R2:eth1"
         ]
       }

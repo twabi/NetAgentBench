@@ -30,14 +30,14 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:GigabitEthernet1",
+          "R2:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R3:eth1"
+          "R2:Ethernet2",
+          "R3:GigabitEthernet1"
         ]
       }
     ],

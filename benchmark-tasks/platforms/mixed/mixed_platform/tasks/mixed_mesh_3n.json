@@ -1,10 +1,10 @@
 {
   "task_id": "mixed_mesh_3n",
-  "description": "Mesh 3-node: FRR and Arista mixed",
+  "description": "Mesh 3-node: FRR and Nokia mixed",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "arista_eos"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -17,8 +17,8 @@
       {
         "name": "R2",
         "type": "router",
-        "image": "ceos:latest",
-        "platform": "arista_eos"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       },
       {
         "name": "R3",
@@ -31,7 +31,7 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
@@ -42,7 +42,7 @@
       },
       {
         "endpoints": [
-          "R2:eth2",
+          "R2:ethernet-1/2",
           "R3:eth2"
         ]
       }

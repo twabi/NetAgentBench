@@ -3,8 +3,8 @@
   "description": "Linear 3-node: FRR and Arista cEOS mixed topology",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "arista_eos"
+    "arista_eos",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -31,12 +31,12 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
+          "R2:Ethernet2",
           "R3:eth1"
         ]
       }

@@ -3,8 +3,8 @@
   "description": "Linear 5-node: Nokia SRL and Arista cEOS mixed",
   "platform": "frr",
   "mixed_platforms": [
-    "arista_eos",
-    "nokia_srl"
+    "nokia_srl",
+    "arista_eos"
   ],
   "topology": {
     "nodes": [
@@ -42,26 +42,26 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:ethernet-1/1",
+          "R2:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R3:eth1"
+          "R2:Ethernet2",
+          "R3:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth3",
-          "R4:eth1"
+          "R3:ethernet-1/2",
+          "R4:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth4",
-          "R5:eth1"
+          "R4:Ethernet2",
+          "R5:ethernet-1/1"
         ]
       }
     ],

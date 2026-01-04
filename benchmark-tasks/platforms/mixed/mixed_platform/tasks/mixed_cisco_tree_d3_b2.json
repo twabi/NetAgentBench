@@ -102,86 +102,86 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:GigabitEthernet1",
+          "R2:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth2",
-          "R3:eth1"
+          "R1:GigabitEthernet2",
+          "R3:GigabitEthernet1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth1",
-          "R4:eth1"
+          "R2:Ethernet2",
+          "R4:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R5:eth1"
+          "R2:Ethernet3",
+          "R5:GigabitEthernet1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth1",
-          "R6:eth1"
+          "R3:GigabitEthernet2",
+          "R6:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth2",
-          "R7:eth1"
+          "R3:GigabitEthernet3",
+          "R7:GigabitEthernet1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth1",
-          "R8:eth1"
+          "R4:Ethernet2",
+          "R8:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth2",
-          "R9:eth1"
+          "R4:Ethernet3",
+          "R9:GigabitEthernet1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth1",
-          "R10:eth1"
+          "R5:GigabitEthernet2",
+          "R10:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth2",
-          "R11:eth1"
+          "R5:GigabitEthernet3",
+          "R11:GigabitEthernet1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth1",
-          "R12:eth1"
+          "R6:Ethernet2",
+          "R12:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth2",
-          "R13:eth1"
+          "R6:Ethernet3",
+          "R13:GigabitEthernet1"
         ]
       },
       {
         "endpoints": [
-          "R7:eth1",
-          "R14:eth1"
+          "R7:GigabitEthernet2",
+          "R14:Ethernet1"
         ]
       },
       {
         "endpoints": [
-          "R7:eth2",
-          "R15:eth1"
+          "R7:GigabitEthernet3",
+          "R15:GigabitEthernet1"
         ]
       }
     ],

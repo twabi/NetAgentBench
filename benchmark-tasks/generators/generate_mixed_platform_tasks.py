@@ -2,7 +2,7 @@
 Generate Mixed-Platform task variations.
 
 Creates tasks where nodes use different network platforms (FRR, Nokia SRL, 
-Arista EOS, Cisco IOS-XE) within the same topology.
+Nokia EOS, Nokia) within the same topology.
 """
 import sys
 from pathlib import Path
@@ -15,6 +15,7 @@ from topology_generator import TopologyGenerator
 
 
 # Platform configurations with their container images
+# Only FRR and Nokia SR Linux are used - they are the only free containerlab-compatible routers
 PLATFORMS = {
     "frr": {
         "image": "frrouting/frr:latest",
@@ -23,14 +24,6 @@ PLATFORMS = {
     "nokia_srl": {
         "image": "ghcr.io/nokia/srlinux:latest",
         "display": "Nokia SRL"
-    },
-    "arista_eos": {
-        "image": "ceos:latest",
-        "display": "Arista cEOS"
-    },
-    "cisco_ios_xe": {
-        "image": "cisco-iosxe:latest",
-        "display": "Cisco IOS-XE"
     }
 }
 
@@ -60,42 +53,42 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         )
         tasks.append(task)
 
-    # Two-platform combinations: FRR + Arista
+    # Two-platform combinations: FRR + Nokia
     for node_count in [2, 3, 4, 5, 6]:
         generator.reset_ip_counter()
         topo = generator.generate_linear(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_frr_arista_linear_{node_count}n",
-            platforms=["frr", "arista_eos"],
-            description=f"Linear {node_count}-node: FRR and Arista cEOS mixed topology"
+            task_id=f"mixed_frr_nokia_linear_{node_count}n",
+            platforms=["frr", "nokia_srl"],
+            description=f"Linear {node_count}-node: FRR and Nokia mixed topology"
         )
         tasks.append(task)
 
-    # Two-platform combinations: FRR + Cisco
+    # Two-platform combinations: FRR + Nokia
     for node_count in [2, 3, 4, 5, 6]:
         generator.reset_ip_counter()
         topo = generator.generate_linear(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_frr_cisco_linear_{node_count}n",
-            platforms=["frr", "cisco_ios_xe"],
-            description=f"Linear {node_count}-node: FRR and Cisco IOS-XE mixed topology"
+            task_id=f"mixed_frr_nokia_linear_{node_count}n",
+            platforms=["frr", "nokia_srl"],
+            description=f"Linear {node_count}-node: FRR and Nokia mixed topology"
         )
         tasks.append(task)
 
-    # Two-platform combinations: Nokia + Arista
+    # Two-platform combinations: Nokia + Nokia
     for node_count in [2, 3, 4, 5]:
         generator.reset_ip_counter()
         topo = generator.generate_linear(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_nokia_arista_linear_{node_count}n",
-            platforms=["nokia_srl", "arista_eos"],
-            description=f"Linear {node_count}-node: Nokia SRL and Arista cEOS mixed"
+            task_id=f"mixed_nokia_nokia_linear_{node_count}n",
+            platforms=["nokia_srl", "nokia_srl"],
+            description=f"Linear {node_count}-node: Nokia SRL and Nokia mixed"
         )
         tasks.append(task)
 
@@ -107,8 +100,8 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_3plat_linear_{node_count}n",
-            platforms=["frr", "nokia_srl", "arista_eos"],
-            description=f"Linear {node_count}-node: FRR, Nokia, Arista mixed topology"
+            platforms=["frr", "nokia_srl", "nokia_srl"],
+            description=f"Linear {node_count}-node: FRR, Nokia, Nokia mixed topology"
         )
         tasks.append(task)
 
@@ -120,7 +113,7 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_4plat_linear_{node_count}n",
-            platforms=["frr", "nokia_srl", "arista_eos", "cisco_ios_xe"],
+            platforms=["frr", "nokia_srl", "nokia_srl", "nokia_srl"],
             description=f"Linear {node_count}-node: All four platforms mixed"
         )
         tasks.append(task)
@@ -139,17 +132,17 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         )
         tasks.append(task)
 
-    # Star with Arista hub
+    # Star with Nokia hub
     for node_count in [3, 4, 5, 6]:
         generator.reset_ip_counter()
         topo = generator.generate_star(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_arista_hub_star_{node_count}n",
-            platforms=["arista_eos", "frr"],
-            hub_platform="arista_eos",
-            description=f"Star {node_count}-node: Arista hub, FRR spokes"
+            task_id=f"mixed_nokia_hub_star_{node_count}n",
+            platforms=["nokia_srl", "frr"],
+            hub_platform="nokia_srl",
+            description=f"Star {node_count}-node: Nokia hub, FRR spokes"
         )
         tasks.append(task)
 
@@ -161,8 +154,8 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_ring_{node_count}n",
-            platforms=["frr", "nokia_srl", "arista_eos"],
-            description=f"Ring {node_count}-node: Mixed FRR, Nokia, Arista"
+            platforms=["frr", "nokia_srl", "nokia_srl"],
+            description=f"Ring {node_count}-node: Mixed FRR, Nokia, Nokia"
         )
         tasks.append(task)
 
@@ -189,8 +182,8 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_mesh_{node_count}n",
-            platforms=["frr", "arista_eos"],
-            description=f"Mesh {node_count}-node: FRR and Arista mixed"
+            platforms=["frr", "nokia_srl"],
+            description=f"Mesh {node_count}-node: FRR and Nokia mixed"
         )
         tasks.append(task)
 
@@ -216,49 +209,35 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_ospf_{node_count}n",
-            platforms=["frr", "arista_eos"],
+            platforms=["frr", "nokia_srl"],
             property_type="ospf_configuration",
-            description=f"Linear {node_count}-node: OSPF between FRR and Arista"
+            description=f"Linear {node_count}-node: OSPF between FRR and Nokia"
         )
         tasks.append(task)
 
-    # Cisco-Nokia combinations
+    # Nokia-Nokia combinations
     for node_count in [2, 3, 4]:
         generator.reset_ip_counter()
         topo = generator.generate_linear(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_cisco_nokia_{node_count}n",
-            platforms=["cisco_ios_xe", "nokia_srl"],
-            description=f"Linear {node_count}-node: Cisco and Nokia mixed"
+            task_id=f"mixed_nokia_nokia_{node_count}n",
+            platforms=["nokia_srl", "nokia_srl"],
+            description=f"Linear {node_count}-node: Nokia and Nokia mixed"
         )
         tasks.append(task)
 
-    # Cisco-Arista combinations
+    # Nokia-Nokia combinations
     for node_count in [2, 3, 4, 5]:
         generator.reset_ip_counter()
         topo = generator.generate_linear(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_cisco_arista_{node_count}n",
-            platforms=["cisco_ios_xe", "arista_eos"],
-            description=f"Linear {node_count}-node: Cisco and Arista mixed"
-        )
-        tasks.append(task)
-
-    # Star with Cisco hub
-    for node_count in [3, 4, 5, 6]:
-        generator.reset_ip_counter()
-        topo = generator.generate_star(node_count)
-        
-        task = create_mixed_platform_task(
-            topology=topo,
-            task_id=f"mixed_cisco_hub_star_{node_count}n",
-            platforms=["cisco_ios_xe", "frr"],
-            hub_platform="cisco_ios_xe",
-            description=f"Star {node_count}-node: Cisco hub, FRR spokes"
+            task_id=f"mixed_nokia_nokia_{node_count}n",
+            platforms=["nokia_srl", "nokia_srl"],
+            description=f"Linear {node_count}-node: Nokia and Nokia mixed"
         )
         tasks.append(task)
 
@@ -270,9 +249,23 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_nokia_hub_star_{node_count}n",
-            platforms=["nokia_srl", "arista_eos"],
+            platforms=["nokia_srl", "frr"],
             hub_platform="nokia_srl",
-            description=f"Star {node_count}-node: Nokia hub, Arista spokes"
+            description=f"Star {node_count}-node: Nokia hub, FRR spokes"
+        )
+        tasks.append(task)
+
+    # Star with Nokia hub
+    for node_count in [3, 4, 5, 6]:
+        generator.reset_ip_counter()
+        topo = generator.generate_star(node_count)
+        
+        task = create_mixed_platform_task(
+            topology=topo,
+            task_id=f"mixed_nokia_hub_star_{node_count}n",
+            platforms=["nokia_srl", "nokia_srl"],
+            hub_platform="nokia_srl",
+            description=f"Star {node_count}-node: Nokia hub, Nokia spokes"
         )
         tasks.append(task)
 
@@ -284,22 +277,22 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_4plat_ring_{node_count}n",
-            platforms=["frr", "nokia_srl", "arista_eos", "cisco_ios_xe"],
+            platforms=["frr", "nokia_srl", "nokia_srl", "nokia_srl"],
             description=f"Ring {node_count}-node: All four platforms"
         )
         tasks.append(task)
 
-    # BGP with Cisco
+    # BGP with Nokia
     for node_count in [2, 3, 4]:
         generator.reset_ip_counter()
         topo = generator.generate_linear(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_ebgp_cisco_{node_count}n",
-            platforms=["cisco_ios_xe", "frr"],
+            task_id=f"mixed_ebgp_nokia_{node_count}n",
+            platforms=["nokia_srl", "frr"],
             property_type="bgp_configuration",
-            description=f"Linear {node_count}-node: eBGP between Cisco and FRR"
+            description=f"Linear {node_count}-node: eBGP between Nokia and FRR"
         )
         tasks.append(task)
 
@@ -325,12 +318,12 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_4plat_mesh_{node_count}n",
-            platforms=["frr", "nokia_srl", "arista_eos", "cisco_ios_xe"],
+            platforms=["frr", "nokia_srl", "nokia_srl", "nokia_srl"],
             description=f"Mesh {node_count}-node: All four platforms"
         )
         tasks.append(task)
 
-    # Tree with Cisco root
+    # Tree with Nokia root
     for depth in [2, 3]:
         for branch in [2, 3]:
             generator.reset_ip_counter()
@@ -339,10 +332,10 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
             
             task = create_mixed_platform_task(
                 topology=topo,
-                task_id=f"mixed_cisco_tree_d{depth}_b{branch}",
-                platforms=["cisco_ios_xe", "arista_eos"],
-                hub_platform="cisco_ios_xe",
-                description=f"Tree d{depth}b{branch} ({node_count} nodes): Cisco root"
+                task_id=f"mixed_nokia_tree_d{depth}_b{branch}",
+                platforms=["nokia_srl", "nokia_srl"],
+                hub_platform="nokia_srl",
+                description=f"Tree d{depth}b{branch} ({node_count} nodes): Nokia root"
             )
             tasks.append(task)
 
@@ -368,7 +361,7 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_4plat_linear_{node_count}n_large",
-            platforms=["frr", "nokia_srl", "arista_eos", "cisco_ios_xe"],
+            platforms=["frr", "nokia_srl", "nokia_srl", "nokia_srl"],
             description=f"Linear {node_count}-node: All platforms, larger scale"
         )
         tasks.append(task)
@@ -381,8 +374,8 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_alternating_ring_{node_count}n",
-            platforms=["frr", "cisco_ios_xe"],
-            description=f"Ring {node_count}-node: FRR-Cisco alternating"
+            platforms=["frr", "nokia_srl"],
+            description=f"Ring {node_count}-node: FRR-Nokia alternating"
         )
         tasks.append(task)
 
@@ -394,7 +387,7 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         task = create_mixed_platform_task(
             topology=topo,
             task_id=f"mixed_ebgp_4plat_{node_count}n",
-            platforms=["frr", "nokia_srl", "arista_eos", "cisco_ios_xe"],
+            platforms=["frr", "nokia_srl", "nokia_srl", "nokia_srl"],
             property_type="bgp_configuration",
             description=f"Linear {node_count}-node: eBGP across all 4 platforms"
         )
@@ -427,6 +420,8 @@ def create_mixed_platform_task(
     """
     # Assign platforms to nodes in round-robin fashion
     nodes_list = []
+    node_platforms = {}  # name -> platform mapping
+    
     for i, node in enumerate(topology.nodes):
         if hub_platform and i == 0:
             # First node gets hub platform for star topologies
@@ -435,6 +430,7 @@ def create_mixed_platform_task(
             # Round-robin assignment
             platform = platforms[i % len(platforms)]
         
+        node_platforms[node.name] = platform
         nodes_list.append({
             "name": node.name,
             "type": node.type,
@@ -442,12 +438,41 @@ def create_mixed_platform_task(
             "platform": platform,
         })
 
+    # Translate interface names based on platform
+    def translate_interface(node_name: str, interface: str) -> str:
+        """Translate interface name based on node's platform."""
+        platform = node_platforms.get(node_name, "frr")
+        
+        if platform == "nokia_srl":
+            # Nokia requires ethernet-L/P format (e.g., eth1 -> ethernet-1/1)
+            if interface.startswith("eth"):
+                num = interface[3:]
+                return f"ethernet-1/{num}"
+            return interface
+        else:
+            # FRR, Nokia, and linux use ethN format as-is
+            return interface
+
+    # Process links with translated interface names
+    links_list = []
+    for link in topology.links:
+        endpoints = link.endpoints
+        if len(endpoints) == 2:
+            # Parse node:interface format
+            node1, intf1 = endpoints[0].split(":")
+            node2, intf2 = endpoints[1].split(":")
+            
+            # Translate interfaces based on each node's platform
+            new_intf1 = translate_interface(node1, intf1)
+            new_intf2 = translate_interface(node2, intf2)
+            
+            links_list.append({
+                "endpoints": [f"{node1}:{new_intf1}", f"{node2}:{new_intf2}"]
+            })
+
     topo_dict = {
         "nodes": nodes_list,
-        "links": [
-            {"endpoints": link.endpoints}
-            for link in topology.links
-        ],
+        "links": links_list,
         "interfaces": []
     }
 

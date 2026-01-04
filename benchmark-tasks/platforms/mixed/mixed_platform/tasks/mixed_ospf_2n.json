@@ -1,10 +1,10 @@
 {
   "task_id": "mixed_ospf_2n",
-  "description": "Linear 2-node: OSPF between FRR and Arista",
+  "description": "Linear 2-node: OSPF between FRR and Nokia",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "arista_eos"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -17,15 +17,15 @@
       {
         "name": "R2",
         "type": "router",
-        "image": "ceos:latest",
-        "platform": "arista_eos"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       }
     ],
     "links": [
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       }
     ],

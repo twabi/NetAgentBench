@@ -1,10 +1,10 @@
 {
   "task_id": "mixed_frr_nokia_linear_6n",
-  "description": "Linear 6-node: FRR and Nokia SRL mixed topology",
+  "description": "Linear 6-node: FRR and Nokia mixed topology",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "nokia_srl"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -49,31 +49,31 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
+          "R2:ethernet-1/2",
           "R3:eth1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth3",
-          "R4:eth1"
+          "R3:eth2",
+          "R4:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth4",
+          "R4:ethernet-1/2",
           "R5:eth1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth5",
-          "R6:eth1"
+          "R5:eth2",
+          "R6:ethernet-1/1"
         ]
       }
     ],

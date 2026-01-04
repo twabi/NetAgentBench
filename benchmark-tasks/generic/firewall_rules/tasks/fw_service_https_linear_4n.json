@@ -44,7 +44,7 @@
       },
       {
         "endpoints": [
-          "R3:eth3",
+          "R3:eth2",
           "R4:eth1"
         ]
       }

@@ -3,8 +3,8 @@
   "description": "Linear 2-node: FRR and Cisco IOS-XE mixed topology",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "cisco_ios_xe"
+    "cisco_ios_xe",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -25,7 +25,7 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:GigabitEthernet1"
         ]
       }
     ],

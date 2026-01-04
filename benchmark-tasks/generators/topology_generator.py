@@ -68,6 +68,24 @@ class TopologyGenerator:
             platform=self.default_platform,
         )
 
+    def _translate_interface(self, interface: str) -> str:
+        """
+        Translate interface name based on platform.
+        
+        Args:
+            interface: Interface name in standard format (eth1, eth2, etc.)
+            
+        Returns:
+            Platform-specific interface name
+        """
+        if self.default_platform == "nokia_srl":
+            # Nokia requires ethernet-L/P format (e.g., eth1 -> ethernet-1/1)
+            if interface.startswith("eth"):
+                num = interface[3:]
+                return f"ethernet-1/{num}"
+        # FRR, VyOS, and linux use ethN format as-is
+        return interface
+
     def _create_link(self, node1: str, interface1: str, node2: str, interface2: str) -> Link:
         """
         Create a link between two nodes.
@@ -81,7 +99,10 @@ class TopologyGenerator:
         Returns:
             Link object
         """
-        return Link(endpoints=[f"{node1}:{interface1}", f"{node2}:{interface2}"])
+        # Translate interfaces based on platform
+        intf1 = self._translate_interface(interface1)
+        intf2 = self._translate_interface(interface2)
+        return Link(endpoints=[f"{node1}:{intf1}", f"{node2}:{intf2}"])
 
     def generate_linear(self, node_count: int) -> TopologySpecification:
         """
@@ -209,9 +230,14 @@ class TopologyGenerator:
         links = []
         node_id = 1
 
+        # Track interface counters for each node's downlinks (to children)
+        # eth1 is reserved for uplink (to parent), eth2+ for downlinks
+        parent_downlink_counter = {}  # parent_id -> next downlink interface
+
         # Generate nodes level by level
         current_level = [node_id]
         nodes.append(self._create_node(node_id))
+        parent_downlink_counter[node_id] = 1  # Root node starts at eth1 (no uplink)
         node_id += 1
 
         for level in range(depth):
@@ -220,9 +246,13 @@ class TopologyGenerator:
                 for child_num in range(branching_factor):
                     child_id = node_id
                     nodes.append(self._create_node(child_id))
+                    parent_downlink_counter[child_id] = 2  # Children start downlinks at eth2 (eth1 is uplink)
 
                     # Create link between parent and child
-                    parent_intf = f"eth{child_num + 1}"
+                    # Parent uses its next available downlink interface
+                    parent_intf = f"eth{parent_downlink_counter[parent_id]}"
+                    parent_downlink_counter[parent_id] += 1
+                    # Child uses eth1 for uplink to parent
                     child_intf = "eth1"
                     link = self._create_link(f"R{parent_id}", parent_intf, f"R{child_id}", child_intf)
                     links.append(link)

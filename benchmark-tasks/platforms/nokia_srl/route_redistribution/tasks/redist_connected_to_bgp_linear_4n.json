@@ -32,20 +32,20 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:ethernet-1/1",
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R3:eth1"
+          "R2:ethernet-1/2",
+          "R3:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth3",
-          "R4:eth1"
+          "R3:ethernet-1/2",
+          "R4:ethernet-1/1"
         ]
       }
     ],

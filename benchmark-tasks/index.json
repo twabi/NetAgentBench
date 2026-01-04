@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated": "2026-01-03T23:24:41.704035Z",
-  "total_tasks": 116,
+  "generated": "2026-01-04T03:00:58.089837Z",
+  "total_tasks": 98,
   "property_types": {
     "reachability": {
-      "count": 116,
+      "count": 0,
       "description": "Network connectivity and reachability between nodes",
       "tasks_dir": "property_types/reachability/tasks/"
     },
@@ -39,7 +39,7 @@
       "tasks_dir": "property_types/route_redistribution/tasks/"
     },
     "mixed_platform": {
-      "count": 0,
+      "count": 98,
       "description": "Tasks with multiple platforms (FRR, Nokia, Arista, Cisco)",
       "tasks_dir": "property_types/mixed_platform/tasks/"
     }

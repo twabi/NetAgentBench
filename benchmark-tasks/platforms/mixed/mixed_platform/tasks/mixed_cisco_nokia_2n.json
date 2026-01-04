@@ -24,8 +24,8 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:GigabitEthernet1",
+          "R2:ethernet-1/1"
         ]
       }
     ],

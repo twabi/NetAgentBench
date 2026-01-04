@@ -1,11 +1,10 @@
 {
   "task_id": "mixed_ring_4n",
-  "description": "Ring 4-node: Mixed FRR, Nokia, Arista",
+  "description": "Ring 4-node: Mixed FRR, Nokia, Nokia",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "arista_eos",
-    "nokia_srl"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -24,8 +23,8 @@
       {
         "name": "R3",
         "type": "router",
-        "image": "ceos:latest",
-        "platform": "arista_eos"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       },
       {
         "name": "R4",
@@ -38,18 +37,18 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R3:eth1"
+          "R2:ethernet-1/2",
+          "R3:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth2",
+          "R3:ethernet-1/2",
           "R4:eth1"
         ]
       },
@@ -100,6 +99,6 @@
   },
   "optimal_solution": {
     "command_count": 16,
-    "description": "Configure connectivity across 3 platforms"
+    "description": "Configure connectivity across 2 platforms"
   }
 }

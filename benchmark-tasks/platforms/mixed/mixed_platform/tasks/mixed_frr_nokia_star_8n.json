@@ -3,8 +3,8 @@
   "description": "Star 8-node: FRR hub, Nokia spokes",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "nokia_srl"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -61,7 +61,7 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
@@ -73,7 +73,7 @@
       {
         "endpoints": [
           "R1:eth3",
-          "R4:eth1"
+          "R4:ethernet-1/1"
         ]
       },
       {
@@ -85,7 +85,7 @@
       {
         "endpoints": [
           "R1:eth5",
-          "R6:eth1"
+          "R6:ethernet-1/1"
         ]
       },
       {
@@ -97,7 +97,7 @@
       {
         "endpoints": [
           "R1:eth7",
-          "R8:eth1"
+          "R8:ethernet-1/1"
         ]
       }
     ],

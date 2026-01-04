@@ -1,0 +1,85 @@
+{
+  "task_id": "mixed_nokia_nokia_linear_3n",
+  "description": "Linear 3-node: Nokia SRL and Nokia mixed",
+  "platform": "frr",
+  "mixed_platforms": [
+    "nokia_srl"
+  ],
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:ethernet-1/1",
+          "R2:ethernet-1/1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:ethernet-1/2",
+          "R3:ethernet-1/1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "mixed_platform_connectivity",
+        "type": "reachability",
+        "description": "Connectivity verified between mixed platforms",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 192.168.1.2",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted"
+          }
+        }
+      },
+      {
+        "id": "platform_interop",
+        "type": "interface_up",
+        "description": "Interfaces up across platform boundary",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ip link show",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "state UP"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 45,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 12,
+    "description": "Configure connectivity across 1 platforms"
+  }
+}

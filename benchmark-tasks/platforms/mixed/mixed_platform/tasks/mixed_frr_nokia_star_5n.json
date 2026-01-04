@@ -3,8 +3,8 @@
   "description": "Star 5-node: FRR hub, Nokia spokes",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "nokia_srl"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -43,7 +43,7 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
@@ -55,7 +55,7 @@
       {
         "endpoints": [
           "R1:eth3",
-          "R4:eth1"
+          "R4:ethernet-1/1"
         ]
       },
       {

@@ -734,722 +734,722 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:ethernet-1/1",
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth2",
-          "R3:eth1"
+          "R1:ethernet-1/2",
+          "R3:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth3",
-          "R4:eth1"
+          "R1:ethernet-1/3",
+          "R4:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth1",
-          "R5:eth1"
+          "R2:ethernet-1/2",
+          "R5:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R6:eth1"
+          "R2:ethernet-1/3",
+          "R6:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth3",
-          "R7:eth1"
+          "R2:ethernet-1/4",
+          "R7:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth1",
-          "R8:eth1"
+          "R3:ethernet-1/2",
+          "R8:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth2",
-          "R9:eth1"
+          "R3:ethernet-1/3",
+          "R9:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth3",
-          "R10:eth1"
+          "R3:ethernet-1/4",
+          "R10:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth1",
-          "R11:eth1"
+          "R4:ethernet-1/2",
+          "R11:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth2",
-          "R12:eth1"
+          "R4:ethernet-1/3",
+          "R12:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth3",
-          "R13:eth1"
+          "R4:ethernet-1/4",
+          "R13:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth1",
-          "R14:eth1"
+          "R5:ethernet-1/2",
+          "R14:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth2",
-          "R15:eth1"
+          "R5:ethernet-1/3",
+          "R15:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth3",
-          "R16:eth1"
+          "R5:ethernet-1/4",
+          "R16:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth1",
-          "R17:eth1"
+          "R6:ethernet-1/2",
+          "R17:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth2",
-          "R18:eth1"
+          "R6:ethernet-1/3",
+          "R18:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth3",
-          "R19:eth1"
+          "R6:ethernet-1/4",
+          "R19:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R7:eth1",
-          "R20:eth1"
+          "R7:ethernet-1/2",
+          "R20:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R7:eth2",
-          "R21:eth1"
+          "R7:ethernet-1/3",
+          "R21:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R7:eth3",
-          "R22:eth1"
+          "R7:ethernet-1/4",
+          "R22:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R8:eth1",
-          "R23:eth1"
+          "R8:ethernet-1/2",
+          "R23:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R8:eth2",
-          "R24:eth1"
+          "R8:ethernet-1/3",
+          "R24:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R8:eth3",
-          "R25:eth1"
+          "R8:ethernet-1/4",
+          "R25:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R9:eth1",
-          "R26:eth1"
+          "R9:ethernet-1/2",
+          "R26:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R9:eth2",
-          "R27:eth1"
+          "R9:ethernet-1/3",
+          "R27:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R9:eth3",
-          "R28:eth1"
+          "R9:ethernet-1/4",
+          "R28:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R10:eth1",
-          "R29:eth1"
+          "R10:ethernet-1/2",
+          "R29:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R10:eth2",
-          "R30:eth1"
+          "R10:ethernet-1/3",
+          "R30:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R10:eth3",
-          "R31:eth1"
+          "R10:ethernet-1/4",
+          "R31:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R11:eth1",
-          "R32:eth1"
+          "R11:ethernet-1/2",
+          "R32:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R11:eth2",
-          "R33:eth1"
+          "R11:ethernet-1/3",
+          "R33:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R11:eth3",
-          "R34:eth1"
+          "R11:ethernet-1/4",
+          "R34:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R12:eth1",
-          "R35:eth1"
+          "R12:ethernet-1/2",
+          "R35:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R12:eth2",
-          "R36:eth1"
+          "R12:ethernet-1/3",
+          "R36:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R12:eth3",
-          "R37:eth1"
+          "R12:ethernet-1/4",
+          "R37:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R13:eth1",
-          "R38:eth1"
+          "R13:ethernet-1/2",
+          "R38:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R13:eth2",
-          "R39:eth1"
+          "R13:ethernet-1/3",
+          "R39:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R13:eth3",
-          "R40:eth1"
+          "R13:ethernet-1/4",
+          "R40:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R14:eth1",
-          "R41:eth1"
+          "R14:ethernet-1/2",
+          "R41:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R14:eth2",
-          "R42:eth1"
+          "R14:ethernet-1/3",
+          "R42:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R14:eth3",
-          "R43:eth1"
+          "R14:ethernet-1/4",
+          "R43:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R15:eth1",
-          "R44:eth1"
+          "R15:ethernet-1/2",
+          "R44:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R15:eth2",
-          "R45:eth1"
+          "R15:ethernet-1/3",
+          "R45:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R15:eth3",
-          "R46:eth1"
+          "R15:ethernet-1/4",
+          "R46:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R16:eth1",
-          "R47:eth1"
+          "R16:ethernet-1/2",
+          "R47:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R16:eth2",
-          "R48:eth1"
+          "R16:ethernet-1/3",
+          "R48:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R16:eth3",
-          "R49:eth1"
+          "R16:ethernet-1/4",
+          "R49:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R17:eth1",
-          "R50:eth1"
+          "R17:ethernet-1/2",
+          "R50:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R17:eth2",
-          "R51:eth1"
+          "R17:ethernet-1/3",
+          "R51:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R17:eth3",
-          "R52:eth1"
+          "R17:ethernet-1/4",
+          "R52:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R18:eth1",
-          "R53:eth1"
+          "R18:ethernet-1/2",
+          "R53:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R18:eth2",
-          "R54:eth1"
+          "R18:ethernet-1/3",
+          "R54:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R18:eth3",
-          "R55:eth1"
+          "R18:ethernet-1/4",
+          "R55:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R19:eth1",
-          "R56:eth1"
+          "R19:ethernet-1/2",
+          "R56:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R19:eth2",
-          "R57:eth1"
+          "R19:ethernet-1/3",
+          "R57:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R19:eth3",
-          "R58:eth1"
+          "R19:ethernet-1/4",
+          "R58:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R20:eth1",
-          "R59:eth1"
+          "R20:ethernet-1/2",
+          "R59:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R20:eth2",
-          "R60:eth1"
+          "R20:ethernet-1/3",
+          "R60:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R20:eth3",
-          "R61:eth1"
+          "R20:ethernet-1/4",
+          "R61:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R21:eth1",
-          "R62:eth1"
+          "R21:ethernet-1/2",
+          "R62:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R21:eth2",
-          "R63:eth1"
+          "R21:ethernet-1/3",
+          "R63:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R21:eth3",
-          "R64:eth1"
+          "R21:ethernet-1/4",
+          "R64:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R22:eth1",
-          "R65:eth1"
+          "R22:ethernet-1/2",
+          "R65:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R22:eth2",
-          "R66:eth1"
+          "R22:ethernet-1/3",
+          "R66:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R22:eth3",
-          "R67:eth1"
+          "R22:ethernet-1/4",
+          "R67:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R23:eth1",
-          "R68:eth1"
+          "R23:ethernet-1/2",
+          "R68:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R23:eth2",
-          "R69:eth1"
+          "R23:ethernet-1/3",
+          "R69:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R23:eth3",
-          "R70:eth1"
+          "R23:ethernet-1/4",
+          "R70:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R24:eth1",
-          "R71:eth1"
+          "R24:ethernet-1/2",
+          "R71:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R24:eth2",
-          "R72:eth1"
+          "R24:ethernet-1/3",
+          "R72:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R24:eth3",
-          "R73:eth1"
+          "R24:ethernet-1/4",
+          "R73:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R25:eth1",
-          "R74:eth1"
+          "R25:ethernet-1/2",
+          "R74:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R25:eth2",
-          "R75:eth1"
+          "R25:ethernet-1/3",
+          "R75:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R25:eth3",
-          "R76:eth1"
+          "R25:ethernet-1/4",
+          "R76:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R26:eth1",
-          "R77:eth1"
+          "R26:ethernet-1/2",
+          "R77:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R26:eth2",
-          "R78:eth1"
+          "R26:ethernet-1/3",
+          "R78:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R26:eth3",
-          "R79:eth1"
+          "R26:ethernet-1/4",
+          "R79:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R27:eth1",
-          "R80:eth1"
+          "R27:ethernet-1/2",
+          "R80:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R27:eth2",
-          "R81:eth1"
+          "R27:ethernet-1/3",
+          "R81:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R27:eth3",
-          "R82:eth1"
+          "R27:ethernet-1/4",
+          "R82:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R28:eth1",
-          "R83:eth1"
+          "R28:ethernet-1/2",
+          "R83:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R28:eth2",
-          "R84:eth1"
+          "R28:ethernet-1/3",
+          "R84:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R28:eth3",
-          "R85:eth1"
+          "R28:ethernet-1/4",
+          "R85:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R29:eth1",
-          "R86:eth1"
+          "R29:ethernet-1/2",
+          "R86:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R29:eth2",
-          "R87:eth1"
+          "R29:ethernet-1/3",
+          "R87:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R29:eth3",
-          "R88:eth1"
+          "R29:ethernet-1/4",
+          "R88:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R30:eth1",
-          "R89:eth1"
+          "R30:ethernet-1/2",
+          "R89:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R30:eth2",
-          "R90:eth1"
+          "R30:ethernet-1/3",
+          "R90:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R30:eth3",
-          "R91:eth1"
+          "R30:ethernet-1/4",
+          "R91:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R31:eth1",
-          "R92:eth1"
+          "R31:ethernet-1/2",
+          "R92:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R31:eth2",
-          "R93:eth1"
+          "R31:ethernet-1/3",
+          "R93:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R31:eth3",
-          "R94:eth1"
+          "R31:ethernet-1/4",
+          "R94:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R32:eth1",
-          "R95:eth1"
+          "R32:ethernet-1/2",
+          "R95:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R32:eth2",
-          "R96:eth1"
+          "R32:ethernet-1/3",
+          "R96:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R32:eth3",
-          "R97:eth1"
+          "R32:ethernet-1/4",
+          "R97:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R33:eth1",
-          "R98:eth1"
+          "R33:ethernet-1/2",
+          "R98:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R33:eth2",
-          "R99:eth1"
+          "R33:ethernet-1/3",
+          "R99:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R33:eth3",
-          "R100:eth1"
+          "R33:ethernet-1/4",
+          "R100:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R34:eth1",
-          "R101:eth1"
+          "R34:ethernet-1/2",
+          "R101:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R34:eth2",
-          "R102:eth1"
+          "R34:ethernet-1/3",
+          "R102:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R34:eth3",
-          "R103:eth1"
+          "R34:ethernet-1/4",
+          "R103:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R35:eth1",
-          "R104:eth1"
+          "R35:ethernet-1/2",
+          "R104:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R35:eth2",
-          "R105:eth1"
+          "R35:ethernet-1/3",
+          "R105:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R35:eth3",
-          "R106:eth1"
+          "R35:ethernet-1/4",
+          "R106:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R36:eth1",
-          "R107:eth1"
+          "R36:ethernet-1/2",
+          "R107:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R36:eth2",
-          "R108:eth1"
+          "R36:ethernet-1/3",
+          "R108:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R36:eth3",
-          "R109:eth1"
+          "R36:ethernet-1/4",
+          "R109:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R37:eth1",
-          "R110:eth1"
+          "R37:ethernet-1/2",
+          "R110:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R37:eth2",
-          "R111:eth1"
+          "R37:ethernet-1/3",
+          "R111:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R37:eth3",
-          "R112:eth1"
+          "R37:ethernet-1/4",
+          "R112:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R38:eth1",
-          "R113:eth1"
+          "R38:ethernet-1/2",
+          "R113:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R38:eth2",
-          "R114:eth1"
+          "R38:ethernet-1/3",
+          "R114:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R38:eth3",
-          "R115:eth1"
+          "R38:ethernet-1/4",
+          "R115:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R39:eth1",
-          "R116:eth1"
+          "R39:ethernet-1/2",
+          "R116:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R39:eth2",
-          "R117:eth1"
+          "R39:ethernet-1/3",
+          "R117:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R39:eth3",
-          "R118:eth1"
+          "R39:ethernet-1/4",
+          "R118:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R40:eth1",
-          "R119:eth1"
+          "R40:ethernet-1/2",
+          "R119:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R40:eth2",
-          "R120:eth1"
+          "R40:ethernet-1/3",
+          "R120:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R40:eth3",
-          "R121:eth1"
+          "R40:ethernet-1/4",
+          "R121:ethernet-1/1"
         ]
       }
     ],

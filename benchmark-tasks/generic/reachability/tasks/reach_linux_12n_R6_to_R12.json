@@ -1,0 +1,176 @@
+{
+  "task_id": "reach_linux_12n_R6_to_R12",
+  "description": "Linux 12-node linear: R6 to R12 reachability",
+  "platform": "linux",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R6",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R7",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R8",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R9",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R10",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R11",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      },
+      {
+        "name": "R12",
+        "type": "router",
+        "image": "alpine:latest",
+        "platform": "linux"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R5:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R5:eth2",
+          "R6:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R6:eth2",
+          "R7:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R7:eth2",
+          "R8:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R8:eth2",
+          "R9:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R9:eth2",
+          "R10:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R10:eth2",
+          "R11:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R11:eth2",
+          "R12:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "reachability_R6_to_R12",
+        "type": "reachability",
+        "description": "R6 can reach R12 via ping",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R6",
+          "command": "ping -c 3 192.168.12.1",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 10,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 24,
+    "description": "Configure IP addresses and routes on 12 Linux nodes"
+  }
+}

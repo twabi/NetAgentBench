@@ -3,8 +3,8 @@
   "description": "Linear 4-node: eBGP between FRR and Nokia",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "nokia_srl"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -37,19 +37,19 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
+          "R2:ethernet-1/2",
           "R3:eth1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth3",
-          "R4:eth1"
+          "R3:eth2",
+          "R4:ethernet-1/1"
         ]
       }
     ],

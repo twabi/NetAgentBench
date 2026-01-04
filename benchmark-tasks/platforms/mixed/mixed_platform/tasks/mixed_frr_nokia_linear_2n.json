@@ -1,10 +1,10 @@
 {
   "task_id": "mixed_frr_nokia_linear_2n",
-  "description": "Linear 2-node: FRR and Nokia SRL mixed topology",
+  "description": "Linear 2-node: FRR and Nokia mixed topology",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "nokia_srl"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -25,7 +25,7 @@
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       }
     ],

@@ -1,11 +1,10 @@
 {
   "task_id": "mixed_ring_6n",
-  "description": "Ring 6-node: Mixed FRR, Nokia, Arista",
+  "description": "Ring 6-node: Mixed FRR, Nokia, Nokia",
   "platform": "frr",
   "mixed_platforms": [
-    "frr",
-    "arista_eos",
-    "nokia_srl"
+    "nokia_srl",
+    "frr"
   ],
   "topology": {
     "nodes": [
@@ -24,8 +23,8 @@
       {
         "name": "R3",
         "type": "router",
-        "image": "ceos:latest",
-        "platform": "arista_eos"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       },
       {
         "name": "R4",
@@ -42,44 +41,44 @@
       {
         "name": "R6",
         "type": "router",
-        "image": "ceos:latest",
-        "platform": "arista_eos"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       }
     ],
     "links": [
       {
         "endpoints": [
           "R1:eth1",
-          "R2:eth1"
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R3:eth1"
+          "R2:ethernet-1/2",
+          "R3:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth2",
+          "R3:ethernet-1/2",
           "R4:eth1"
         ]
       },
       {
         "endpoints": [
           "R4:eth2",
-          "R5:eth1"
+          "R5:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth2",
-          "R6:eth1"
+          "R5:ethernet-1/2",
+          "R6:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth2",
+          "R6:ethernet-1/2",
           "R1:eth2"
         ]
       }
@@ -124,6 +123,6 @@
   },
   "optimal_solution": {
     "command_count": 24,
-    "description": "Configure connectivity across 3 platforms"
+    "description": "Configure connectivity across 2 platforms"
   }
 }

@@ -92,86 +92,86 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:ethernet-1/1",
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R2:eth2",
-          "R3:eth1"
+          "R2:ethernet-1/2",
+          "R3:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R3:eth2",
-          "R4:eth1"
+          "R3:ethernet-1/2",
+          "R4:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R4:eth2",
-          "R5:eth1"
+          "R4:ethernet-1/2",
+          "R5:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R5:eth2",
-          "R6:eth1"
+          "R5:ethernet-1/2",
+          "R6:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R6:eth2",
-          "R7:eth1"
+          "R6:ethernet-1/2",
+          "R7:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R7:eth2",
-          "R8:eth1"
+          "R7:ethernet-1/2",
+          "R8:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R8:eth2",
-          "R9:eth1"
+          "R8:ethernet-1/2",
+          "R9:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R9:eth2",
-          "R10:eth1"
+          "R9:ethernet-1/2",
+          "R10:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R10:eth2",
-          "R11:eth1"
+          "R10:ethernet-1/2",
+          "R11:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R11:eth2",
-          "R12:eth1"
+          "R11:ethernet-1/2",
+          "R12:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R12:eth2",
-          "R13:eth1"
+          "R12:ethernet-1/2",
+          "R13:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R13:eth2",
-          "R14:eth1"
+          "R13:ethernet-1/2",
+          "R14:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R14:eth2",
-          "R1:eth2"
+          "R14:ethernet-1/2",
+          "R1:ethernet-1/2"
         ]
       }
     ],

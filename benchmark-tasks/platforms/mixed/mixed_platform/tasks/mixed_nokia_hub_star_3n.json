@@ -1,9 +1,8 @@
 {
   "task_id": "mixed_nokia_hub_star_3n",
-  "description": "Star 3-node: Nokia hub, Arista spokes",
+  "description": "Star 3-node: Nokia hub, Nokia spokes",
   "platform": "frr",
   "mixed_platforms": [
-    "arista_eos",
     "nokia_srl"
   ],
   "topology": {
@@ -17,8 +16,8 @@
       {
         "name": "R2",
         "type": "router",
-        "image": "ceos:latest",
-        "platform": "arista_eos"
+        "image": "ghcr.io/nokia/srlinux:latest",
+        "platform": "nokia_srl"
       },
       {
         "name": "R3",
@@ -30,14 +29,14 @@
     "links": [
       {
         "endpoints": [
-          "R1:eth1",
-          "R2:eth1"
+          "R1:ethernet-1/1",
+          "R2:ethernet-1/1"
         ]
       },
       {
         "endpoints": [
-          "R1:eth2",
-          "R3:eth1"
+          "R1:ethernet-1/2",
+          "R3:ethernet-1/1"
         ]
       }
     ],
@@ -81,6 +80,6 @@
   },
   "optimal_solution": {
     "command_count": 12,
-    "description": "Configure connectivity across 2 platforms"
+    "description": "Configure connectivity across 1 platforms"
   }
 }
