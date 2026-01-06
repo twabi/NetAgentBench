@@ -34,6 +34,8 @@ class DagentAdapter(BaseTestee):
         endpoint: str = "http://localhost:8000",
         provider: str = "openai",
         model: Optional[str] = None,
+        agent_mode: str = "single",
+        structure: str = "sequential",
         timeout: float = 300.0,
         testee_id: str = "dagent",
     ):
@@ -44,6 +46,8 @@ class DagentAdapter(BaseTestee):
             endpoint: Dagent HTTP endpoint (default: localhost:8000)
             provider: LLM provider (openai, anthropic, etc.)
             model: Model name
+            agent_mode: Agent mode ("single" or "multi")
+            structure: Multi-agent structure ("sequential", "concurrent", "debate", "group_chat")
             timeout: Request timeout in seconds
             testee_id: Unique identifier for this testee
         """
@@ -58,6 +62,8 @@ class DagentAdapter(BaseTestee):
         self.endpoint = endpoint.rstrip("/")
         self.provider = provider
         self.model = model
+        self.agent_mode = agent_mode
+        self.structure = structure
         self.timeout = timeout
         self.testee_id = testee_id
         self.httpx = httpx
@@ -154,7 +160,9 @@ class DagentAdapter(BaseTestee):
                 for p in task.intent.properties
             ],
             "provider": self.provider,
-            "model": self.model
+            "model": self.model,
+            "agent_mode": self.agent_mode,
+            "structure": self.structure,
         }
         
         with self.httpx.Client(timeout=timeout_config) as client:

@@ -123,6 +123,8 @@ class InteractiveBenchmarkController:
         dagent_endpoint: Optional[str] = None,
         dagent_provider: Optional[str] = None,
         dagent_model: Optional[str] = None,
+        dagent_mode: str = "single",
+        dagent_structure: str = "sequential",
         verbose: bool = False,
     ) -> BenchmarkResult:
         """
@@ -149,6 +151,8 @@ class InteractiveBenchmarkController:
             dagent_endpoint: Optional dagent HTTP endpoint to trigger
             dagent_provider: LLM provider for dagent (openai, gemini, anthropic, ollama)
             dagent_model: Model name for dagent (e.g., gpt-4o, gemini-2.0-flash)
+            dagent_mode: Agent mode ('single' for single-agent, 'multi' for multi-agent)
+            dagent_structure: Multi-agent structure ('sequential', 'concurrent', 'debate', 'group_chat')
             verbose: Print each agent action as it executes
 
         Returns:
@@ -253,6 +257,9 @@ class InteractiveBenchmarkController:
                     # Pass provider and model to dagent
                     "provider": dagent_provider or "openai",
                     "model": dagent_model,
+                    # Pass agent mode and structure
+                    "agent_mode": dagent_mode,
+                    "structure": dagent_structure,
                 }
                 
                 try:

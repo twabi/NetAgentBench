@@ -279,12 +279,14 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @click.option("--dagent-endpoint", default=None, help="Dagent HTTP endpoint to trigger (e.g., http://localhost:8000)")
 @click.option("--provider", default="openai", help="LLM provider: openai, anthropic, gemini, ollama (default: openai)")
 @click.option("--model", default=None, help="Model name (e.g., gpt-4o, gemini-2.0-flash, claude-3-5-sonnet)")
+@click.option("--agent-mode", type=click.Choice(["single", "multi"]), default="single", help="Agent mode: single (one agent) or multi (multi-agent)")
+@click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
 @click.option("--turn-limit", type=int, default=50, help="Max config commands (default: 50)")
 @click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds (default: 600)")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
 @click.option("--wait-for-submit", is_flag=True, help="Wait for agent to call submit (manual mode)")
 @click.option("--verbose", "-v", is_flag=True, help="Print each agent action as it executes")
-def run_task(task_file, dagent_endpoint, provider, model, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
+def run_task(task_file, dagent_endpoint, provider, model, agent_mode, structure, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
     """
     Run a single task file in multi-turn interactive mode.
     
@@ -294,24 +296,24 @@ def run_task(task_file, dagent_endpoint, provider, model, turn_limit, time_limit
     Examples:
     
         \\b
-        # Run with dagent using OpenAI (default)
-        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000
+        # Run with dagent using single-agent (default)
+        benchmark run-task tasks/task.json --dagent-endpoint http://localhost:8000
         
         \\b
-        # Run with Gemini
-        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000 --provider gemini --model gemini-2.0-flash
+        # Run with multi-agent sequential pattern
+        benchmark run-task tasks/task.json --dagent-endpoint http://localhost:8000 --agent-mode multi --structure sequential
         
         \\b
-        # Run with Anthropic Claude
-        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000 --provider anthropic --model claude-3-5-sonnet-20241022
+        # Run with Gemini and multi-agent debate pattern
+        benchmark run-task tasks/task.json --dagent-endpoint http://localhost:8000 --provider gemini --model gemini-2.5-pro --agent-mode multi --structure debate
         
         \\b
         # Run with custom limits
-        benchmark run-task tasks/multiturn_test_simple.json --dagent-endpoint http://localhost:8000 --turn-limit 20 --time-limit 120
+        benchmark run-task tasks/task.json --dagent-endpoint http://localhost:8000 --turn-limit 20 --time-limit 120
         
         \\b
         # Wait for external agent (manual mode)
-        benchmark run-task tasks/multiturn_test_simple.json --wait-for-submit
+        benchmark run-task tasks/task.json --wait-for-submit
     """
     try:
         from benchmark.interactive_controller import InteractiveBenchmarkController
@@ -323,13 +325,14 @@ def run_task(task_file, dagent_endpoint, provider, model, turn_limit, time_limit
             task_data = json.load(f)
         task = TaskDefinition(**task_data)
 
-        # Build testee_id based on provider/model
+        # Build testee_id based on provider/model/mode
         if dagent_endpoint:
+            mode_suffix = "multi" if agent_mode == "multi" else "single"
             if model:
                 # Use model name for clearer identification  
-                testee_id = f"{provider}_{model.replace('-', '').replace('.', '')}"
+                testee_id = f"{provider}_{model.replace('-', '').replace('.', '')}_{mode_suffix}"
             else:
-                testee_id = f"{provider}_default"
+                testee_id = f"{provider}_default_{mode_suffix}"
         else:
             testee_id = "manual_agent"
 
@@ -345,6 +348,9 @@ def run_task(task_file, dagent_endpoint, provider, model, turn_limit, time_limit
             click.echo(f"Dagent Endpoint: {dagent_endpoint}")
             click.echo(f"Provider: {provider}")
             click.echo(f"Model: {model or '(default)'}")
+            click.echo(f"Agent Mode: {agent_mode}")
+            if agent_mode == "multi":
+                click.echo(f"Structure: {structure}")
         else:
             click.echo(f"Wait for Submit: {wait_for_submit}")
         click.echo(f"{'='*80}\n")
@@ -365,6 +371,8 @@ def run_task(task_file, dagent_endpoint, provider, model, turn_limit, time_limit
                 dagent_endpoint=dagent_endpoint,
                 dagent_provider=provider,
                 dagent_model=model,
+                dagent_mode=agent_mode,
+                dagent_structure=structure,
                 verbose=verbose,
             )
         
@@ -557,7 +565,9 @@ def run_llm(property_type, provider, model, base_url, platform, limit, output_di
 @click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds for multi-turn mode (default: 600)")
 @click.option("--provider", default="openai", help="LLM provider (default: openai)")
 @click.option("--model", default=None, help="LLM model name")
-def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit, provider, model):
+@click.option("--agent-mode", type=click.Choice(["single", "multi"]), default="single", help="Agent mode: single (one agent) or multi (multi-agent)")
+@click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
+def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit, provider, model, agent_mode, structure):
     """
     Run all tasks for a property type using dagent multi-agent system.
     
@@ -569,28 +579,25 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
     Examples:
     
         \b
-        # Run reachability tasks with dagent (default localhost, single-turn)
+        # Run reachability tasks with dagent (default localhost, single-turn, single-agent)
         benchmark run-dagent reachability
         
         \b
-        # Run 5 BGP tasks with dagent on custom endpoint
-        benchmark run-dagent bgp_configuration --endpoint http://myserver:8000 --limit 5
+        # Run with multi-agent sequential pattern
+        benchmark run-dagent bgp_configuration --agent-mode multi --structure sequential
         
         \b
         # Run with multi-turn interactive mode
         benchmark run-dagent reachability --mode multi --turn-limit 30 --time-limit 300
         
         \b
-        # Run on specific platform
-        benchmark run-dagent ospf_configuration --platform cisco_ios_xe --limit 10
-        
-        \b
-        # Run with specific model
-        benchmark run-dagent bgp_configuration --provider anthropic --model claude-3-5-sonnet-20241022
+        # Run on specific platform with specific model
+        benchmark run-dagent ospf_configuration --platform frr --provider gemini --model gemini-2.5-pro
     """
     try:
         click.echo(f"Using dagent at: {endpoint}")
         click.echo(f"Mode: {mode}-turn" + (f" (turn_limit={turn_limit}, time_limit={time_limit}s)" if mode == "multi" else ""))
+        click.echo(f"Agent Mode: {agent_mode}" + (f" ({structure})" if agent_mode == "multi" else ""))
 
         if mode == "multi":
             # Multi-turn interactive mode using InteractiveBenchmarkController
@@ -618,7 +625,7 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
                 click.echo(f"Task: {task.task_id}")
                 result = controller.run_interactive(
                     task=task,
-                    testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}",
+                    testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}_{agent_mode}",
                     testee_type="dagent",
                     turn_limit=turn_limit,
                     time_limit=time_limit,
@@ -626,6 +633,8 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
                     dagent_endpoint=endpoint,
                     dagent_provider=provider,
                     dagent_model=model,
+                    dagent_mode=agent_mode,
+                    dagent_structure=structure,
                 )
                 storage.save_result(result)
                 results.append(result)
@@ -649,6 +658,8 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
                 testee_id=f"dagent_{endpoint.replace('http://', '').replace(':', '_')}",
                 provider=provider,
                 model=model,
+                agent_mode=agent_mode,
+                structure=structure,
             )
 
             _run_property_execution(
@@ -1361,5 +1372,70 @@ def analyze(identifier, output_dir, format, batch_name):
         sys.exit(1)
 
 
+@main.command()
+@click.argument("session_path", type=click.Path(exists=True))
+@click.option("--no-charts", is_flag=True, help="Skip chart generation")
+def analyze_session(session_path, no_charts):
+    """
+    Analyze a benchmark study session.
+    
+    SESSION_PATH is the path to a session folder (e.g., results/sessions/baseline_study_xxx).
+    
+    Generates:
+      - analysis_report.md: Comprehensive markdown report with model comparison
+      - charts/: Visualization charts (unless --no-charts)
+    
+    Examples:
+    
+        benchmark analyze-session results/sessions/baseline_study_20260106_031052
+    """
+    try:
+        from benchmark.analysis.session_analyzer import (
+            generate_session_report,
+            generate_session_charts,
+            SessionAnalyzer,
+        )
+        
+        click.echo(f"Analyzing session: {session_path}")
+        click.echo("=" * 80)
+        
+        # Load session info
+        analyzer = SessionAnalyzer(session_path)
+        session_info = analyzer.session_info
+        
+        click.echo(f"Session: {session_info.get('session_name', 'unknown')}")
+        click.echo(f"Models: {', '.join(session_info.get('models', []))}")
+        click.echo(f"Property Types: {', '.join(session_info.get('property_types', []))}")
+        click.echo("")
+        
+        # Generate report
+        click.echo("Generating analysis report...")
+        report_path = generate_session_report(session_path)
+        click.echo(f"  Report: {report_path}")
+        
+        # Generate charts
+        if not no_charts:
+            click.echo("Generating comparison charts...")
+            chart_paths = generate_session_charts(session_path)
+            for chart_path in chart_paths:
+                click.echo(f"  Chart: {chart_path}")
+        
+        click.echo("")
+        click.echo("=" * 80)
+        click.echo("Session analysis complete!")
+        click.echo(f"View report: {report_path}")
+        
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Session analysis failed: {e}")
+        click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
 if __name__ == "__main__":
     main()
+
