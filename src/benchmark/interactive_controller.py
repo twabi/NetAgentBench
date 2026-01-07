@@ -169,6 +169,7 @@ class InteractiveBenchmarkController:
         errors: List[str] = []
         property_results: List[PropertyEvaluationResult] = []
         submit_result: Optional[SubmitResult] = None
+        reasoning_trace: List[Dict[str, Any]] = []
 
         # Timing
         start_time = time.time()
@@ -271,6 +272,7 @@ class InteractiveBenchmarkController:
                         dagent_result = response.json()
                         # Extract model_version from dagent response
                         model_name = dagent_result.get("model_version", "unknown")
+                        reasoning_trace = dagent_result.get("reasoning_trace", [])
                         logger.info(f"Dagent response: {dagent_result}")
                         logger.info(f"Agent model: {model_name}")
                         
@@ -496,6 +498,7 @@ class InteractiveBenchmarkController:
                     f"{node} | {cmd}" for node, cmd in approach_tuples
                 ],
                 errors=errors,
+                reasoning_trace=reasoning_trace,
             )
 
             logger.info(

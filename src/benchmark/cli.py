@@ -325,9 +325,12 @@ def run_task(task_file, dagent_endpoint, provider, model, agent_mode, structure,
             task_data = json.load(f)
         task = TaskDefinition(**task_data)
 
-        # Build testee_id based on provider/model/mode
+        # Build testee_id based on provider/model/mode/structure
         if dagent_endpoint:
             mode_suffix = "multi" if agent_mode == "multi" else "single"
+            # Include structure in testee_id for multi-agent runs
+            if agent_mode == "multi":
+                mode_suffix = f"multi_{structure}"
             if model:
                 # Use model name for clearer identification  
                 testee_id = f"{provider}_{model.replace('-', '').replace('.', '')}_{mode_suffix}"

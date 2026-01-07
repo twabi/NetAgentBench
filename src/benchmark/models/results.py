@@ -206,6 +206,9 @@ class BenchmarkResult(BaseModel):
     final_state: Optional[Dict[str, Any]] = Field(
         None, description="Final network state (if captured)"
     )
+    reasoning_trace: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Agent reasoning trace (multi-turn only)"
+    )
 
 
 # ============================================================================
