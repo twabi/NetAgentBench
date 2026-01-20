@@ -234,6 +234,11 @@ class InteractiveBenchmarkController:
             # STEP 3: Trigger Dagent (if endpoint provided)
             # ============================================================
             dagent_result = None
+            token_usage = None
+            tool_usage = None
+            agent_conversations = None
+            total_commands = None
+            failed_commands = None
             if dagent_endpoint:
                 logger.info(f"Step 3: Triggering dagent at {dagent_endpoint}")
                 import httpx
@@ -273,8 +278,21 @@ class InteractiveBenchmarkController:
                         # Extract model_version from dagent response
                         model_name = dagent_result.get("model_version", "unknown")
                         reasoning_trace = dagent_result.get("reasoning_trace", [])
+                        # Extract new tracking metrics
+                        token_usage = dagent_result.get("token_usage", None)
+                        tool_usage = dagent_result.get("tool_usage", None)
+                        agent_conversations = dagent_result.get("agent_conversations", None)
+                        # Calculate failed commands from actions
+                        actions_list = dagent_result.get("actions", [])
+                        total_commands = len(actions_list)
+                        failed_commands = sum(
+                            1 for a in actions_list 
+                            if not a.get("result", {}).get("success", True)
+                        )
                         logger.info(f"Dagent response: {dagent_result}")
                         logger.info(f"Agent model: {model_name}")
+                        if token_usage:
+                            logger.info(f"Token usage: {token_usage}")
                         
                         # Verbose: print each action
                         if verbose:
@@ -491,8 +509,11 @@ class InteractiveBenchmarkController:
                     turns_to_complete=turns_used,
                     time_to_complete=session_time,
                     termination_reason=termination_reason,
-                    tool_usage=None,  # TODO: Add tool tracking to MCP server
-                    failed_commands=None,  # TODO: Track failed commands in session
+                    tool_usage=tool_usage if dagent_endpoint else None,
+                    total_commands=total_commands,
+                    failed_commands=failed_commands,
+                    token_usage=token_usage if dagent_endpoint else None,
+                    agent_conversations=agent_conversations if dagent_endpoint else None,
                 ),
                 execution_log=[
                     f"{node} | {cmd}" for node, cmd in approach_tuples

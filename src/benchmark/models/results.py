@@ -121,8 +121,17 @@ class ExecutionMetrics(BaseModel):
     tool_usage: Optional[Dict[str, int]] = Field(
         None, description="Tool usage counts e.g. {'exec_command': 5, 'get_nodes': 1} (multi-turn only)"
     )
+    total_commands: Optional[int] = Field(
+        None, description="Total number of commands executed by agent (multi-turn only)"
+    )
     failed_commands: Optional[int] = Field(
         None, description="Number of commands that returned non-zero exit code (multi-turn only)"
+    )
+    token_usage: Optional[Dict[str, int]] = Field(
+        None, description="Token usage: prompt_tokens, completion_tokens, total_tokens (multi-turn only)"
+    )
+    agent_conversations: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Inter-agent message log for multi-agent patterns (multi-turn only)"
     )
 
 
