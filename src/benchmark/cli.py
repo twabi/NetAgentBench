@@ -285,8 +285,9 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds (default: 600)")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
 @click.option("--wait-for-submit", is_flag=True, help="Wait for agent to call submit (manual mode)")
+@click.option("--provider-host", help="Host URL for provider (e.g., http://oai:11434)")
 @click.option("--verbose", "-v", is_flag=True, help="Print each agent action as it executes")
-def run_task(task_file, dagent_endpoint, provider, model, agent_mode, structure, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
+def run_task(task_file, dagent_endpoint, provider, model, provider_host, agent_mode, structure, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
     """
     Run a single task file in multi-turn interactive mode.
     
@@ -374,6 +375,7 @@ def run_task(task_file, dagent_endpoint, provider, model, agent_mode, structure,
                 dagent_endpoint=dagent_endpoint,
                 dagent_provider=provider,
                 dagent_model=model,
+                dagent_host=provider_host,
                 dagent_mode=agent_mode,
                 dagent_structure=structure,
                 verbose=verbose,
@@ -570,7 +572,8 @@ def run_llm(property_type, provider, model, base_url, platform, limit, output_di
 @click.option("--model", default=None, help="LLM model name")
 @click.option("--agent-mode", type=click.Choice(["single", "multi"]), default="single", help="Agent mode: single (one agent) or multi (multi-agent)")
 @click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
-def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit, provider, model, agent_mode, structure):
+@click.option("--provider-host", help="Host URL for provider (e.g., http://oai:11434)")
+def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit, provider, model, provider_host, agent_mode, structure):
     """
     Run all tasks for a property type using dagent multi-agent system.
     
@@ -636,6 +639,7 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
                     dagent_endpoint=endpoint,
                     dagent_provider=provider,
                     dagent_model=model,
+                    dagent_host=provider_host,
                     dagent_mode=agent_mode,
                     dagent_structure=structure,
                 )
@@ -663,6 +667,7 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
                 model=model,
                 agent_mode=agent_mode,
                 structure=structure,
+                host=provider_host,
             )
 
             _run_property_execution(

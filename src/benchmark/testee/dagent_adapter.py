@@ -38,6 +38,7 @@ class DagentAdapter(BaseTestee):
         structure: str = "sequential",
         timeout: float = 300.0,
         testee_id: str = "dagent",
+        host: Optional[str] = None,
     ):
         """
         Initialize Dagent adapter.
@@ -50,6 +51,7 @@ class DagentAdapter(BaseTestee):
             structure: Multi-agent structure ("sequential", "concurrent", "debate", "group_chat")
             timeout: Request timeout in seconds
             testee_id: Unique identifier for this testee
+            host: Optional host URL for provider (e.g., Ollama URL)
         """
         try:
             import httpx
@@ -62,6 +64,7 @@ class DagentAdapter(BaseTestee):
         self.endpoint = endpoint.rstrip("/")
         self.provider = provider
         self.model = model
+        self.host = host
         self.agent_mode = agent_mode
         self.structure = structure
         self.timeout = timeout
@@ -163,6 +166,7 @@ class DagentAdapter(BaseTestee):
             "model": self.model,
             "agent_mode": self.agent_mode,
             "structure": self.structure,
+            "host": self.host,
         }
         
         with self.httpx.Client(timeout=timeout_config) as client:
