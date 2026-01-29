@@ -5,7 +5,7 @@
 set -e
 
 # Configuration
-DAGENT_ENDPOINT="${DAGENT_ENDPOINT:-http://localhost:8000}"
+DAGENT_ENDPOINT="${DAGENT_ENDPOINT:-http://10.23.52.8:8000}"
 OLLAMA_HOST="http://10.23.52.8:11434"
 # "Unreachably big" limits
 TURN_LIMIT=10000

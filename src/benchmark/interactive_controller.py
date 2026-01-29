@@ -119,6 +119,7 @@ class InteractiveBenchmarkController:
         turn_limit: int = 50,
         time_limit: float = 600.0,
         mcp_port: int = 8001,
+        mcp_host: str = "localhost",
         wait_for_submit: bool = True,
         dagent_endpoint: Optional[str] = None,
         dagent_provider: Optional[str] = None,
@@ -259,7 +260,7 @@ class InteractiveBenchmarkController:
                         }
                         for p in task.intent.properties
                     ],
-                    "mcp_url": f"http://localhost:{mcp_port}/mcp",
+                    "mcp_url": f"http://{mcp_host}:{mcp_port}/mcp",
                     "turn_limit": turn_limit,
                     "time_limit": time_limit,
                     # Pass provider and model to dagent
