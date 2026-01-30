@@ -187,11 +187,17 @@ class InteractiveBenchmarkController:
             logger.info("Step 1: Creating interactive session")
             provision_start = time.time()
 
+            # Get convergence timeout from task definition, default to 60s for BGP/OSPF
+            convergence_timeout = 60
+            if task.convergence and hasattr(task.convergence, 'timeout_seconds'):
+                convergence_timeout = task.convergence.timeout_seconds
+            
             self._session = InteractiveSession(
                 task=task,
                 infrastructure=self.infrastructure,
                 turn_limit=turn_limit,
                 time_limit=time_limit,
+                convergence_timeout=convergence_timeout,
             )
 
             # Start session (provisions topology)

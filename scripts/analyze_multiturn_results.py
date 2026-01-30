@@ -82,22 +82,14 @@ def normalize_model_name(result: Dict) -> str:
     """Extract and normalize model name from result."""
     model = result.get("model_version") or ""
     
-    # Remove provider prefix if present (e.g., "openai:" or "gemini:")
-    if ":" in model:
-        model = model.split(":")[-1]
-    
-    # Simplify long model names
+    # Remove provider prefix if present
+    for provider in ["ollama:", "openai:", "gemini:"]:
+        if model.lower().startswith(provider):
+            model = model[len(provider):]
+            break
+            
+    # Simplify long model names by removing date suffixes
     model = model.replace("-2025-08-07", "").replace("2025-08-07", "")
-    
-    # Standard names
-    if "gpt-5-mini" in model.lower() or "gpt5mini" in model.lower():
-        return "GPT-5-mini"
-    elif "gemini-2.5-pro" in model.lower() or "gemini25pro" in model.lower():
-        return "Gemini-2.5-Pro"
-    elif "gemini" in model.lower():
-        return "Gemini"
-    elif "gpt" in model.lower():
-        return "GPT"
     
     return model or "unknown"
 
@@ -163,6 +155,21 @@ def compute_metrics(results: List[Dict]) -> Dict[str, Any]:
     if times:
         metrics["avg_time"] = np.mean(times)
         metrics["std_time"] = np.std(times)
+        
+    # NEW: Token Usage Metrics
+    total_tokens = []
+    for r in results:
+        usage = r.get("metrics", {}).get("token_usage", {})
+        if usage and "total_tokens" in usage:
+            total_tokens.append(usage["total_tokens"])
+    
+    if total_tokens:
+        metrics["avg_tokens"] = np.mean(total_tokens)
+        metrics["std_tokens"] = np.std(total_tokens)
+        metrics["total_tokens_consumed"] = sum(total_tokens)
+        
+        # Estimated cost (blended rate placeholder: $5/1M tokens)
+        metrics["est_cost"] = (sum(total_tokens) / 1_000_000) * 5.0
     
     return metrics
 
@@ -491,17 +498,22 @@ def compute_research_metrics(results: List[Dict]) -> Dict[str, Any]:
     
     # RQ3: Parallelism (commands per turn)
     for pattern, pattern_results in by_pattern.items():
-        turns = [r.get("metrics", {}).get("turns_to_complete", 0) for r in pattern_results]
-        times = [r.get("metrics", {}).get("time_to_complete", 0) for r in pattern_results]
+        turns = [r.get("metrics", {}).get("turns_to_complete") for r in pattern_results]
+        times = [r.get("metrics", {}).get("time_to_complete") for r in pattern_results]
         
         total_cmds = sum(len(parse_execution_log(r)) for r in pattern_results)
-        total_turns = sum(t for t in turns if t and t > 0)
+        
+        # Filter None values for calculations
+        valid_turns = [t for t in turns if t is not None and t > 0]
+        valid_times = [t for t in times if t is not None and t > 0]
+        
+        total_turns = sum(valid_turns)
         
         if total_turns > 0:
             metrics["rq3_parallelism"][pattern] = {
                 "parallelism_factor": total_cmds / total_turns,
-                "avg_time": np.mean([t for t in times if t and t > 0]) if any(t > 0 for t in times) else 0,
-                "avg_turns": np.mean([t for t in turns if t and t > 0]) if any(t > 0 for t in turns) else 0,
+                "avg_time": np.mean(valid_times) if valid_times else 0,
+                "avg_turns": np.mean(valid_turns) if valid_turns else 0,
             }
     
     # Speedup: single vs multi time
@@ -549,6 +561,10 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         lines.append(f"| Avg Turns | {overall['avg_turns']:.1f} ± {overall.get('std_turns', 0):.1f} |")
     if "avg_time" in overall:
         lines.append(f"| Avg Time | {overall['avg_time']:.0f}s ± {overall.get('std_time', 0):.0f}s |")
+    if "avg_tokens" in overall:
+        lines.append(f"| Avg Tokens | {overall['avg_tokens']:.0f} ± {overall.get('std_tokens', 0):.0f} |")
+        lines.append(f"| Total Tokens | {overall['total_tokens_consumed']:,} |")
+        lines.append(f"| Est. Cost | ${overall['est_cost']:.2f} |")
     lines.append("")
     
     # Pattern comparison (main focus!)
@@ -558,8 +574,8 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         "",
         "## Agent Pattern Comparison",
         "",
-        "| Pattern | Runs | Success | Score | Completeness | Robustness | Turns | Time |",
-        "|---------|------|---------|-------|--------------|------------|-------|------|",
+        "| Pattern | Runs | Success | Score | Completeness | Robustness | Turns | Time | Tokens |",
+        "|---------|------|---------|-------|--------------|------------|-------|------|--------|",
     ])
     
     pattern_order = ["single", "sequential", "debate", "group_chat", "concurrent"]
@@ -568,10 +584,11 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
             m = compute_metrics(by_pattern[pattern])
             turns_str = f"{m.get('avg_turns', 0):.1f}" if "avg_turns" in m else "-"
             time_str = f"{m.get('avg_time', 0):.0f}s" if "avg_time" in m else "-"
+            tokens_str = f"{m.get('avg_tokens', 0):.0f}" if "avg_tokens" in m else "-"
             lines.append(
                 f"| **{pattern}** | {m['count']} | {m['success_rate']*100:.0f}% | "
                 f"{m['avg_final_score']:.3f} | {m['avg_completeness']:.3f} | "
-                f"{m['avg_robustness']:.3f} | {turns_str} | {time_str} |"
+                f"{m['avg_robustness']:.3f} | {turns_str} | {time_str} | {tokens_str} |"
             )
     lines.append("")
     
@@ -582,15 +599,16 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         "",
         "## Model Comparison",
         "",
-        "| Model | Runs | Success | Score | Completeness | Turns |",
-        "|-------|------|---------|-------|--------------|-------|",
+        "| Model | Runs | Success | Score | Completeness | Turns | Tokens |",
+        "|-------|------|---------|-------|--------------|-------|--------|",
     ])
     for model, model_results in sorted(by_model.items()):
         m = compute_metrics(model_results)
         turns_str = f"{m.get('avg_turns', 0):.1f}" if "avg_turns" in m else "-"
+        tokens_str = f"{m.get('avg_tokens', 0):.0f}" if "avg_tokens" in m else "-"
         lines.append(
             f"| **{model}** | {m['count']} | {m['success_rate']*100:.0f}% | "
-            f"{m['avg_final_score']:.3f} | {m['avg_completeness']:.3f} | {turns_str} |"
+            f"{m['avg_final_score']:.3f} | {m['avg_completeness']:.3f} | {turns_str} | {tokens_str} |"
         )
     lines.append("")
     
@@ -601,15 +619,16 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         "",
         "## Per-Task Breakdown",
         "",
-        "| Task | Runs | Success | Score | Completeness | Turns |",
-        "|------|------|---------|-------|--------------|-------|",
+        "| Task | Runs | Success | Score | Completeness | Turns | Tokens |",
+        "|------|------|---------|-------|--------------|-------|--------|",
     ])
     for task, task_results in sorted(by_task.items()):
         m = compute_metrics(task_results)
         turns_str = f"{m.get('avg_turns', 0):.1f}" if "avg_turns" in m else "-"
+        tokens_str = f"{m.get('avg_tokens', 0):.0f}" if "avg_tokens" in m else "-"
         lines.append(
             f"| **{task}** | {m['count']} | {m['success_rate']*100:.0f}% | "
-            f"{m['avg_final_score']:.3f} | {m['avg_completeness']:.3f} | {turns_str} |"
+            f"{m['avg_final_score']:.3f} | {m['avg_completeness']:.3f} | {turns_str} | {tokens_str} |"
         )
     lines.append("")
     

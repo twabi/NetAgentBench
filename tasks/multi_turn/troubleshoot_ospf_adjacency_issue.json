@@ -80,6 +80,40 @@
       }
     ]
   },
+  "preconfiguration": [
+    {
+      "node": "R1",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.1/32\n exit\n interface eth1\n  ip address 10.0.12.1/30\n exit\n interface eth2\n  ip address 10.0.14.1/30\n exit\n router ospf\n  ospf router-id 10.0.0.1\n  network 10.0.0.1/32 area 0\n  network 10.0.12.0/30 area 0\n  network 10.0.14.0/30 area 0'"
+    },
+    {
+      "node": "R2",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.2/32\n exit\n interface eth1\n  ip address 10.0.12.2/30\n exit\n interface eth2\n  ip address 10.0.23.2/30\n exit\n router ospf\n  ospf router-id 10.0.0.2\n  network 10.0.0.2/32 area 0\n  network 10.0.12.0/30 area 0\n  network 10.0.23.0/30 area 0'"
+    },
+    {
+      "node": "R3",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.3/32\n exit\n interface eth1\n  ip address 10.0.23.3/30\n exit\n interface eth2\n  ip address 10.0.34.3/30\n exit\n router ospf\n  ospf router-id 10.0.0.3\n  network 10.0.0.3/32 area 0\n  network 10.0.23.0/30 area 1\n  network 10.0.34.0/30 area 0'"
+    },
+    {
+      "node": "R4",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.4/32\n exit\n interface eth1\n  ip address 10.0.34.4/30\n exit\n interface eth2\n  ip address 10.0.14.4/30\n exit\n router ospf\n  ospf router-id 10.0.0.4\n  network 10.0.0.4/32 area 0\n  network 10.0.34.0/30 area 0\n  network 10.0.14.0/30 area 0'"
+    }
+  ],
+  "fault_verification": [
+    {
+      "id": "verify_missing_adjacency",
+      "type": "ospf_configuration",
+      "description": "Verify that OSPF adjacency between R2 and R3 is NOT Full due to area mismatch",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "R2",
+        "command": "vtysh -c 'show ip ospf neighbor 10.0.0.3'",
+        "parser": "text",
+        "success_condition": {
+          "not_contains_text": "Full"
+        }
+      }
+    }
+  ],
   "convergence": {
     "timeout_seconds": 45,
     "check_interval_seconds": 3

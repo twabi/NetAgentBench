@@ -268,6 +268,15 @@ class TextParser(OutputParser):
                 satisfied = search_text in output_norm
                 return satisfied, {"found": satisfied, "search_text": search_text}
             
+            # Check single not_contains_text
+            if "not_contains_text" in success_condition:
+                search_text = success_condition["not_contains_text"]
+                if case_insensitive:
+                    search_text = search_text.lower()
+                
+                satisfied = search_text not in output_norm
+                return satisfied, {"found": not satisfied, "search_text": search_text}
+            
             # Check contains_all
             if "contains_all" in success_condition:
                 all_texts = success_condition["contains_all"]
@@ -281,6 +290,19 @@ class TextParser(OutputParser):
                 satisfied = len(found) == len(all_texts)
                 return satisfied, {"found_all": satisfied, "found": found}
             
+            # Check not_contains_all
+            if "not_contains_all" in success_condition:
+                all_texts = success_condition["not_contains_all"]
+                found = []
+                
+                for text in all_texts:
+                    search_text = text.lower() if case_insensitive else text
+                    if search_text in output_norm:
+                        found.append(text)
+                
+                satisfied = len(found) < len(all_texts)
+                return satisfied, {"found_all": not satisfied, "found": found}
+            
             # Check contains_any
             if "contains_any" in success_condition:
                 any_texts = success_condition["contains_any"]
@@ -293,6 +315,19 @@ class TextParser(OutputParser):
                 
                 satisfied = len(found) > 0
                 return satisfied, {"found_any": satisfied, "found": found}
+            
+            # Check not_contains_any
+            if "not_contains_any" in success_condition:
+                any_texts = success_condition["not_contains_any"]
+                found = []
+                
+                for text in any_texts:
+                    search_text = text.lower() if case_insensitive else text
+                    if search_text in output_norm:
+                        found.append(text)
+                
+                satisfied = len(found) == 0
+                return satisfied, {"found_any": len(found) > 0, "found": found}
             
             # No valid condition specified
             return False, None

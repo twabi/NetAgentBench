@@ -227,6 +227,163 @@ class TestInteractiveSessionLifecycle:
         with pytest.raises(SessionError, match="already active"):
             mock_session.start()
 
+    def test_start_executes_preconfiguration(self):
+        """Test start() executes pre-configuration steps."""
+        from benchmark.session.session import InteractiveSession
+        from benchmark.models.task import (
+            TaskDefinition,
+            TopologySpecification,
+            Node,
+            NodeType,
+            IntentSpecification,
+            Platform,
+            PreconfigurationStep,
+            Property,
+            PropertyType,
+            EvaluationProcedure,
+        )
+
+        nodes = [Node(name="R1", type=NodeType.ROUTER)]
+        topology = TopologySpecification(nodes=nodes, links=[], interfaces=[])
+        eval_proc = EvaluationProcedure(
+            method="exec_and_parse", target_node="R1", command="test", parser="text", success_condition={}
+        )
+        prop = Property(
+            id="p1", type=PropertyType.INTERFACE_UP, description="Test", evaluation=eval_proc
+        )
+        task = TaskDefinition(
+            task_id="test_preconfig",
+            description="Test",
+            platform=Platform.FRR,
+            topology=topology,
+            intent=IntentSpecification(properties=[prop]),
+            preconfiguration=[
+                PreconfigurationStep(node="R1", command="conf t"),
+                PreconfigurationStep(node="R1", command="interface lo")
+            ]
+        )
+
+        mock_infra = Mock()
+        mock_infra.provision.return_value = "topo1"
+        mock_infra.is_ready.return_value = True
+        mock_infra.get_node_container_name.return_value = "clab-R1"
+
+        session = InteractiveSession(task, infrastructure=mock_infra)
+        session._executor = Mock()
+        session._executor.exec_on_node.return_value = ("", "", 0)
+
+        session.start()
+
+        # Check executor was called for preconfig
+        assert session._executor.exec_on_node.call_count == 2
+        session._executor.exec_on_node.assert_any_call("clab-R1", "conf t", timeout=30)
+        session._executor.exec_on_node.assert_any_call("clab-R1", "interface lo", timeout=30)
+
+    def test_start_fails_if_fault_not_verified(self):
+        """Test start() fails if fault verification property is not satisfied."""
+        from benchmark.session.session import InteractiveSession, SessionError
+        from benchmark.models.task import (
+            TaskDefinition,
+            TopologySpecification,
+            Node,
+            NodeType,
+            IntentSpecification,
+            Platform,
+            Property,
+            PropertyType,
+            EvaluationProcedure,
+        )
+        from benchmark.models.results import PropertyEvaluationResult
+
+        nodes = [Node(name="R1", type=NodeType.ROUTER)]
+        topology = TopologySpecification(nodes=nodes, links=[], interfaces=[])
+        prop = Property(
+            id="fault1",
+            type=PropertyType.OSPF_CONFIGURATION,
+            description="Fault expected",
+            evaluation=EvaluationProcedure(
+                method="exec_and_parse", target_node="R1", command="test", parser="text", success_condition={}
+            )
+        )
+        task = TaskDefinition(
+            task_id="test_fault",
+            description="Test",
+            platform=Platform.FRR,
+            topology=topology,
+            intent=IntentSpecification(properties=[prop]),
+            fault_verification=[prop]
+        )
+
+        mock_infra = Mock()
+        mock_infra.provision.return_value = "topo1"
+        mock_infra.is_ready.return_value = True
+
+        session = InteractiveSession(task, infrastructure=mock_infra)
+        session._evaluator = Mock()
+        # Mock failed verification
+        session._evaluator.evaluate_all_properties.return_value = [
+            PropertyEvaluationResult(
+                property_id="fault1", satisfied=False, observation_raw="", observation_parsed=None, evaluation_time_seconds=0.1
+            )
+        ]
+
+        with pytest.raises(SessionError, match="Fault verification failed"):
+            session.start()
+
+        assert session.is_active is False
+        mock_infra.teardown.assert_called_once_with("topo1")
+
+    def test_start_succeeds_if_fault_verified(self):
+        """Test start() succeeds if fault verification property is satisfied."""
+        from benchmark.session.session import InteractiveSession
+        from benchmark.models.task import (
+            TaskDefinition,
+            TopologySpecification,
+            Node,
+            NodeType,
+            IntentSpecification,
+            Platform,
+            Property,
+            PropertyType,
+            EvaluationProcedure,
+        )
+        from benchmark.models.results import PropertyEvaluationResult
+
+        nodes = [Node(name="R1", type=NodeType.ROUTER)]
+        topology = TopologySpecification(nodes=nodes, links=[], interfaces=[])
+        prop = Property(
+            id="fault1",
+            type=PropertyType.OSPF_CONFIGURATION,
+            description="Fault expected",
+            evaluation=EvaluationProcedure(
+                method="exec_and_parse", target_node="R1", command="test", parser="text", success_condition={}
+            )
+        )
+        task = TaskDefinition(
+            task_id="test_fault",
+            description="Test",
+            platform=Platform.FRR,
+            topology=topology,
+            intent=IntentSpecification(properties=[prop]),
+            fault_verification=[prop]
+        )
+
+        mock_infra = Mock()
+        mock_infra.provision.return_value = "topo1"
+        mock_infra.is_ready.return_value = True
+
+        session = InteractiveSession(task, infrastructure=mock_infra)
+        session._evaluator = Mock()
+        # Mock successful verification
+        session._evaluator.evaluate_all_properties.return_value = [
+            PropertyEvaluationResult(
+                property_id="fault1", satisfied=True, observation_raw="", observation_parsed=None, evaluation_time_seconds=0.1
+            )
+        ]
+
+        session.start()
+        assert session.is_active is True
+
 
 class TestExecCommand:
     """Test exec_command functionality."""

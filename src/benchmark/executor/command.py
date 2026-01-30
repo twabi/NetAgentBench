@@ -87,8 +87,10 @@ class CommandExecutor:
                 # Note: Docker exec_run returns (exit_code, output)
                 # By default, stderr is merged into stdout
                 # demux=False means (exit_code, output) where output is combined stdout+stderr
+                # Execute command using shell to ensure correct argument parsing
+                # (e.g. quotes, newlines, pipes)
                 return container.exec_run(
-                    command,
+                    ["/bin/sh", "-c", command],
                     stdout=True,
                     stderr=True,
                     demux=False,

@@ -14,7 +14,8 @@ from typing import List, Optional, Tuple
 from benchmark.executor.command import CommandExecutor
 from benchmark.infrastructure.base import InfrastructureProvider
 from benchmark.infrastructure.containerlab import ContainerlabProvider
-from benchmark.models.task import TaskDefinition
+from benchmark.models.task import TaskDefinition, Property
+from benchmark.evaluator.property import PropertyEvaluator
 from benchmark.session.models import (
     CommandType,
     ConvergenceStatus,
@@ -96,8 +97,9 @@ class InteractiveSession:
         self._start_time: Optional[datetime] = None
         self._topology_id: Optional[str] = None
 
-        # Command executor
+        # Command executor and evaluator
         self._executor = CommandExecutor()
+        self._evaluator = PropertyEvaluator()
 
     @property
     def is_active(self) -> bool:
@@ -158,6 +160,12 @@ class InteractiveSession:
                 self.infrastructure.teardown(self._topology_id)
                 raise SessionError("Topology failed to become ready within timeout")
 
+        # 1. Apply Pre-configuration
+        self._apply_preconfiguration()
+
+        # 2. Verify Fault State
+        self._verify_fault_state()
+
         # Initialize session state
         self._start_time = datetime.now()
         self._is_active = True
@@ -180,6 +188,89 @@ class InteractiveSession:
 
         logger.info(f"Session {self._context.session_id} started successfully")
         return self._context
+
+    def _apply_preconfiguration(self):
+        """Apply pre-configuration steps to the network."""
+        if not self.task.preconfiguration:
+            return
+
+        logger.info(f"Applying pre-configuration for task {self.task.task_id}")
+        for step in self.task.preconfiguration:
+            container_name = self.infrastructure.get_node_container_name(
+                self._topology_id, step.node
+            )
+            try:
+                # Use executor directly to avoid turn tracking and convergence delays during setup
+                stdout, stderr, exit_code = self._executor.exec_on_node(
+                    container_name, step.command, timeout=self.convergence_timeout
+                )
+                if exit_code != 0:
+                    logger.warning(
+                        f"Pre-configuration command failed on {step.node}: {step.command} (exit {exit_code})"
+                    )
+                    logger.debug(f"Stderr: {stderr}")
+                else:
+                    logger.info(f"Pre-configuration command succeeded on {step.node}")
+                    logger.debug(f"Pre-config Output:\n{stdout}")
+            except Exception as e:
+                logger.error(f"Error applying pre-configuration step on {step.node}: {e}")
+                raise SessionError(f"Pre-configuration failed: {e}") from e
+
+    def _verify_fault_state(self):
+        """Verify that the network is in the expected faulty state."""
+        if not self.task.fault_verification:
+            return
+
+        logger.info(f"Verifying fault state for task {self.task.task_id}")
+        
+        # Give some initial time for protocols to start after pre-config
+        initial_wait = min(5.0, self.convergence_timeout / 4)
+        time.sleep(initial_wait)
+
+        max_retries = 5
+        retry_interval = self.convergence_timeout / max_retries
+        
+        last_results = []
+        for attempt in range(max_retries):
+            last_results = self._evaluator.evaluate_all_properties(
+                self.infrastructure, self._topology_id, self.task.fault_verification
+            )
+
+            all_satisfied = True
+            for result in last_results:
+                if not result.satisfied:
+                    all_satisfied = False
+                    logger.debug(
+                        f"Fault verification attempt {attempt + 1}/{max_retries} failed for {result.property_id}"
+                    )
+                    break
+
+            if all_satisfied:
+                logger.info("Fault state verified successfully")
+                return
+
+            if attempt < max_retries - 1:
+                time.sleep(retry_interval)
+
+        # If we reached here, verification failed all attempts
+        for result in last_results:
+            if not result.satisfied:
+                error_prefix = f"Fault verification failed for property {result.property_id} after {max_retries} attempts"
+                error_msg = f"{error_prefix}: {result.error_message}" if result.error_message else error_prefix
+                
+                # Log the raw observation for debugging
+                if result.observation_raw:
+                    logger.error(f"Raw observation for {result.property_id}:\n{result.observation_raw}")
+                else:
+                    logger.error(f"No raw observation captured for {result.property_id}")
+                
+                logger.error(error_msg)
+                
+                # Cleanup if verification fails
+                self.infrastructure.teardown(self._topology_id)
+                self._topology_id = None
+                
+                raise SessionError(error_msg)
 
     def exec_command(
         self,

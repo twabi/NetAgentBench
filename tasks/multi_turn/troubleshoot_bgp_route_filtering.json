@@ -66,7 +66,7 @@
       {
         "id": "filtering_verified",
         "type": "bgp_configuration",
-        "description": "ISP only receives authorized public prefix (203.0.113.0/24), not internal routes",
+        "description": "ISP only receives authorized public prefix (203.0.113.0/30), not internal routes",
         "evaluation": {
           "method": "exec_and_parse",
           "target_node": "ISP",
@@ -93,6 +93,54 @@
       }
     ]
   },
+  "preconfiguration": [
+    {
+      "node": "EDGE",
+      "command": "vtysh -c 'conf t\n ip prefix-list PL-PUBLIC-ONLY permit 203.0.113.0/30\n route-map FILTER-OUT permit 10\n  match ip address prefix-list PL-PUBLIC-ONLY\n exit\n interface lo\n  ip address 10.0.0.1/32\n exit\n interface eth1\n  ip address 203.0.113.2/30\n exit\n interface eth2\n  ip address 10.1.0.1/30\n exit\n interface eth3\n  ip address 10.2.0.1/30\n exit\n router bgp 65000\n  no bgp ebgp-requires-policy\n  bgp router-id 10.0.0.1\n  neighbor 203.0.113.1 remote-as 65001\n  network 10.0.0.1/32\n  network 10.1.0.0/30\n  network 10.2.0.0/30\n  network 203.0.113.0/30'"
+    },
+    {
+      "node": "ISP",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 1.1.1.1/32\n exit\n interface eth1\n  ip address 203.0.113.1/30\n exit\n router bgp 65001\n  no bgp ebgp-requires-policy\n  bgp router-id 1.1.1.1\n  neighbor 203.0.113.2 remote-as 65000\n  network 1.1.1.1/32'"
+    },
+    {
+      "node": "INTERNAL1",
+      "command": "vtysh -c 'conf t\n interface eth1\n  ip address 10.1.0.2/30\n exit\n interface lo\n  ip address 10.10.1.1/32\n exit'"
+    },
+    {
+      "node": "INTERNAL2",
+      "command": "vtysh -c 'conf t\n interface eth1\n  ip address 10.2.0.2/30\n exit\n interface lo\n  ip address 10.10.2.1/32\n exit'"
+    }
+  ],
+  "fault_verification": [
+    {
+      "id": "verify_bgp_adjacency",
+      "type": "bgp_configuration",
+      "description": "Verify that BGP session with ISP is established",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "EDGE",
+        "command": "vtysh -c 'show ip bgp neighbors 203.0.113.1'",
+        "parser": "text",
+        "success_condition": {
+          "contains_text": "Established"
+        }
+      }
+    },
+    {
+      "id": "verify_route_leak",
+      "type": "bgp_configuration",
+      "description": "Verify that ISP is receiving the internal route 10.0.0.1/32 (route leak)",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "ISP",
+        "command": "vtysh -c 'show ip bgp'",
+        "parser": "text",
+        "success_condition": {
+          "contains_text": "10.0.0.1"
+        }
+      }
+    }
+  ],
   "convergence": {
     "timeout_seconds": 60,
     "check_interval_seconds": 3

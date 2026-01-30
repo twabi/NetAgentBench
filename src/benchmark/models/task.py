@@ -264,6 +264,20 @@ class TopologySpecification(BaseModel):
 
 
 # ============================================================================
+# Pre-configuration and Fault Verification Models
+# ============================================================================
+
+
+class PreconfigurationStep(BaseModel):
+    """
+    A single step in the pre-configuration sequence.
+    """
+
+    node: str = Field(..., description="Node name to execute the command on")
+    command: str = Field(..., description="Command string to execute")
+
+
+# ============================================================================
 # Property Evaluation Models (Definitions 10-11 in formalization)
 # ============================================================================
 
@@ -385,6 +399,12 @@ class TaskDefinition(BaseModel):
     )
     topology: TopologySpecification = Field(..., description="Network topology T")
     intent: IntentSpecification = Field(..., description="Intent specification P")
+    preconfiguration: Optional[List[PreconfigurationStep]] = Field(
+        None, description="Steps to establish initial state"
+    )
+    fault_verification: Optional[List[Property]] = Field(
+        None, description="Properties that MUST be satisfied for the fault to exist"
+    )
     convergence: ConvergenceConfig = Field(
         default_factory=ConvergenceConfig,
         description="Convergence configuration",
