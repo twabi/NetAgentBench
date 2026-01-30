@@ -13,6 +13,7 @@ import uuid
 from typing import Dict, Any
 import yaml
 import docker
+import shutil
 
 from benchmark.infrastructure.base import InfrastructureProvider
 from benchmark.models.task import TopologySpecification
@@ -212,23 +213,21 @@ service integrated-vtysh-config
 
             if result.returncode != 0:
                 error_msg = f"Containerlab deploy failed: {result.stderr}"
+                # Try to clean up any partially created resources
+                try:
+                    self.teardown(topology_id)
+                except:
+                    pass
                 raise Exception(error_msg)
 
             return topology_id
 
         except Exception as e:
-            # Cleanup will be handled by teardown or caller if they catch it
-            # But we should try to clean up if we failed to return ID
-            # Actually, we register it in self.temp_dirs, so explicit teardown calls will clean it.
-            # But if provision fails, caller might not call teardown with this ID?
-            # Safe to assume caller handles exception.
-            if os.path.exists(temp_dir):
-                try:
-                    shutil.rmtree(temp_dir)
-                except:
-                    pass
-            if topology_id in self.temp_dirs:
-                del self.temp_dirs[topology_id]
+            # Ensure teardown is called if we haven't already
+            try:
+                self.teardown(topology_id)
+            except:
+                pass
             raise Exception(f"Failed to provision topology: {str(e)}")
 
     def is_ready(self, topology_id: str) -> bool:
@@ -300,8 +299,8 @@ service integrated-vtysh-config
         
         # Cleanup tasks
         try:
-            self._cleanup_docker_networks(topology_id)
             self._cleanup_containers(topology_id)
+            self._cleanup_docker_networks(topology_id)
 
             # Clean up temp directory
             if topology_id in self.temp_dirs:
@@ -384,11 +383,18 @@ service integrated-vtysh-config
             stale_networks = []
             for network in networks:
                 if network.name.startswith("bench_"):
-                    # Check if there are any containers connected
-                    # Only remove if no containers are using it
-                    network.reload()  # Refresh network state
-                    if len(network.containers) == 0:
-                        stale_networks.append(network)
+                    # Force remove any containers still attached to this network
+                    try:
+                        network.reload()
+                        if network.containers:
+                            for container in network.containers:
+                                try:
+                                    container.remove(force=True)
+                                except:
+                                    pass
+                    except:
+                        pass
+                    stale_networks.append(network)
             
             # Remove stale networks
             removed_count = 0

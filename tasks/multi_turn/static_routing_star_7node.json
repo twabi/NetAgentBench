@@ -1,0 +1,85 @@
+{
+  "task_id": "static_routing_star_7node",
+  "description": "7-node star topology with static routing. Central router R1 connects to 6 edge routers (R2-R7). Configure static routes so all edge routers can reach each other through R1.",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "R1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R5", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R6", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R7", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["R1:eth1", "R2:eth1"]},
+      {"endpoints": ["R1:eth2", "R3:eth1"]},
+      {"endpoints": ["R1:eth3", "R4:eth1"]},
+      {"endpoints": ["R1:eth4", "R5:eth1"]},
+      {"endpoints": ["R1:eth5", "R6:eth1"]},
+      {"endpoints": ["R1:eth6", "R7:eth1"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "r1_has_ip",
+        "type": "interface_up",
+        "description": "R1 eth1 has IP address configured",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ip addr show eth1",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10.1.0.1"
+          }
+        }
+      },
+      {
+        "id": "r2_can_reach_r3",
+        "type": "reachability",
+        "description": "R2 can reach R3 through R1 (via static routing)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "ping -c 2 -W 1 10.3.0.3",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "2 packets transmitted, 2 packets received"
+          }
+        }
+      },
+      {
+        "id": "r4_can_reach_r7",
+        "type": "reachability",
+        "description": "R4 can reach R7 through R1 (via static routing)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "ping -c 2 -W 1 10.7.0.7",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "2 packets transmitted, 2 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 30,
+    "check_interval_seconds": 2
+  },
+  "optimal_solution": {
+    "command_count": 20,
+    "description": "Configure IPs on all interfaces + enable IP forwarding on R1 + add static routes"
+  },
+  "research_context": {
+    "complexity": "low",
+    "expected_turns": "15-25",
+    "expected_time_minutes": 5
+  }
+}

@@ -392,6 +392,7 @@ class BenchmarkController:
                 validity_check = self.validity_checker.check_validity(
                     property_results=property_results,
                     execution_log=execution_log,
+                    final_score=scoring_result.final_score,
                 )
                 logger.info(f"Valid solution: {validity_check.is_valid_solution}")
             except Exception as e:

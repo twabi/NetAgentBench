@@ -175,12 +175,27 @@ class BenchmarkMCPServer:
         @self._mcp.tool()
         def get_session_status() -> Dict[str, Any]:
             """
-            Get the current session status.
+            Get the current session status including resource constraints.
 
-            Returns information about turns used/remaining and time elapsed/remaining.
+            IMPORTANT: Call this BEFORE starting extensive work to understand your resource budget!
+            This helps you plan effectively by showing:
+            - How many configuration turns you've used vs. remaining
+            - How much time has elapsed vs. remaining
+            - Whether the session is still active
+
+            Use this information to:
+            - Prioritize essential configurations when resources are limited
+            - Decide between thorough verification vs. quick completion
+            - Avoid running out of turns before core requirements are met
 
             Returns:
-                Session status with turns and time information
+                Session status with turns and time information:
+                - success: Whether the status check succeeded
+                - is_active: Whether the session is still accepting commands
+                - turns_used: Number of configuration commands executed
+                - turns_remaining: Number of configuration commands left
+                - time_elapsed: Seconds elapsed since session start
+                - time_remaining: Seconds remaining before timeout
             """
             try:
                 status = self.session.get_session_status()

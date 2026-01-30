@@ -1,0 +1,127 @@
+{
+  "task_id": "ccie_bgp_dual_homing_expert",
+  "description": "Enterprise dual-homed BGP scenario with redundant ISP connections. Configure eBGP peering with two ISPs (AS 65001 and AS 65002), implement outbound and inbound route filtering using prefix-lists and route-maps, configure local-preference for primary/backup path selection, and implement AS-PATH prepending for inbound traffic engineering. Verify failover behavior and optimize convergence times. Based on CCIE Service Provider and Enterprise lab scenarios.\n\nIP Addressing Plan:\n- EDGE1: eth1=203.0.113.2/30 (to ISP1), eth2=10.0.1.1/30 (to CORE), lo=10.0.0.1/32\n- EDGE2: eth1=198.51.100.2/30 (to ISP2), eth2=10.0.2.1/30 (to CORE), lo=10.0.0.2/32\n- ISP1: eth1=203.0.113.1/30, lo=1.1.1.1/32\n- ISP2: eth1=198.51.100.1/30, lo=2.2.2.2/32\n- CORE: eth1=10.0.1.2/30, eth2=10.0.2.2/30, lo=10.0.0.100/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "EDGE1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "EDGE2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "ISP1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "ISP2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "CORE", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["EDGE1:eth1", "ISP1:eth1"]},
+      {"endpoints": ["EDGE2:eth1", "ISP2:eth1"]},
+      {"endpoints": ["EDGE1:eth2", "CORE:eth1"]},
+      {"endpoints": ["EDGE2:eth2", "CORE:eth2"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ebgp_isp1_established",
+        "type": "bgp_configuration",
+        "description": "eBGP session with ISP1 (AS 65001) is established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE1",
+          "command": "vtysh -c 'show ip bgp summary'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "65001"
+          }
+        }
+      },
+      {
+        "id": "ebgp_isp2_established",
+        "type": "bgp_configuration",
+        "description": "eBGP session with ISP2 (AS 65002) is established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE2",
+          "command": "vtysh -c 'show ip bgp summary'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "65002"
+          }
+        }
+      },
+      {
+        "id": "route_filtering_outbound",
+        "type": "bgp_configuration",
+        "description": "Outbound route filtering: only enterprise prefixes advertised to ISPs",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "ISP1",
+          "command": "vtysh -c 'show ip bgp' | grep 10.0.0.0",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10.0.0.0"
+          }
+        }
+      },
+      {
+        "id": "primary_path_preference",
+        "type": "bgp_configuration",
+        "description": "Local preference configured for primary path selection (ISP1 preferred)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE1",
+          "command": "vtysh -c 'show ip bgp 0.0.0.0/0'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "best",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "as_path_prepending",
+        "type": "bgp_configuration",
+        "description": "AS-PATH prepending on backup path for inbound traffic engineering",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE2",
+          "command": "vtysh -c 'show ip bgp neighbors' | grep 'route-map'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "route-map"
+          }
+        }
+      },
+      {
+        "id": "convergence_time_optimized",
+        "type": "bgp_configuration",
+        "description": "BGP convergence optimization: timers tuned for faster failover (<60s)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE1",
+          "command": "vtysh -c 'show ip bgp neighbors' | grep 'Hold time'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "30"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 120,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 120,
+    "description": "Configure BGP ASN, establish eBGP peers with both ISPs, create prefix-lists for filtering, configure route-maps for local-pref and AS-PATH manipulation, tune BGP timers (keepalive 10s, holdtime 30s), verify peering and routing policy"
+  },
+  "research_context": {
+    "complexity": "expert",
+    "expected_turns": "100-140",
+    "expected_time_minutes": 120,
+    "citation": "CCIE Service Provider and Enterprise lab exam format (8+ hours total, this represents 1 major scenario). BGP convergence optimization research: default BGP hold time 180s can be reduced to 30s with BFD for sub-second detection (Noction BGP optimization whitepaper). Complex BGP deployments: hours to days for policy manipulation and traffic engineering (Catchpoint BGP analysis).",
+    "literature_basis": "Dual-homed BGP is a standard enterprise/SP scenario covered in CCIE R&S and SP labs. Design based on RFC 4271 (BGP-4), Cisco CCIE official cert guide, and common ISP multi-homing best practices. AS-PATH prepending and local-preference manipulation are standard BGP policy techniques documented in IETF RFCs and vendor best practice guides.",
+    "time_justification": "120 minutes (2 hours) represents realistic time for expert-level BGP configuration with policy optimization. CCIE candidates spend 12-24 months preparing, with individual lab scenarios taking 1-3 hours. This task is scoped as one complete BGP scenario within a larger CCIE-style lab."
+  }
+}

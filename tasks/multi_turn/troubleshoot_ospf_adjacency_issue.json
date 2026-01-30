@@ -1,0 +1,99 @@
+{
+  "task_id": "troubleshoot_ospf_adjacency_issue",
+  "description": "OSPF adjacency troubleshooting scenario. A 4-router OSPF network has a misconfigured router preventing full adjacency formation. Identify the root cause (mismatched area IDs, MTU mismatch, or authentication issues) and restore full OSPF neighbor relationships. This represents a common real-world configuration error scenario.\n\nIP Addressing Plan:\n- R1: eth1=10.0.12.1/30, eth2=10.0.14.1/30, lo=10.0.0.1/32\n- R2: eth1=10.0.12.2/30, eth2=10.0.23.2/30, lo=10.0.0.2/32\n- R3: eth1=10.0.23.3/30, eth2=10.0.34.3/30, lo=10.0.0.3/32\n- R4: eth1=10.0.34.4/30, eth2=10.0.14.4/30, lo=10.0.0.4/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "R1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["R1:eth1", "R2:eth1"]},
+      {"endpoints": ["R2:eth2", "R3:eth1"]},
+      {"endpoints": ["R3:eth2", "R4:eth1"]},
+      {"endpoints": ["R4:eth2", "R1:eth2"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "initial_problem_identified",
+        "type": "ospf_configuration",
+        "description": "Identify that OSPF adjacency is broken between R2 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "not_contains_text": "R3"
+          }
+        }
+      },
+      {
+        "id": "root_cause_diagnosed",
+        "type": "ospf_configuration",
+        "description": "Diagnose the issue: R3 has wrong OSPF area configured (Area 1 instead of Area 0)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "vtysh -c 'show ip ospf interface eth1'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "area",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "adjacency_restored",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R3 is now Full",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "full",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "full_topology_convergence",
+        "type": "reachability",
+        "description": "End-to-end reachability restored after fix",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 -W 2 10.0.0.4",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 45,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 30,
+    "description": "Use 'show ip ospf neighbor' to identify missing adjacency, check OSPF interface details with 'show ip ospf interface', identify area mismatch, reconfigure R3 interface into correct area, verify adjacency formation"
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "25-45",
+    "expected_time_minutes": 35,
+    "citation": "CCNP troubleshooting scenarios and real-world MTTR data. ExamCollection CCNP practice: 'Identify and fix OSPF configuration issue within 10 minutes' is a standard timed challenge. Industry MTTR for configuration errors: 15 minutes to 4 hours (IoRiver Network Downtime Study). OSPF adjacency problems are among the most common routing issues (30min-8hr resolution time for routing problems - Network Defense Blog case studies).",
+    "literature_basis": "OSPF adjacency issues are a classic troubleshooting scenario in networking. Common causes documented in RFC 2328 (OSPF v2) and network engineering case studies include: area ID mismatch, MTU mismatch, authentication mismatch, network type mismatch. This scenario specifically uses area ID mismatch which is covered extensively in CCNP TSHOOT curriculum and CBT Nuggets CCNP troubleshooting course.",
+    "time_justification": "35 minutes represents realistic troubleshooting time. Fast resolution (expert): 10-15min. Average resolution: 30-60min. This aligns with MTTR data for configuration errors and CCNP timed practice scenarios."
+  }
+}

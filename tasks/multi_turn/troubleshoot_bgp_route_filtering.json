@@ -1,0 +1,112 @@
+{
+  "task_id": "troubleshoot_bgp_route_filtering",
+  "description": "BGP route filtering troubleshooting scenario. An enterprise edge router is advertising all internal routes to an ISP peer instead of only the approved public prefixes. Diagnose why the configured prefix-list is not being applied and fix the route-map to properly filter outbound advertisements. Verify that only authorized prefixes are sent to the ISP while maintaining internal route propagation.\n\nIP Addressing Plan:\n- EDGE: eth1=203.0.113.2/30 (to ISP), eth2=10.1.0.1/30, eth3=10.2.0.1/30, lo=10.0.0.1/32\n- ISP: eth1=203.0.113.1/30, lo=1.1.1.1/32\n- INTERNAL1: eth1=10.1.0.2/30, lo=10.10.1.1/32\n- INTERNAL2: eth1=10.2.0.2/30, lo=10.10.2.1/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "EDGE", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "ISP", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "INTERNAL1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "INTERNAL2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["EDGE:eth1", "ISP:eth1"]},
+      {"endpoints": ["EDGE:eth2", "INTERNAL1:eth1"]},
+      {"endpoints": ["EDGE:eth3", "INTERNAL2:eth1"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "problem_identified",
+        "type": "bgp_configuration",
+        "description": "Identify that ISP is receiving unwanted internal routes (10.0.0.0/8)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "ISP",
+          "command": "vtysh -c 'show ip bgp' | grep 10.0.0.0",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10.0.0.0"
+          }
+        }
+      },
+      {
+        "id": "route_map_issue_diagnosed",
+        "type": "bgp_configuration",
+        "description": "Diagnose that route-map exists but is not applied to BGP neighbor",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE",
+          "command": "vtysh -c 'show ip bgp neighbors' | grep 'route-map'",
+          "parser": "text",
+          "success_condition": {
+            "not_contains_text": "filter-out",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "route_map_applied",
+        "type": "bgp_configuration",
+        "description": "Route-map FILTER-OUT now applied to ISP neighbor in outbound direction",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE",
+          "command": "vtysh -c 'show ip bgp neighbors' | grep 'route-map out'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "filter-out",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "filtering_verified",
+        "type": "bgp_configuration",
+        "description": "ISP only receives authorized public prefix (203.0.113.0/24), not internal routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "ISP",
+          "command": "vtysh -c 'show ip bgp' | grep -c '203.0.113.0'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "1"
+          }
+        }
+      },
+      {
+        "id": "internal_routes_blocked",
+        "type": "bgp_configuration",
+        "description": "ISP does not have internal routes (10.0.0.0/8) in BGP table",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "ISP",
+          "command": "vtysh -c 'show ip bgp' | grep -c '10.0.0.0'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "0"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 35,
+    "description": "Check BGP neighbor config with 'show ip bgp neighbors', identify missing route-map application, review existing prefix-list and route-map with 'show route-map', apply route-map to neighbor with 'neighbor X.X.X.X route-map FILTER-OUT out', perform soft reset with 'clear ip bgp * soft out', verify filtering"
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "30-50",
+    "expected_time_minutes": 40,
+    "citation": "BGP troubleshooting scenarios and industry MTTR data. BGP route filtering is a critical enterprise skill covered in CCNP ENARSI and CCIE curricula. Industry MTTR for configuration errors: 15 minutes to 4 hours. BGP-specific issues can range from 30 minutes (simple config) to hours (complex policy debugging) based on Catchpoint BGP analysis and network engineering case studies.",
+    "literature_basis": "BGP route filtering using prefix-lists and route-maps is a standard practice documented in RFC 4271 (BGP-4) and Cisco BGP best practices guides. This scenario represents a common operational error: having a filter policy defined but failing to apply it to the neighbor. This issue type is documented in multiple CCNP TSHOOT case studies and appears in real-world incident reports where misconfigurations led to route leaks (Network Defense Blog case studies, Moldstud network troubleshooting examples).",
+    "time_justification": "40 minutes represents realistic troubleshooting and verification time for BGP policy issues. Fast diagnosis (expert): 15-25min. Average resolution: 30-60min. Includes time for diagnosis using show commands, applying the fix, performing soft-reset, and verifying proper filtering from ISP perspective. Aligns with 15min-4hr MTTR range for configuration errors."
+  }
+}

@@ -248,6 +248,9 @@ class InteractiveBenchmarkController:
                 
                 # Prepare task info for dagent
                 dagent_request = {
+                    # COMPLETE task definition for model context
+                    "task_definition": task.model_dump() if hasattr(task, 'model_dump') else task.dict(),
+                    # Individual fields (backwards compatibility)
                     "task_id": task.task_id,
                     "description": task.description,
                     "nodes": [n.name for n in task.topology.nodes],
@@ -321,6 +324,17 @@ class InteractiveBenchmarkController:
                 except Exception as e:
                     logger.error(f"Dagent call failed: {e}")
                     errors.append(f"Dagent call failed: {e}")
+                    
+                    # RECOVERY: Try to get metrics from session if dagent failed/timed out
+                    try:
+                        exec_log_tuples = self._session.get_execution_log()
+                        if exec_log_tuples:
+                            total_commands = len(exec_log_tuples)
+                            failed_commands = sum(1 for _, _, success in exec_log_tuples if not success)
+                            tool_usage = {"exec_command": total_commands}
+                            logger.info(f"Recovered partial metrics from session: {total_commands} commands")
+                    except Exception as recovery_err:
+                        logger.warning(f"Could not recover metrics from session: {recovery_err}")
                 
                 session_time = time.time() - provision_start - provision_time
 
@@ -449,6 +463,7 @@ class InteractiveBenchmarkController:
                 validity_check = self.validity_checker.check_validity(
                     property_results=property_results,
                     execution_log=execution_log,
+                    final_score=scoring_result.final_score,
                 )
                 logger.info(f"Valid solution: {validity_check.is_valid_solution}")
 

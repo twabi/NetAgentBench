@@ -1,0 +1,100 @@
+{
+  "task_id": "ccna_rip_routing_basic",
+  "description": "Basic RIP (Routing Information Protocol) configuration across 4 routers in a small enterprise network. Configure RIPv2 with network statements, enable authentication, and verify full routing table convergence. RIP is a distance-vector protocol covered in CCNA curriculum as a foundational routing protocol concept.\n\nIP Addressing Plan (configure these IPs on the routers):\n- R1: eth1=10.1.1.1/30, eth2=10.1.2.1/30, lo=10.0.0.1/32\n- R2: eth1=10.1.1.2/30, eth2=10.2.1.1/30, lo=10.0.0.2/32\n- R3: eth1=10.1.2.2/30, eth2=10.3.1.1/30, lo=10.0.0.3/32\n- R4: eth1=10.2.1.2/30, eth2=10.3.1.2/30, lo=10.0.0.4/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "R1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["R1:eth1", "R2:eth1"]},
+      {"endpoints": ["R1:eth2", "R3:eth1"]},
+      {"endpoints": ["R2:eth2", "R4:eth1"]},
+      {"endpoints": ["R3:eth2", "R4:eth2"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "rip_process_running",
+        "type": "interface_up",
+        "description": "RIP process is running on R1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip rip status'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "rip",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "rip_routes_learned",
+        "type": "interface_up",
+        "description": "R1 has learned RIP routes from neighbors",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip route rip'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "R>"
+          }
+        }
+      },
+      {
+        "id": "full_reachability",
+        "type": "reachability",
+        "description": "End-to-end reachability: R1 can reach R4 via learned RIP routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 -W 2 10.0.0.4",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "ripv2_configured",
+        "type": "interface_up",
+        "description": "RIPv2 is configured (not RIPv1)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip rip status'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "send version 2",
+            "case_insensitive": true
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 45,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 30,
+    "description": "Configure IP addresses on all interfaces, enter RIP configuration mode, specify version 2, add network statements for directly connected networks, verify routing table convergence"
+  },
+  "research_context": {
+    "complexity": "basic",
+    "expected_turns": "25-40",
+    "expected_time_minutes": 20,
+    "citation": "CCNA 200-301 curriculum covers RIP as foundational distance-vector protocol. RIP configuration is simpler than OSPF (single-area OSPF: 20-40min, RIP typically 15-25min for basic configs). CCNA exam sims target 5-10 minutes per task for proficient candidates. RIP is covered in Cisco CCNA official cert guide chapter on distance-vector routing.",
+    "literature_basis": "RIP is a standard CCNA topic covered in Cisco CCNA 200-301 official certification guide. While RIP is considered legacy, it's still taught as the simplest distance-vector protocol for understanding routing fundamentals. FRR fully supports RIPv1/v2 (RFC 2453). Common CCNA lab exercises include basic RIP configuration with network statements and RIPv2 authentication.",
+    "time_justification": "20 minutes is reasonable for basic RIP configuration. RIP is simpler than OSPF (no areas, no adjacency states beyond basic neighbor discovery). CCNA practice: basic RIP configs 15-25min for novices. Aligns with CCNA exam sim format (5-10min target for proficient users). FRR RIP configuration uses similar commands to Cisco IOS.",
+    "platform_notes": "FRR fully supports RIP and RIPv2. Commands are similar to Cisco IOS: 'router rip', 'version 2', 'network X.X.X.X/X'. FRR RIP implementation is RFC 2453 compliant."
+  }
+}

@@ -25,28 +25,36 @@ class ValidityChecker:
     def check_validity(
         self,
         property_results: List[PropertyEvaluationResult],
-        execution_log: List[ExecutionLogEntry]
+        execution_log: List[ExecutionLogEntry],
+        final_score: float = 0.0
     ) -> ValidityCheck:
         """
-        Check if a solution is valid according to Theorem 1.
+        Check if a solution is valid.
+        
+        Success criteria (updated to allow exploration):
+        - Semantic correctness: All properties must be satisfied
+        - Score threshold: final_score >= 0.7
+        
+        Note: Syntactic correctness (no failed commands) is tracked for
+        metrics but does NOT affect pass/fail status. Models are allowed
+        to explore and recover from failures.
         
         Args:
             property_results: List of property evaluation results
             execution_log: List of command execution log entries
+            final_score: Overall computed score (0.0-1.0)
             
         Returns:
             ValidityCheck with condition results and overall validity
         """
-        # Condition A: Syntactic Correctness
-        # All commands must execute successfully (exit code 0)
+        # Condition A: Syntactic Correctness (tracked for metrics only)
         condition_a_syntactic = self._check_syntactic_correctness(execution_log)
         
-        # Condition B: Semantic Completeness
-        # All properties must be satisfied
+        # Condition B: Semantic Completeness (required for pass)
         condition_b_semantic = self._check_semantic_completeness(property_results)
         
-        # Valid solution: Both conditions must be true
-        is_valid_solution = condition_a_syntactic and condition_b_semantic
+        # Valid solution: Semantic correctness AND score threshold
+        is_valid_solution = condition_b_semantic and final_score >= 0.7
         
         return ValidityCheck(
             is_valid_solution=is_valid_solution,

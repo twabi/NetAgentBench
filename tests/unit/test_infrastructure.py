@@ -74,7 +74,7 @@ class TestContainerlabYAMLGeneration:
 
         provider = ContainerlabProvider()
         topology_id = "test_topo_001"
-        yaml_content = provider._generate_clab_yaml(topology, topology_id)
+        yaml_content = provider._generate_clab_yaml(topology, topology_id, "/tmp")
 
         # Verify YAML structure
         assert "name: " in yaml_content
@@ -106,7 +106,7 @@ class TestContainerlabYAMLGeneration:
         topology = TopologySpecification(nodes=nodes, links=[])
 
         provider = ContainerlabProvider()
-        yaml_content = provider._generate_clab_yaml(topology, "test_topo")
+        yaml_content = provider._generate_clab_yaml(topology, "test_topo", "/tmp")
 
         # Verify node properties in YAML
         assert "frrouting/frr:v8.4.0" in yaml_content
@@ -131,7 +131,7 @@ class TestContainerlabYAMLGeneration:
         topology = TopologySpecification(nodes=nodes, links=links)
 
         provider = ContainerlabProvider()
-        yaml_content = provider._generate_clab_yaml(topology, "test_topo")
+        yaml_content = provider._generate_clab_yaml(topology, "test_topo", "/tmp")
 
         # Verify links in YAML
         assert "links:" in yaml_content
@@ -161,7 +161,7 @@ class TestContainerlabYAMLGeneration:
         topology = TopologySpecification(nodes=nodes, links=links)
 
         provider = ContainerlabProvider()
-        yaml_content = provider._generate_clab_yaml(topology, "test_topo")
+        yaml_content = provider._generate_clab_yaml(topology, "test_topo", "/tmp")
 
         # Verify all links present
         assert "R1:eth1" in yaml_content
@@ -522,7 +522,7 @@ class TestErrorHandling:
         topology = TopologySpecification(nodes=nodes, links=[])
 
         provider = ContainerlabProvider()
-        yaml_content = provider._generate_clab_yaml(topology, "test")
+        yaml_content = provider._generate_clab_yaml(topology, "test", "/tmp")
 
         # Should generate valid YAML even with no links
         assert "R1:" in yaml_content

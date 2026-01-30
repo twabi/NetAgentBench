@@ -7,7 +7,7 @@ set -e
 # Configuration
 LIMIT=30
 DAGENT_ENDPOINT="http://localhost:8000"
-OLLAMA_HOST="http://10.23.52.8:11434"
+OLLAMA_HOST="http://localhost:11434"
 # "Unreachably big" limits
 TURN_LIMIT=100000
 TIME_LIMIT=86400  # 24 hours

@@ -1,0 +1,100 @@
+{
+  "task_id": "ccnp_multiarea_ospf_intermediate",
+  "description": "Multi-area OSPF deployment across 5 routers with Area 0 (backbone), Area 1, and Area 2. Configure OSPF with proper area assignments, route summarization at ABRs (Area Border Routers), and verify full routing table convergence. Based on CCNP ENARSI curriculum for hierarchical OSPF design.\n\nIP Addressing Plan:\n- R1 (ABR): eth1=10.0.12.1/30, eth2=10.0.13.1/30, lo=10.0.0.1/32\n- R2 (ABR): eth1=10.0.12.2/30, eth2=10.1.24.2/30, lo=10.0.0.2/32\n- R3 (ABR): eth1=10.0.13.3/30, eth2=10.2.35.3/30, lo=10.0.0.3/32\n- R4: eth1=10.1.24.4/30, lo=10.0.0.4/32\n- R5: eth1=10.2.35.5/30, lo=10.0.0.5/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "R1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R5", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["R1:eth1", "R2:eth1"]},
+      {"endpoints": ["R1:eth2", "R3:eth1"]},
+      {"endpoints": ["R2:eth2", "R4:eth1"]},
+      {"endpoints": ["R3:eth2", "R5:eth1"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_area0_adjacency",
+        "type": "ospf_configuration",
+        "description": "OSPF Area 0 adjacencies established between R1-R2 and R1-R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "full",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "area1_routes_visible",
+        "type": "ospf_configuration",
+        "description": "Area 1 routes (via R2/R4) visible in Area 0",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "o ia",
+            "case_insensitive": true
+          }
+        }
+      },
+      {
+        "id": "end_to_end_reachability",
+        "type": "reachability",
+        "description": "End-to-end reachability from R4 (Area 1) to R5 (Area 2)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "ping -c 3 -W 2 10.0.0.5",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "route_summarization",
+        "type": "ospf_configuration",
+        "description": "Route summarization configured at ABR reducing routing table size",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "vtysh -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "O IA"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 55,
+    "description": "Configure IP addresses, enable OSPF process, assign interfaces to areas, configure area-range for summarization at ABRs, verify neighbor adjacencies"
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "50-70",
+    "expected_time_minutes": 50,
+    "citation": "CCNP ENARSI training materials and practice scenarios. Multi-area OSPF configuration time: 30-90 minutes (Orhan Ergun CCNP course, Flackbox CCNP materials). CCNP exam preparation study suggests 3-6 months study time with 10-15 hours/week.",
+    "literature_basis": "Standard CCNP ENARSI hierarchical OSPF design pattern. Multi-area OSPF is a key topic in CCNP Enterprise certification (exam 300-410 ENARSI). Design based on RFC 2328 OSPF v2 area architecture and Cisco CCNP official cert guide.",
+    "time_justification": "50 minutes is mid-range for intermediate OSPF tasks. ExamCollection CCNP practice: multi-area OSPF scenarios target 40-60min. This accounts for area configuration, ABR setup, summarization, and verification."
+  }
+}
