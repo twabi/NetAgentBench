@@ -26,34 +26,54 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# Academic styling
+# Publication-quality styling
 plt.style.use('seaborn-v0_8-whitegrid')
 plt.rcParams.update({
-    'font.size': 11,
-    'font.family': 'serif',
-    'axes.labelsize': 12,
-    'axes.titlesize': 13,
+    'font.size': 10,
+    'font.family': 'sans-serif',
+    'font.sans-serif': ['Arial', 'Helvetica', 'DejaVu Sans'],
+    'axes.labelsize': 11,
+    'axes.titlesize': 12,
     'axes.titleweight': 'bold',
-    'xtick.labelsize': 10,
-    'ytick.labelsize': 10,
+    'axes.linewidth': 1.2,
+    'xtick.labelsize': 9,
+    'ytick.labelsize': 9,
     'legend.fontsize': 9,
-    'figure.dpi': 150,
+    'legend.frameon': True,
+    'legend.edgecolor': '0.8',
+    'legend.fancybox': False,
+    'figure.dpi': 100,
     'savefig.dpi': 300,
+    'savefig.bbox': 'tight',
+    'savefig.facecolor': 'white',
+    'lines.linewidth': 2,
+    'lines.markersize': 8,
+    'grid.alpha': 0.3,
+    'grid.linestyle': '--',
     'axes.spines.top': False,
     'axes.spines.right': False,
 })
 
+# Professional colorblind-friendly palette
 COLORS = {
-    'single': '#2E86AB',
-    'sequential': '#A23B72', 
-    'debate': '#F18F01',
-    'group_chat': '#C73E1D',
-    'concurrent': '#3B1F2B',
-    'gpt': '#74AA9C',
-    'gemini': '#4285F4',
+    'single': '#0173B2',       # Blue
+    'sequential': '#DE8F05',   # Orange  
+    'debate': '#029E73',       # Green
+    'group_chat': '#CC78BC',   # Purple
+    'concurrent': '#CA9161',   # Brown
+    'gpt': '#74AA9C',          # Teal
+    'gemini': '#4285F4',       # Google Blue
 }
 
-HATCHES = ['///', '\\\\\\', 'xxx', '...', '+++', 'ooo']
+MARKERS = {
+    'single': 'o',       # Circle
+    'sequential': 's',   # Square
+    'debate': '^',       # Triangle up
+    'group_chat': 'D',   # Diamond
+    'concurrent': 'v',   # Triangle down
+}
+
+HATCHES = ['///', '\\\\\\\\\\\\', 'xxx', '...', '+++', 'ooo']
 
 
 def load_session_results(session_dir: Path) -> List[Dict[str, Any]]:
@@ -129,28 +149,115 @@ def extract_agent_config(result: Dict) -> Tuple[str, str]:
     return mode, structure
 
 
+# Task metadata for cross-task analysis
+TASK_METADATA = {
+    "ccna_rip_routing_basic": {
+        "difficulty": "basic",
+        "type": "configuration",
+        "protocol": "RIP",
+        "complexity_score": 1,
+        "display_name": "CCNA RIP Routing",
+        # Research-driven metrics (from "Towards a Science of Scaling Agent Systems")
+        "sequential_depth": 2,  # Set IP → Enable RIP
+        "parallelizable_breadth": 4,  # 4 independent routers can be configured in parallel
+        "tool_reasoning_ratio": "low"  # Reasoning-heavy task
+    },
+    "ccnp_multiarea_ospf_intermediate": {
+        "difficulty": "intermediate",
+        "type": "configuration",
+        "protocol": "OSPF",
+        "complexity_score": 2,
+        "display_name": "CCNP Multi-Area OSPF",
+        "sequential_depth": 3,  # Set IP → OSPF process → Area configuration
+        "parallelizable_breadth": 3,  # 3 areas can be configured in parallel
+        "tool_reasoning_ratio": "medium"
+    },
+    "ccie_bgp_dual_homing_expert": {
+        "difficulty": "expert",
+        "type": "configuration",
+        "protocol": "BGP",
+        "complexity_score": 3,
+        "display_name": "CCIE BGP Dual-Homing",
+        "sequential_depth": 5,  # IP → EBGP → Verify adjacency → Route-map → Policy verification
+        "parallelizable_breadth": 2,  # 2 ISP connections with some parallel config potential
+        "tool_reasoning_ratio": "medium"
+    },
+    "troubleshoot_ospf_adjacency_issue": {
+        "difficulty": "intermediate",
+        "type": "troubleshooting",
+        "protocol": "OSPF",
+        "complexity_score": 2,
+        "display_name": "Troubleshoot OSPF Adjacency",
+        "sequential_depth": 6,  # Diagnose → Identify problem → Apply fix → Verify → Re-diagnose if needed
+        "parallelizable_breadth": 1,  # Troubleshooting must be sequential (no parallelism)
+        "tool_reasoning_ratio": "high"  # Heavy diagnostic reasoning required
+    },
+    "troubleshoot_bgp_route_filtering": {
+        "difficulty": "expert",
+        "type": "troubleshooting",
+        "protocol": "BGP",
+        "complexity_score": 3,
+        "display_name": "Troubleshoot BGP Route Filtering",
+        "sequential_depth": 7,  # Deep diagnostic chain: check routes → analyze policy → test filters → verify
+        "parallelizable_breadth": 1,  # Must be sequential
+        "tool_reasoning_ratio": "high"  # Very reasoning-heavy
+    }
+}
+
+
+def filter_valid_results(results: List[Dict]) -> Tuple[List[Dict], int]:
+    """Filter out results where syntactic_validity == 0 (timeout/error cases).
+    
+    Returns:
+        (valid_results, filtered_count)
+    """
+    valid = []
+    filtered = 0
+    
+    for r in results:
+        syntactic_validity = r.get("scoring", {}).get("syntactic_validity", 1.0)
+        if syntactic_validity == 0.0:
+            filtered += 1
+        else:
+            valid.append(r)
+    
+    return valid, filtered
+
+
 def compute_metrics(results: List[Dict]) -> Dict[str, Any]:
     """Compute aggregate metrics from results."""
     if not results:
-        return {"count": 0}
+        return {"count": 0, "valid_count": 0, "filtered_count": 0}
+    
+    # Filter invalid results (syntactic_validity == 0 means timeout/error)
+    valid_results, filtered_count = filter_valid_results(results)
+    
+    if not valid_results:
+        return {
+            "count": len(results),
+            "valid_count": 0,
+            "filtered_count": filtered_count
+        }
     
     metrics = {
         "count": len(results),
-        "success_rate": sum(1 for r in results if r.get("success")) / len(results),
-        "avg_final_score": np.mean([r.get("scoring", {}).get("final_score", 0) for r in results]),
-        "std_final_score": np.std([r.get("scoring", {}).get("final_score", 0) for r in results]),
-        "avg_completeness": np.mean([r.get("scoring", {}).get("completeness", 0) for r in results]),
-        "avg_robustness": np.mean([r.get("scoring", {}).get("robustness", 0) for r in results]),
+        "valid_count": len(valid_results),
+        "filtered_count": filtered_count,
+        "success_rate": sum(1 for r in valid_results if r.get("success")) / len(valid_results),
+        "avg_final_score": np.mean([r.get("scoring", {}).get("final_score", 0) for r in valid_results]),
+        "std_final_score": np.std([r.get("scoring", {}).get("final_score", 0) for r in valid_results]),
+        "avg_completeness": np.mean([r.get("scoring", {}).get("completeness", 0) for r in valid_results]),
+        "avg_robustness": np.mean([r.get("scoring", {}).get("robustness", 0) for r in valid_results]),
     }
     
     # Multi-turn specific
-    turns = [r.get("metrics", {}).get("turns_to_complete") for r in results]
+    turns = [r.get("metrics", {}).get("turns_to_complete") for r in valid_results]
     turns = [t for t in turns if t is not None and t > 0]
     if turns:
         metrics["avg_turns"] = np.mean(turns)
         metrics["std_turns"] = np.std(turns)
     
-    times = [r.get("metrics", {}).get("time_to_complete") for r in results]
+    times = [r.get("metrics", {}).get("time_to_complete") for r in valid_results]
     times = [t for t in times if t is not None and t > 0]
     if times:
         metrics["avg_time"] = np.mean(times)
@@ -158,7 +265,7 @@ def compute_metrics(results: List[Dict]) -> Dict[str, Any]:
         
     # NEW: Token Usage Metrics
     total_tokens = []
-    for r in results:
+    for r in valid_results:
         usage = r.get("metrics", {}).get("token_usage", {})
         if usage and "total_tokens" in usage:
             total_tokens.append(usage["total_tokens"])
@@ -534,6 +641,528 @@ def compute_research_metrics(results: List[Dict]) -> Dict[str, Any]:
 
 
 
+# =============================================================================
+# NEW: Cross-Task Analysis
+# =============================================================================
+
+def analyze_by_task_type(results: List[Dict]) -> Dict[str, Any]:
+    """Analyze performance by task characteristics (difficulty, type, protocol)."""
+    analysis = {
+        "by_difficulty": defaultdict(list),
+        "by_type": defaultdict(list),
+        "by_protocol": defaultdict(list),
+        "by_task": defaultdict(list),
+    }
+    
+    for result in results:
+        task_id = result.get("task_id", "unknown")
+        metadata = TASK_METADATA.get(task_id, {})
+        
+        difficulty = metadata.get("difficulty", "unknown")
+        task_type = metadata.get("type", "unknown")
+        protocol = metadata.get("protocol", "unknown")
+        
+        analysis["by_difficulty"][difficulty].append(result)
+        analysis["by_type"][task_type].append(result)
+        analysis["by_protocol"][protocol].append(result)
+        analysis["by_task"][task_id].append(result)
+    
+    # Compute metrics for each grouping
+    metrics_summary = {}
+    for grouping, group_results in analysis.items():
+        metrics_summary[grouping] = {}
+        for group_key, group_data in group_results.items():
+            metrics_summary[grouping][group_key] = compute_metrics(group_data)
+    
+    return metrics_summary
+
+
+def analyze_failure_modes(results: List[Dict]) -> Dict[str, Any]:
+    """Detailed failure analysis per task type."""
+    analysis = {
+        "by_task": defaultdict(lambda: {
+            "total": 0,
+            "failed": 0,
+            "timeout": 0,
+            "syntax_error": 0,
+            "property_failure": 0,
+            "zero_validity": 0,
+            "error_details": defaultdict(int)
+        })
+    }
+    
+    for result in results:
+        task_id = result.get("task_id", "unknown")
+        task_stats = analysis["by_task"][task_id]
+        
+        task_stats["total"] += 1
+        
+        # Check for zero validity (timeout/error)
+        syntactic_validity = result.get("scoring", {}).get("syntactic_validity", 1.0)
+        if syntactic_validity == 0.0:
+            task_stats["zero_validity"] += 1
+        
+        # Check success
+        if not result.get("success", False):
+            task_stats["failed"] += 1
+        
+        # Categorize errors
+        errors = result.get("errors", [])
+        for error in errors:
+            error_cat = categorize_error(error)
+            task_stats["error_details"][error_cat] += 1
+            
+            if error_cat == "timeout":
+                task_stats["timeout"] += 1
+            elif error_cat == "syntax_error":
+                task_stats["syntax_error"] += 1
+            elif error_cat == "property_failure":
+                task_stats["property_failure"] += 1
+    
+    # Calculate failure rates
+    for task_id, stats in analysis["by_task"].items():
+        total = stats["total"]
+        if total > 0:
+            stats["failure_rate"] = stats["failed"] / total
+            stats["zero_validity_rate"] = stats["zero_validity"] / total
+    
+    return analysis
+
+
+def analyze_pattern_task_fit(results: List[Dict]) -> Dict[str, Any]:
+    """Analyze which patterns work best for which task types."""
+    analysis = {
+        "pattern_x_task": {},
+        "pattern_x_difficulty": {},
+        "pattern_x_type": {},
+        "best_pattern_by_task": {},
+    }
+    
+    # Build pattern × task matrix
+    by_task = group_by_task(results)
+    by_pattern = group_by_pattern(results)
+    
+    pattern_order = ["single", "sequential", "debate", "group_chat", "concurrent"]
+    
+    for task_id, task_results in by_task.items():
+        analysis["pattern_x_task"][task_id] = {}
+        
+        best_score = -1
+        best_pattern = None
+        
+        for pattern in pattern_order:
+            pattern_task_results = [r for r in task_results 
+                                   if extract_agent_config(r)[0] == "single" and pattern == "single"
+                                   or extract_agent_config(r)[1] == pattern and pattern != "single"]
+            
+            if pattern_task_results:
+                metrics = compute_metrics(pattern_task_results)
+                analysis["pattern_x_task"][task_id][pattern] = metrics
+                
+                avg_score = metrics.get("avg_final_score", 0)
+                if avg_score > best_score:
+                    best_score = avg_score
+                    best_pattern = pattern
+            else:
+                analysis["pattern_x_task"][task_id][pattern] = None
+        
+        analysis["best_pattern_by_task"][task_id] = {
+            "pattern": best_pattern,
+            "score": best_score
+        }
+    
+    # Pattern × difficulty
+    for difficulty in ["basic", "intermediate", "expert"]:
+        analysis["pattern_x_difficulty"][difficulty] = {}
+        difficulty_results = [r for r in results 
+                            if TASK_METADATA.get(r.get("task_id", ""), {}).get("difficulty") == difficulty]
+        
+        for pattern in pattern_order:
+            pattern_diff_results = [r for r in difficulty_results
+                                   if (extract_agent_config(r)[0] == "single" and pattern == "single")
+                                   or (extract_agent_config(r)[1] == pattern and pattern != "single")]
+            if pattern_diff_results:
+                analysis["pattern_x_difficulty"][difficulty][pattern] = compute_metrics(pattern_diff_results)
+    
+    # Pattern × type (configuration vs troubleshooting)
+    for task_type in ["configuration", "troubleshooting"]:
+        analysis["pattern_x_type"][task_type] = {}
+        type_results = [r for r in results 
+                       if TASK_METADATA.get(r.get("task_id", ""), {}).get("type") == task_type]
+        
+        for pattern in pattern_order:
+            pattern_type_results = [r for r in type_results
+                                   if (extract_agent_config(r)[0] == "single" and pattern == "single")
+                                   or (extract_agent_config(r)[1] == pattern and pattern != "single")]
+            if pattern_type_results:
+                analysis["pattern_x_type"][task_type][pattern] = compute_metrics(pattern_type_results)
+    
+    return analysis
+
+
+def compute_effect_size(group1: List[float], group2: List[float]) -> float:
+    """Calculate Cohen's d effect size."""
+    if not group1 or not group2:
+        return 0.0
+    
+    mean1 = np.mean(group1)
+    mean2 = np.mean(group2)
+    std1 = np.std(group1, ddof=1)
+    std2 = np.std(group2, ddof=1)
+    n1 = len(group1)
+    n2 = len(group2)
+    
+    # Pooled standard deviation
+    pooled_std = np.sqrt(((n1 - 1) * std1**2 + (n2 - 1) * std2**2) / (n1 + n2 - 2))
+    
+    if pooled_std == 0:
+        return 0.0
+    
+    return (mean1 - mean2) / pooled_std
+
+
+def bootstrap_confidence_interval(data: List[float], n_bootstrap: int = 1000, confidence: float = 0.95) -> Tuple[float, float]:
+    """Calculate confidence interval via bootstrap."""
+    if not data:
+        return (0.0, 0.0)
+    
+    data_array = np.array(data)
+    bootstrapped_means = []
+    
+    for _ in range(n_bootstrap):
+        sample = np.random.choice(data_array, size=len(data_array), replace=True)
+        bootstrapped_means.append(np.mean(sample))
+    
+    alpha = 1 - confidence
+    lower_percentile = (alpha / 2) * 100
+    upper_percentile = (1 - alpha / 2) * 100
+    
+    ci_lower = np.percentile(bootstrapped_means, lower_percentile)
+    ci_upper = np.percentile(bootstrapped_means, upper_percentile)
+    
+    return (ci_lower, ci_upper)
+
+
+def format_with_ci(mean: float, ci_lower: float, ci_upper: float) -> str:
+    """Format value with confidence interval."""
+    return f"{mean:.3f} [{ci_lower:.3f}, {ci_upper:.3f}]"
+
+
+def calculate_context_loss_rate(results: List[Dict]) -> Dict[str, Any]:
+    """
+    Analyze execution logs to measure information fragmentation (context loss).
+    
+    Detects three types of context loss:
+    1. Redundant queries: Same show/diagnostic command executed multiple times
+    2. Conflicting actions: Commands that undo or contradict previous work
+    3. Missing dependencies: Configuration attempted before prerequisites exist
+    
+    Returns analysis by pattern with context loss rates.
+    """
+    analysis = {
+        "by_pattern": {},
+        "overall": {
+            "redundant_queries": 0,
+            "conflicting_actions": 0,
+            "missing_dependencies": 0,
+            "total_actions": 0
+        }
+    }
+    
+    pattern_order = ["single", "sequential", "debate", "group_chat", "concurrent"]
+    by_pattern = group_by_pattern(results)
+    
+    for pattern in pattern_order:
+        pattern_results = by_pattern.get(pattern, [])
+        if not pattern_results:
+            continue
+            
+        pattern_stats = {
+            "redundant_queries": 0,
+            "conflicting_actions": 0,
+            "missing_dependencies": 0,
+            "total_actions": 0,
+            "runs_analyzed": 0,
+            "context_loss_rate": 0.0
+        }
+        
+        for result in pattern_results:
+            execution_log = result.get("execution_log", [])
+            if not execution_log:
+                continue
+                
+            pattern_stats["runs_analyzed"] += 1
+            pattern_stats["total_actions"] += len(execution_log)
+            
+            # Track commands by node and type
+            command_history = {}  # {node: {command_type: [indexes]}}
+            
+            for idx, cmd in enumerate(execution_log):
+                if not cmd or "|" not in cmd:
+                    continue
+                    
+                try:
+                    node, command = cmd.split("|", 1)
+                    node = node.strip()
+                    command = command.strip()
+                    
+                    if node not in command_history:
+                        command_history[node] = {}
+                    
+                    # Detect redundant queries
+                    if is_diagnostic_command(command):
+                        cmd_type = get_command_signature(command)
+                        
+                        if cmd_type not in command_history[node]:
+                            command_history[node][cmd_type] = []
+                        command_history[node][cmd_type].append(idx)
+                        
+                        # If same diagnostic appears 3+ times, it's redundant
+                        if len(command_history[node][cmd_type]) >= 3:
+                            pattern_stats["redundant_queries"] += 1
+                    
+                    # Detect conflicting actions
+                    if is_config_command(command):
+                        # Check for "no" commands that undo previous config
+                        if "no router" in command or "no network" in command or "shutdown" in command:
+                            # Look back to see if we configured this before
+                            positive_cmd = command.replace("no ", "").replace("shutdown", "no shutdown")
+                            for prev_idx in range(idx):
+                                if prev_idx < len(execution_log):
+                                    prev_cmd = execution_log[prev_idx]
+                                    if node in prev_cmd and positive_cmd in prev_cmd:
+                                        pattern_stats["conflicting_actions"] += 1
+                                        break
+      
+                    # Detect missing dependencies
+                    # Example: configuring RIP before IP addresses are set
+                    if "router rip" in command or "router ospf" in command or "router bgp" in command:
+                        # Check if node has IP configured
+                        has_ip = False
+                        for prev_idx in range(idx):
+                            if prev_idx < len(execution_log):
+                                prev_cmd = execution_log[prev_idx]
+                                if node in prev_cmd and "ip addr add" in prev_cmd:
+                                    has_ip = True
+                                    break
+                        if not has_ip:
+                            pattern_stats["missing_dependencies"] += 1
+                            
+                except Exception as e:
+                    # Skip malformed commands
+                    continue
+        
+        # Calculate context loss rate
+        total_errors = (pattern_stats["redundant_queries"] + 
+                       pattern_stats["conflicting_actions"] + 
+                       pattern_stats["missing_dependencies"])
+        
+        if pattern_stats["total_actions"] > 0:
+            pattern_stats["context_loss_rate"] = total_errors / pattern_stats["total_actions"]
+        
+        analysis["by_pattern"][pattern] = pattern_stats
+        
+        # Update overall stats
+        analysis["overall"]["redundant_queries"] += pattern_stats["redundant_queries"]
+        analysis["overall"]["conflicting_actions"] += pattern_stats["conflicting_actions"]
+        analysis["overall"]["missing_dependencies"] += pattern_stats["missing_dependencies"]
+        analysis["overall"]["total_actions"] += pattern_stats["total_actions"]
+    
+    return analysis
+
+
+def is_diagnostic_command(cmd: str) -> bool:
+    """Check if command is diagnostic/read-only."""
+    diagnostic_patterns = ["show", "ping", "traceroute", "ip route get", "ip addr show"]
+    return any(pattern in cmd.lower() for pattern in diagnostic_patterns)
+
+
+def is_config_command(cmd: str) -> bool:
+    """Check if command is configuration (write)."""
+    config_patterns = ["vtysh -c", "ip addr add", "ip link set", "router ", "network "]
+    return any(pattern in cmd.lower() for pattern in config_patterns)
+
+
+def get_command_signature(cmd: str) -> str:
+    """Extract command signature for deduplication."""
+    # Remove variable parts like timestamps, but keep structure
+    cmd_lower = cmd.lower()
+    if "show ip route" in cmd_lower:
+        return "show_ip_route"
+    elif "show ip ospf" in cmd_lower:
+        return "show_ip_ospf"
+    elif "show ip rip" in cmd_lower:
+        return "show_ip_rip"
+    elif "show ip bgp" in cmd_lower:
+        return "show_ip_bgp"
+    elif "ping" in cmd_lower:
+        # Extract destination IP/host
+        parts = cmd.split()
+        for i, part in enumerate(parts):
+            if part == "ping" and i+1 < len(parts):
+                return f"ping_{parts[i+1]}"
+        return "ping_unknown"
+    else:
+        return "other_diagnostic"
+
+
+def analyze_sequential_depth_correlation(results: List[Dict]) -> Dict[str, Any]:
+    """
+    Analyze correlation between task sequential depth and pattern performance.
+    
+    Returns depth-stratified performance metrics for each pattern.
+    """
+    analysis = {
+        "by_depth": {},  # {depth: {pattern: metrics}}
+        "correlation": {},  # {pattern: correlation_coefficient}
+    }
+    
+    pattern_order = ["single", "sequential", "debate", "group_chat", "concurrent"]
+    
+    # Group results by sequential depth
+    for task_id, metadata in TASK_METADATA.items():
+        depth = metadata.get("sequential_depth", 0)
+        if depth not in analysis["by_depth"]:
+            analysis["by_depth"][depth] = {}
+        
+        task_results = [r for r in results if r.get("task_id") == task_id]
+        
+        for pattern in pattern_order:
+            pattern_results = [r for r in task_results
+                             if (extract_agent_config(r)[0] == "single" and pattern == "single")
+                             or (extract_agent_config(r)[1] == pattern and pattern != "single")]
+            
+            if pattern_results:
+                metrics = compute_metrics(pattern_results)
+                if pattern not in analysis["by_depth"][depth]:
+                    analysis["by_depth"][depth] = {}
+                analysis["by_depth"][depth][pattern] = metrics
+    
+    # Calculate correlation for each pattern
+    for pattern in pattern_order:
+        depths = []
+        success_rates = []
+        
+        for depth, pattern_metrics in analysis["by_depth"].items():
+            if pattern in pattern_metrics:
+                metrics = pattern_metrics[pattern]
+                if metrics.get("valid_count", 0) > 0:
+                    depths.append(depth)
+                    success_rates.append(metrics.get("success_rate", 0))
+        
+        if len(depths) >= 2:
+            # Calculate Pearson correlation
+            correlation = np.corrcoef(depths, success_rates)[0, 1] if len(depths) > 1 else 0
+            analysis["correlation"][pattern] = correlation
+        else:
+            analysis["correlation"][pattern] = None
+    
+    return analysis
+
+
+def generate_task_property_matrix_data(results: List[Dict]) -> Dict[str, Any]:
+    """
+    Generate data for task property matrix visualization.
+    
+    Returns task positioning by parallelizable breadth and sequential depth,
+    with best-performing pattern for each task.
+    """
+    matrix_data = {
+        "tasks": [],  # List of {task, breadth, depth, best_pattern, max_score}
+        "pattern_regions": {}  # {pattern: [(breadth, depth)]} for region highlighting
+    }
+    
+    pattern_order = ["single", "sequential", "debate", "group_chat", "concurrent"]
+    
+    for task_id, metadata in TASK_METADATA.items():
+        depth = metadata.get("sequential_depth", 0)
+        breadth = metadata.get("parallelizable_breadth", 0)
+        display_name = metadata.get("display_name", task_id)
+        
+        # Find best pattern for this task
+        task_results = [r for r in results if r.get("task_id") == task_id]
+        best_pattern = None
+        max_score = -1
+        
+        for pattern in pattern_order:
+            pattern_results = [r for r in task_results
+                             if (extract_agent_config(r)[0] == "single" and pattern == "single")
+                             or (extract_agent_config(r)[1] == pattern and pattern != "single")]
+            
+            if pattern_results:
+                metrics = compute_metrics(pattern_results)
+                avg_score = metrics.get("avg_final_score", 0)
+                if avg_score > max_score:
+                    max_score = avg_score
+                    best_pattern = pattern
+        
+        if best_pattern:
+            task_entry = {
+                "task_id": task_id,
+                "display_name": display_name,
+                "breadth": breadth,
+                "depth": depth,
+                "best_pattern": best_pattern,
+                "max_score": max_score
+            }
+            matrix_data["tasks"].append(task_entry)
+            
+            # Add to pattern region
+            if best_pattern not in matrix_data["pattern_regions"]:
+                matrix_data["pattern_regions"][best_pattern] = []
+            matrix_data["pattern_regions"][best_pattern].append((breadth, depth))
+    
+    return matrix_data
+
+def compute_academic_metrics(results: List[Dict]) -> Dict[str, Any]:
+    """Compute rigorous academic metrics with effect sizes and CIs."""
+    metrics = {}
+    
+    by_pattern = group_by_pattern(results)
+    
+    # Single vs Multi comparison with effect size
+    single_scores = [r.get("scoring", {}).get("final_score", 0) 
+                    for r in by_pattern.get("single", [])]
+    multi_scores = []
+    for pattern in ["sequential", "debate", "group_chat", "concurrent"]:
+        multi_scores.extend([r.get("scoring", {}).get("final_score", 0) 
+                            for r in by_pattern.get(pattern, [])])
+    
+    if single_scores and multi_scores:
+        # Filter valid results
+        single_valid = [s for s in single_scores if s > 0 or s == 0]  # Keep all
+        multi_valid = [s for s in multi_scores if s > 0 or s == 0]
+        
+        effect_size = compute_effect_size(single_valid, multi_valid)
+        single_ci = bootstrap_confidence_interval(single_valid)
+        multi_ci = bootstrap_confidence_interval(multi_valid)
+        
+        metrics["single_vs_multi"] = {
+            "single_mean": np.mean(single_valid),
+            "single_ci": single_ci,
+            "multi_mean": np.mean(multi_valid),
+            "multi_ci": multi_ci,
+            "effect_size": effect_size,
+            "interpretation": "large" if abs(effect_size) > 0.8 else "medium" if abs(effect_size) > 0.5 else "small"
+        }
+    
+    # Pattern comparisons with CIs
+    metrics["patterns"] = {}
+    for pattern, pattern_results in by_pattern.items():
+        scores = [r.get("scoring", {}).get("final_score", 0) for r in pattern_results]
+        valid_scores = [s for s in scores if isinstance(s, (int, float))]
+        
+        if valid_scores:
+            ci = bootstrap_confidence_interval(valid_scores)
+            metrics["patterns"][pattern] = {
+                "mean": np.mean(valid_scores),
+                "ci": ci,
+                "n": len(valid_scores)
+            }
+    
+    return metrics
+
+
 def generate_report(session_dir: Path, results: List[Dict]) -> str:
     """Generate markdown analysis report."""
     lines = [
@@ -544,6 +1173,24 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         f"**Total Runs:** {len(results)}",
         "",
     ]
+    
+    # Data Quality Summary
+    overall = compute_metrics(results)
+    lines.extend([
+        "## Data Quality Summary",
+        "",
+        "> [!NOTE]",
+        "> **Error Filtering**: Results with `syntactic_validity == 0.0` are excluded from averages.",
+        "> These indicate timeout/execution failures where no commands were executed.",
+        "",
+        "| Metric | Count |",
+        "|--------|-------|",
+        f"| Total Runs | {overall.get('count', 0)} |",
+        f"| Valid Runs | {overall.get('valid_count', 0)} |",
+        f"| Filtered (Errors) | {overall.get('filtered_count', 0)} |",
+        f"| Error Rate | {overall.get('filtered_count', 0) / max(overall.get('count', 1), 1) * 100:.1f}% |",
+        "",
+    ])
     
     # Overall metrics
     overall = compute_metrics(results)
@@ -660,9 +1307,254 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
     lines.append("")
     
     # =========================================================================
+    # Cross-Task Analysis
+    # =========================================================================
+    task_analysis = analyze_by_task_type(results)
+    failure_analysis = analyze_failure_modes(results)
+    pattern_task_fit = analyze_pattern_task_fit(results)
+    academic_metrics = compute_academic_metrics(results)
+    
+    lines.extend([
+        "---",
+        "",
+        "## Task-Level Performance Analysis",
+        "",
+        "### Performance by Task",
+        "",
+        "| Task | Difficulty | Type | Protocol | Valid/Total | Success | Avg Score | Best Pattern |",
+        "|------|-----------|------|----------|-------------|---------|-----------|--------------|",
+    ])
+    
+    for task_id in sorted(TASK_METADATA.keys()):
+        if task_id in task_analysis["by_task"]:
+            metadata = TASK_METADATA[task_id]
+            metrics = task_analysis["by_task"][task_id]
+            display_name = metadata.get("display_name", task_id)
+            difficulty = metadata.get("difficulty", "-")
+            task_type = metadata.get("type", "-")
+            protocol = metadata.get("protocol", "-")
+            
+            valid_count = metrics.get("valid_count", 0)
+            total_count = metrics.get("count", 0)
+            success_rate = metrics.get("success_rate", 0)
+            avg_score = metrics.get("avg_final_score", 0)
+            
+            best_info = pattern_task_fit["best_pattern_by_task"].get(task_id, {})
+            best_pattern = best_info.get("pattern", "-")
+            
+            lines.append(
+                f"| {display_name} | {difficulty} | {task_type} | {protocol} | "
+                f"{valid_count}/{total_count} | {success_rate*100:.0f}% | {avg_score:.3f} | {best_pattern} |"
+            )
+    
+    lines.extend([
+        "",
+        "### Performance by Task Characteristics",
+        "",
+        "#### By Difficulty Level",
+        "",
+        "| Difficulty | Valid Runs | Avg Score | Success Rate |",
+        "|-----------|-----------|-----------|--------------|",
+    ])
+    
+    for difficulty in ["basic", "intermediate", "expert"]:
+        if difficulty in task_analysis["by_difficulty"]:
+            metrics = task_analysis["by_difficulty"][difficulty]
+            lines.append(
+                f"| {difficulty.capitalize()} | {metrics.get('valid_count', 0)} | "
+                f"{metrics.get('avg_final_score', 0):.3f} | {metrics.get('success_rate', 0)*100:.0f}% |"
+            )
+    
+    lines.extend([
+        "",
+        "#### By Task Type",
+        "",
+        "| Type | Valid Runs | Avg Score | Success Rate |",
+        "|------|-----------|-----------|--------------|",
+    ])
+    
+    for task_type in ["configuration", "troubleshooting"]:
+        if task_type in task_analysis["by_type"]:
+            metrics = task_analysis["by_type"][task_type]
+            lines.append(
+                f"| {task_type.capitalize()} | {metrics.get('valid_count', 0)} | "
+                f"{metrics.get('avg_final_score', 0):.3f} | {metrics.get('success_rate', 0)*100:.0f}% |"
+            )
+    
+    lines.extend([
+        "",
+        "#### By Protocol",
+        "",
+        "| Protocol | Valid Runs | Avg Score | Success Rate |",
+        "|----------|-----------|-----------|--------------|",
+    ])
+    
+    for protocol in ["RIP", "OSPF", "BGP"]:
+        if protocol in task_analysis["by_protocol"]:
+            metrics = task_analysis["by_protocol"][protocol]
+            lines.append(
+                f"| {protocol} | {metrics.get('valid_count', 0)} | "
+                f"{metrics.get('avg_final_score', 0):.3f} | {metrics.get('success_rate', 0)*100:.0f}% |"
+            )
+    
+    lines.extend([
+        "",
+        "---",
+        "",
+        "## Failure Mode Analysis",
+        "",
+        "### Failure Breakdown by Task",
+        "",
+        "| Task | Total | Failed | Zero Validity | Timeout | Failure Rate |",
+        "|------|-------|--------|---------------|---------|--------------|",
+    ])
+    
+    for task_id in sorted(TASK_METADATA.keys()):
+        if task_id in failure_analysis["by_task"]:
+            stats = failure_analysis["by_task"][task_id]
+            display_name = TASK_METADATA[task_id].get("display_name", task_id)
+            lines.append(
+                f"| {display_name} | {stats['total']} | {stats['failed']} | "
+                f"{stats['zero_validity']} | {stats['timeout']} | {stats['failure_rate']*100:.0f}% |"
+            )
+    
+    lines.extend([
+        "",
+        "> [!NOTE]",
+        "> **Zero Validity**: Runs where syntactic_validity=0 (timeout or no commands executed)",
+        "> These runs are excluded from performance averages.",
+        "",
+        "---",
+        "",
+        "## Pattern-Task Fit Analysis",
+        "",
+        "### Best Pattern by Task",
+        "",
+    ])
+    
+    for task_id in sorted(TASK_METADATA.keys()):
+        if task_id in pattern_task_fit["best_pattern_by_task"]:
+            best_info = pattern_task_fit["best_pattern_by_task"][task_id]
+            display_name = TASK_METADATA[task_id].get("display_name", task_id)
+            pattern = best_info.get("pattern", "-")
+            score = best_info.get("score", 0)
+            lines.append(f"- **{display_name}**: {pattern} (score: {score:.3f})")
+    
+    lines.extend([
+        "",
+        "### Pattern Performance Matrix (Score by Task)",
+        "",
+        "| Task | Single | Sequential | Debate | Group Chat | Concurrent |",
+        "|------|--------|-----------|--------|-----------|-------------|",
+    ])
+    
+    sorted_tasks = sorted(TASK_METADATA.items(), key=lambda x: x[1]['complexity_score'])
+    for task_id, metadata in sorted_tasks:
+        display_name = metadata.get('display_name', task_id)
+        row = f"| {display_name} |"
+        
+        for pattern in pattern_order:
+            pattern_metrics = pattern_task_fit["pattern_x_task"].get(task_id, {}).get(pattern)
+            if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
+                score = pattern_metrics.get("avg_final_score", 0)
+                row += f" {score:.3f} |"
+            else:
+                row += " - |"
+        
+        lines.append(row)
+    
+    lines.extend([
+        "",
+        "### Pattern Performance by Difficulty",
+        "",
+        "| Pattern | Basic | Intermediate | Expert |",
+        "|---------|-------|--------------|--------|",
+    ])
+    
+    pattern_order = ["single", "sequential", "debate", "group_chat", "concurrent"]
+    for pattern in pattern_order:
+        row = f"| {pattern} |"
+        for difficulty in ["basic", "intermediate", "expert"]:
+            diff_data = pattern_task_fit["pattern_x_difficulty"].get(difficulty, {})
+            pattern_metrics = diff_data.get(pattern)
+            if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
+                score = pattern_metrics.get("avg_final_score", 0)
+                row += f" {score:.3f} |"
+            else:
+                row += " - |"
+        lines.append(row)
+    
+    lines.extend([
+        "",
+        "### Pattern Performance by Task Type",
+        "",
+        "| Pattern | Configuration | Troubleshooting |",
+        "|---------|---------------|-----------------|",
+    ])
+    
+    for pattern in pattern_order:
+        row = f"| {pattern} |"
+        for task_type in ["configuration", "troubleshooting"]:
+            type_data = pattern_task_fit["pattern_x_type"].get(task_type, {})
+            pattern_metrics = type_data.get(pattern)
+            if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
+                score = pattern_metrics.get("avg_final_score", 0)
+                row += f" {score:.3f} |"
+            else:
+                row += " - |"
+        lines.append(row)
+    
+    lines.extend([
+        "",
+        "---",
+        "",
+        "## Statistical Analysis",
+        "",
+        "### Single vs Multi-Agent (with Confidence Intervals)",
+        "",
+    ])
+    
+    if "single_vs_multi" in academic_metrics:
+        svm = academic_metrics["single_vs_multi"]
+        single_mean = svm["single_mean"]
+        single_ci = svm["single_ci"]
+        multi_mean = svm["multi_mean"]
+        multi_ci = svm["multi_ci"]
+        effect_size = svm["effect_size"]
+        interpretation = svm["interpretation"]
+        
+        lines.extend([
+            "| Architecture | Mean Score | 95% CI | N |",
+            "|--------------|-----------|--------|---|",
+            f"| Single-Agent | {single_mean:.3f} | [{single_ci[0]:.3f}, {single_ci[1]:.3f}] | {academic_metrics['patterns'].get('single', {}).get('n', 0)} |",
+            f"| Multi-Agent | {multi_mean:.3f} | [{multi_ci[0]:.3f}, {multi_ci[1]:.3f}] | - |",
+            "",
+            f"**Effect Size (Cohen's d):** {effect_size:.3f} ({interpretation})",
+            "",
+        ])
+    
+    lines.extend([
+        "### Pattern Performance with Confidence Intervals",
+        "",
+        "| Pattern | Mean Score | 95% CI | N |",
+        "|---------|-----------|--------|---|",
+    ])
+    
+    for pattern in pattern_order:
+        if pattern in academic_metrics.get("patterns", {}):
+            p_data = academic_metrics["patterns"][pattern]
+            mean = p_data["mean"]
+            ci = p_data["ci"]
+            n = p_data["n"]
+            lines.append(f"| {pattern} | {mean:.3f} | [{ci[0]:.3f}, {ci[1]:.3f}] | {n} |")
+    
+    lines.append("")
+    
+    # =========================================================================
     # NEW: Research Question Analysis
     # =========================================================================
     research_metrics = compute_research_metrics(results)
+
     
     lines.extend([
         "---",
@@ -1102,7 +1994,9 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
             for j, model in enumerate(models):
                 matching = [r for r in pattern_results if normalize_model_name(r) == model]
                 if matching:
-                    matrix[i, j] = compute_metrics(matching)["avg_final_score"]
+                    metrics = compute_metrics(matching)
+                    if metrics.get("valid_count", 0) > 0:
+                        matrix[i, j] = metrics.get("avg_final_score", 0)
         
         im = ax.imshow(matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
         
@@ -1300,6 +2194,239 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
         
         plt.tight_layout()
         chart_path = charts_dir / "exploration_patterns.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+    
+    # ========== NEW Chart 10: Performance vs Task Complexity (Line Plot) ==========
+    # Similar to reference image style
+    task_analysis = analyze_by_task_type(results)
+    pattern_task_fit = analyze_pattern_task_fit(results)
+    
+    # Build complexity data
+    complexity_data = {}
+    for pattern in patterns_present:
+        complexity_data[pattern] = []
+    
+    # Sort tasks by complexity
+    sorted_tasks = sorted(TASK_METADATA.items(), key=lambda x: x[1]['complexity_score'])
+    
+    for task_id, metadata in sorted_tasks:
+        complexity = metadata['complexity_score']
+        
+        for pattern in patterns_present:
+            pattern_metrics = pattern_task_fit["pattern_x_task"].get(task_id, {}).get(pattern)
+            if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
+                score = pattern_metrics.get("avg_final_score", 0) * 100  # Convert to percentage
+                complexity_data[pattern].append((complexity, score))
+    
+    # Create line plot
+    if any(len(data) > 0 for data in complexity_data.values()):
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        for pattern in patterns_present:
+            data = complexity_data[pattern]
+            if len(data) >= 2:  # Need at least 2 points for a line
+                x_vals = [d[0] for d in data]
+                y_vals = [d[1] for d in data]
+                
+                ax.plot(x_vals, y_vals, 
+                       marker=MARKERS.get(pattern, 'o'),
+                       color=COLORS.get(pattern, '#888888'),
+                       label=pattern.replace('_', ' ').title(),
+                       linewidth=2, markersize=10, alpha=0.8)
+        
+        ax.set_xlabel('Task Complexity Score', fontweight='bold', fontsize=11)
+        ax.set_ylabel('Performance (%)', fontweight='bold', fontsize=11)
+        ax.set_title('Performance vs Task Complexity', fontsize=12, fontweight='bold', pad=15)
+        ax.set_xticks([1, 2, 3])
+        ax.set_xticklabels(['Basic\n(CCNA)', 'Intermediate\n(CCNP)', 'Expert\n(CCIE)'], fontsize=9)
+        ax.set_ylim(0, 100)
+        ax.grid(True, alpha=0.3, linestyle='--')
+        ax.legend(loc='best', frameon=True, fancybox=False, edgecolor='0.8', fontsize=9)
+        
+        plt.tight_layout()
+        chart_path = charts_dir / "performance_vs_complexity.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+    
+    # ========== NEW Chart 11: Task-Pattern Fit Heatmap ==========
+    if len(sorted_tasks) > 0 and len(patterns_present) >= 2:
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        # Build matrix
+        matrix = np.zeros((len(sorted_tasks), len(patterns_present)))
+        task_labels = []
+        
+        for i, (task_id, metadata) in enumerate(sorted_tasks):
+            task_labels.append(metadata.get('display_name', task_id))
+            
+            for j, pattern in enumerate(patterns_present):
+                pattern_metrics = pattern_task_fit["pattern_x_task"].get(task_id, {}).get(pattern)
+                if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
+                    matrix[i, j] = pattern_metrics.get("avg_final_score", 0)
+        
+        im = ax.imshow(matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
+        
+        ax.set_xticks(np.arange(len(patterns_present)))
+        ax.set_yticks(np.arange(len(sorted_tasks)))
+        ax.set_xticklabels([p.replace('_', ' ').title() for p in patterns_present], 
+                          fontsize=10, fontweight='bold')
+        ax.set_yticklabels(task_labels, fontsize=9)
+        ax.set_xlabel('Agent Pattern', fontweight='bold', fontsize=11)
+        ax.set_ylabel('Task', fontweight='bold', fontsize=11)
+        ax.set_title('Pattern Performance by Task', fontsize=12, fontweight='bold', pad=15)
+        
+        # Add text annotations
+        for i in range(len(sorted_tasks)):
+            for j in range(len(patterns_present)):
+                val = matrix[i, j]
+                if val > 0:  # Only show non-zero values
+                    color = 'white' if val < 0.3 or val > 0.7 else 'black'
+                    ax.text(j, i, f'{val:.2f}', ha='center', va='center',
+                           fontsize=9, fontweight='bold', color=color)
+                else:
+                    ax.text(j, i, '-', ha='center', va='center',
+                           fontsize=9, color='gray')
+        
+        cbar = plt.colorbar(im, ax=ax, shrink=0.8)
+        cbar.set_label('Final Score', fontweight='bold', fontsize=10)
+        
+        plt.tight_layout()
+        chart_path = charts_dir / "task_pattern_heatmap.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+    
+    # ========== NEW Chart 12: Difficulty Comparison (Line Plot with CI) ==========
+    if "pattern_x_difficulty" in pattern_task_fit:
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        difficulties = ["basic", "intermediate", "expert"]
+        x_pos = [1, 2, 3]
+        
+        for pattern in patterns_present:
+            scores = []
+            for difficulty in difficulties:
+                diff_data = pattern_task_fit["pattern_x_difficulty"].get(difficulty, {})
+                pattern_metrics = diff_data.get(pattern)
+                if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
+                    scores.append(pattern_metrics.get("avg_final_score", 0) * 100)
+                else:
+                    scores.append(None)
+            
+            # Filter out None values for plotting
+            valid_x = [x_pos[i] for i in range(len(scores)) if scores[i] is not None]
+            valid_scores = [s for s in scores if s is not None]
+            
+            if len(valid_scores) >= 2:
+                ax.plot(valid_x, valid_scores,
+                       marker=MARKERS.get(pattern, 'o'),
+                       color=COLORS.get(pattern, '#888888'),
+                       label=pattern.replace('_', ' ').title(),
+                       linewidth=2.5, markersize=10, alpha=0.85)
+        
+        ax.set_xlabel('Task Difficulty', fontweight='bold', fontsize=12)
+        ax.set_ylabel('Performance (%)', fontweight='bold', fontsize=12)
+        ax.set_title('Agent Performance Across Difficulty Levels', 
+                    fontsize=13, fontweight='bold', pad=15)
+        ax.set_xticks(x_pos)
+        ax.set_xticklabels(['Basic', 'Intermediate', 'Expert'], fontsize=10)
+        ax.set_ylim(0, 100)
+        ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.8)
+        ax.legend(loc='best', frameon=True, fancybox=False, edgecolor='0.8', 
+                 fontsize=10, ncol=1)
+        
+        # Add difficulty labels with task info
+        for i, (pos, diff) in enumerate(zip(x_pos, difficulties)):
+            tasks_at_level = [t for t, m in TASK_METADATA.items() 
+                            if m.get('difficulty') == diff]
+            ax.text(pos, -8, f'({len(tasks_at_level)} tasks)', 
+                   ha='center', va='top', fontsize=8, style='italic', color='gray')
+        
+        plt.tight_layout()
+        chart_path = charts_dir / "difficulty_performance.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+
+    # ========== NEW Chart 13: Tokens vs Score Scatter ==========
+    tokens_data = []
+    scores_data = []
+    pattern_data = []
+    
+    for result in results:
+        usage = result.get("metrics", {}).get("token_usage")
+        tokens = usage.get("total_tokens") if usage else None
+        score = result.get("scoring", {}).get("final_score", 0)
+        mode, structure = extract_agent_config(result)
+        pattern = "single" if mode == "single" else structure
+        
+        if tokens and tokens > 0:
+            tokens_data.append(tokens)
+            scores_data.append(score)
+            pattern_data.append(pattern)
+    
+    if tokens_data and len(set(pattern_data)) >= 2:
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        for pattern in patterns_present:
+            idx = [i for i, p in enumerate(pattern_data) if p == pattern]
+            if idx:
+                t = [tokens_data[i] for i in idx]
+                s = [scores_data[i] for i in idx]
+                ax.scatter(t, s, c=COLORS.get(pattern, '#888888'), 
+                          label=pattern.replace('_', ' ').title(), s=80, alpha=0.7, edgecolors='black')
+        
+        ax.set_xlabel('Total Tokens Consumed', fontweight='bold', fontsize=11)
+        ax.set_ylabel('Final Score', fontweight='bold', fontsize=11)
+        ax.set_title('Token Consumption vs Score by Pattern', fontsize=12, fontweight='bold', pad=15)
+        ax.set_ylim(-0.05, 1.05)
+        ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5)
+        ax.legend(loc='upper right', frameon=True, fancybox=False, edgecolor='0.8', fontsize=9)
+        ax.grid(True, alpha=0.3, linestyle='--')
+        
+        plt.tight_layout()
+        chart_path = charts_dir / "tokens_vs_score.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+
+    # ========== NEW Chart 14: Average Token Consumption per Pattern ==========
+    if len(patterns_present) >= 2:
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        avg_tokens = []
+        token_stds = []
+        
+        for pattern in patterns_present:
+            m = compute_metrics(by_pattern[pattern])
+            avg_tokens.append(m.get("avg_tokens", 0))
+            token_stds.append(m.get("std_tokens", 0))
+            
+        x = np.arange(len(patterns_present))
+        colors = [COLORS.get(p, '#888888') for p in patterns_present]
+        
+        bars = ax.bar(x, avg_tokens, yerr=token_stds, color=colors, edgecolor='black', linewidth=0.8, capsize=4)
+        for bar, hatch in zip(bars, HATCHES):
+            bar.set_hatch(hatch)
+            
+        ax.set_ylabel('Average Tokens Consumed', fontweight='bold', fontsize=11)
+        ax.set_xlabel('Agent Pattern', fontweight='bold', fontsize=11)
+        ax.set_title('Average Token Consumption by Pattern', fontsize=12, fontweight='bold', pad=15)
+        ax.set_xticks(x)
+        ax.set_xticklabels([p.replace('_', '\n').title() for p in patterns_present], fontsize=9)
+        ax.grid(True, alpha=0.3, axis='y', linestyle='--')
+        
+        # Add value labels on top of bars
+        for i, (bar, val) in enumerate(zip(bars, avg_tokens)):
+            if val > 0:
+                ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + token_stds[i] * 0.1 + 1000, 
+                       f'{val:,.0f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
+        
+        plt.tight_layout()
+        chart_path = charts_dir / "avg_tokens_by_pattern.png"
         plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
         plt.close()
         chart_paths.append(chart_path)
