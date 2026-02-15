@@ -102,7 +102,8 @@
           "command": "vtysh -c 'show ip bgp neighbors' | grep 'Hold time'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "30"
+            "contains_text": "Hold time is 30",
+            "case_insensitive": true
           }
         }
       }

@@ -1,9 +1,6 @@
 #!/bin/bash
 # run_comparative_multiturn_study.sh
 # Runs comparative multi-turn benchmark study:
-# - Models: GPT-5-mini, Qwen3-Coder:30b, Deepseek-Coder:33b
-# - Patterns: Single, Sequential, Debate, Group Chat, Concurrent
-# - Repetitions: 5 runs per configuration
 
 set -e
 
@@ -11,10 +8,11 @@ set -e
 DAGENT_ENDPOINT="${DAGENT_ENDPOINT:-http://localhost:8000}"
 OLLAMA_HOST="http://localhost:11434"
 # "Unreachably big" limits
-TURN_LIMIT=10000
+TURN_LIMIT=100
 TIME_LIMIT=1800  # 30 minutes
+CONTEXT_LENGTH=120000
 # Repetitions per configuration
-REPETITIONS=5
+REPETITIONS=3
 
 # Multi-turn tasks
 TASKS=(
@@ -36,9 +34,8 @@ AGENT_CONFIGS=(
 
 # Models to test (provider:model)
 MODELS=(
-    "openai:gpt-5-mini-2025-08-07"
-    "ollama:qwen3-Coder:30b"
-    "ollama:deepseek-coder:33b"
+    "ollama:qwen3-coder:30b"
+    #"ollama:llama3.3:70b"
 )
 
 # Create dated session folder
@@ -118,6 +115,7 @@ run_multiturn() {
         --structure "${structure}" \
         --turn-limit ${TURN_LIMIT} \
         --time-limit ${TIME_LIMIT} \
+        --context-length "${CONTEXT_LENGTH}" \
         --output-dir "${OUTPUT_DIR}"; then
         SUCCESSFUL=$((SUCCESSFUL + 1))
         echo "  ✓ Completed successfully"

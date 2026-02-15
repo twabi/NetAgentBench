@@ -127,6 +127,7 @@ class InteractiveBenchmarkController:
         dagent_host: Optional[str] = None,
         dagent_mode: str = "single",
         dagent_structure: str = "sequential",
+        context_length: Optional[int] = None,
         verbose: bool = False,
     ) -> BenchmarkResult:
         """
@@ -278,7 +279,7 @@ class InteractiveBenchmarkController:
                     "host": dagent_host,
                     "agent_mode": dagent_mode,
                     "structure": dagent_structure,
-
+                    "context_length": context_length,
                 }
                 
                 try:

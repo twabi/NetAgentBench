@@ -59,8 +59,7 @@
           "command": "vtysh -c 'show ip ospf neighbor'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "full",
-            "case_insensitive": true
+            "contains_text": "Full/"
           }
         }
       },

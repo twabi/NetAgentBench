@@ -30,8 +30,7 @@
           "command": "vtysh -c 'show ip rip status'",
           "parser": "text",
           "success_condition": {
-            "contains_text": "rip",
-            "case_insensitive": true
+            "contains_text": "Routing Protocol is"
           }
         }
       },

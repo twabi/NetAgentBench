@@ -287,8 +287,9 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @click.option("--wait-for-submit", is_flag=True, help="Wait for agent to call submit (manual mode)")
 @click.option("--provider-host", help="Host URL for provider (e.g., http://oai:11434)")
 @click.option("--mcp-host", default="localhost", help="Host address for the local MCP server (e.g., your local IP if dagent is remote)")
+@click.option("--context-length", type=int, default=120000, help="Context window for Ollama models (default: 120000)")
 @click.option("--verbose", "-v", is_flag=True, help="Print each agent action as it executes")
-def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_host, agent_mode, structure, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
+def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_host, context_length, agent_mode, structure, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
     """
     Run a single task file in multi-turn interactive mode.
     
@@ -379,6 +380,7 @@ def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_hos
                 dagent_host=provider_host,
                 dagent_mode=agent_mode,
                 dagent_structure=structure,
+                context_length=context_length,
                 mcp_host=mcp_host,
                 verbose=verbose,
             )

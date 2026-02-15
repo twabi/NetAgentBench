@@ -236,7 +236,12 @@ def compute_metrics(results: List[Dict]) -> Dict[str, Any]:
         return {
             "count": len(results),
             "valid_count": 0,
-            "filtered_count": filtered_count
+            "filtered_count": filtered_count,
+            "success_rate": 0,
+            "avg_final_score": 0.0,
+            "std_final_score": 0.0,
+            "avg_completeness": 0.0,
+            "avg_robustness": 0.0,
         }
     
     metrics = {
@@ -554,6 +559,7 @@ def analyze_exploration_patterns(results: List[Dict]) -> Dict[str, Any]:
             }
     
     return analysis
+
 
 
 # =============================================================================
@@ -1229,13 +1235,19 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
     for pattern in pattern_order:
         if pattern in by_pattern:
             m = compute_metrics(by_pattern[pattern])
+            success_rate = m.get('success_rate', 0)
+            avg_score = m.get('avg_final_score', 0)
+            avg_comp = m.get('avg_completeness', 0)
+            avg_rob = m.get('avg_robustness', 0)
+            
             turns_str = f"{m.get('avg_turns', 0):.1f}" if "avg_turns" in m else "-"
             time_str = f"{m.get('avg_time', 0):.0f}s" if "avg_time" in m else "-"
             tokens_str = f"{m.get('avg_tokens', 0):.0f}" if "avg_tokens" in m else "-"
+            
             lines.append(
-                f"| **{pattern}** | {m['count']} | {m['success_rate']*100:.0f}% | "
-                f"{m['avg_final_score']:.3f} | {m['avg_completeness']:.3f} | "
-                f"{m['avg_robustness']:.3f} | {turns_str} | {time_str} | {tokens_str} |"
+                f"| **{pattern}** | {m['count']} | {success_rate*100:.0f}% | "
+                f"{avg_score:.3f} | {avg_comp:.3f} | "
+                f"{avg_rob:.3f} | {turns_str} | {time_str} | {tokens_str} |"
             )
     lines.append("")
     
@@ -1798,6 +1810,60 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
             lines.append(row)
     lines.append("")
     
+
+    # =========================================================================
+    # NEW: Scientific Scaling Analysis
+    # =========================================================================
+    lines.extend([
+        "---",
+        "",
+        "## Scientific Scaling Analysis",
+        "",
+        "Applying principles from frontier research to understand agent performance at scale.",
+        "",
+        "### Information Fragmentation (Context Loss)",
+        "Measures how coordination overhead leads to redundant actions or conflicting configurations.",
+        "",
+        "![Context Loss](charts/context_loss.png)",
+        "",
+        "| Pattern | Redundant | Conflicting | Missing Dep | Loss Rate |",
+        "|---------|-----------|-------------|-------------|-----------|",
+    ])
+    
+    loss_data = calculate_context_loss_rate(results)
+    for p in pattern_order:
+        if p in loss_data["by_pattern"]:
+            s = loss_data["by_pattern"][p]
+            lines.append(f"| {p.title()} | {s.get('redundant_queries', 0)} | {s.get('conflicting_actions', 0)} | {s.get('missing_dependencies', 0)} | {s.get('context_loss_rate', 0)*100:.1f}% |")
+    
+    lines.extend([
+        "",
+        "### Sequential Scaling Correlation",
+        "Correlation between task depth (complexity) and agent performance.",
+        "",
+        "![Depth Scaling](charts/depth_scaling.png)",
+        "",
+        "| Pattern | Correlation (r) | Resilience |",
+        "|---------|-----------------|------------|",
+    ])
+    
+    corr_data = analyze_sequential_depth_correlation(results)
+    for p in pattern_order:
+        if p in corr_data["correlation"]:
+            r = corr_data["correlation"][p]
+            if r is not None:
+                resilience = "High" if r > -0.3 else "Moderate" if r > -0.7 else "Low"
+                lines.append(f"| {p.title()} | {r:.3f} | {resilience} |")
+    
+    lines.extend([
+        "",
+        "### Capability Landscape (Task Property Matrix)",
+        "Mapping the benchmark landscape onto a 2D plane of Parallelizable Breadth and Sequential Depth.",
+        "",
+        "![Task Matrix](charts/task_matrix.png)",
+        "",
+    ])
+
     # =========================================================================
     # NEW: Actionable Recommendations
     # =========================================================================
@@ -2427,6 +2493,109 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
         
         plt.tight_layout()
         chart_path = charts_dir / "avg_tokens_by_pattern.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+    
+    # ========== Chart 15: Sequential Depth vs Success (Scaling Principle) ==========
+    plt.figure(figsize=(10, 6))
+    corr_data = analyze_sequential_depth_correlation(results)
+    depth_plotted = False
+    
+    # Stratify by depth
+    by_depth = corr_data.get("by_depth", {})
+    if by_depth:
+        sorted_depths = sorted(by_depth.keys())
+        for pattern in patterns_present:
+            pattern_scores = []
+            valid_depths = []
+            for depth in sorted_depths:
+                if pattern in by_depth[depth]:
+                    pattern_scores.append(by_depth[depth][pattern].get("success_rate", 0))
+                    valid_depths.append(depth)
+            
+            if valid_depths:
+                corr = corr_data["correlation"].get(pattern)
+                label = f"{pattern.title()}"
+                if corr is not None:
+                    label += f" (r={corr:.2f})"
+                plt.plot(valid_depths, pattern_scores, marker=MARKERS.get(pattern, 'o'), 
+                        label=label, color=COLORS.get(pattern), linewidth=2, markersize=8)
+                depth_plotted = True
+    
+    if depth_plotted:
+        plt.xlabel("Sequential Depth")
+        plt.ylabel("Avg Final Score")
+        plt.title("Scaling Principle: Performance vs. Task Sequential Depth")
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.ylim(-0.05, 1.05)
+        
+        chart_path = charts_dir / "depth_scaling.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+
+    # ========== Chart 16: Context Loss by Pattern (Information Fragmentation) ==========
+    loss_data = calculate_context_loss_rate(results)
+    if loss_data and loss_data.get("by_pattern"):
+        plt.figure(figsize=(10, 6))
+        
+        loss_patterns = [p for p in patterns_present if p in loss_data["by_pattern"]]
+        rates = [loss_data["by_pattern"][p].get("context_loss_rate", 0) * 100 for p in loss_patterns]
+        colors = [COLORS.get(p, '#888888') for p in loss_patterns]
+        
+        x = np.arange(len(loss_patterns))
+        bars = plt.bar(x, rates, color=colors)
+            
+        plt.ylabel("Context Loss Rate (%)")
+        plt.title("Information Fragmentation: Context Loss by Agent Architecture")
+        plt.xticks(x, [p.title() for p in loss_patterns])
+        plt.ylim(0, max(rates + [10]) * 1.2)
+        plt.grid(True, alpha=0.3, axis='y')
+        
+        for bar, val in zip(bars, rates):
+            plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1, 
+                   f'{val:.1f}%', ha='center', va='bottom', fontsize=9)
+        
+        chart_path = charts_dir / "context_loss.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+
+    # ========== Chart 17: Task Property Matrix (Capability Landscape) ==========
+    matrix_data = generate_task_property_matrix_data(results)
+    if matrix_data and matrix_data.get("tasks"):
+        plt.figure(figsize=(10, 8))
+        
+        for task in matrix_data["tasks"]:
+            x, y = task["breadth"], task["depth"]
+            pattern = task["best_pattern"]
+            score = task["max_score"]
+            
+            plt.scatter(x, y, s=500, alpha=0.6, 
+                       color=COLORS.get(pattern, 'gray'))
+            plt.text(x, y, task["display_name"], ha='center', va='center', fontsize=8)
+        
+        # Add a placeholder legend for patterns (user wants this to remain)
+        from matplotlib.lines import Line2D
+        legend_elements = [Line2D([0], [0], marker='o', color='w', label=p.title(),
+                          markerfacecolor=COLORS.get(p, 'gray'), markersize=10, markeredgecolor='black')
+                          for p in patterns_present]
+        plt.legend(handles=legend_elements, title="Best Pattern", loc='upper right', frameon=True, edgecolor='black')
+        
+        plt.xlabel("Parallelizable Breadth")
+        plt.ylabel("Sequential Depth")
+        plt.title("Task Property Matrix: Capability Landscape")
+        plt.grid(True, alpha=0.3)
+        
+        # Set discrete ticks
+        all_x = [t["breadth"] for t in matrix_data["tasks"]]
+        all_y = [t["depth"] for t in matrix_data["tasks"]]
+        if all_x: plt.xticks(range(int(min(all_x)), int(max(all_x)) + 2))
+        if all_y: plt.yticks(range(int(min(all_y)), int(max(all_y)) + 2))
+        
+        chart_path = charts_dir / "task_matrix.png"
         plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
         plt.close()
         chart_paths.append(chart_path)
