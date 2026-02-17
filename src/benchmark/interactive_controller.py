@@ -505,7 +505,13 @@ class InteractiveBenchmarkController:
                 if submit_result:
                     termination_reason = submit_result.reason
                 elif not self._session.is_active:
-                    termination_reason = "submitted"
+                    # Check if it was a timeout vs actual submission
+                    if any("timed out" in e.lower() for e in errors):
+                        termination_reason = "dagent_timeout"
+                    elif turns_used == 0:
+                        termination_reason = "dagent_timeout"  # No turns means dagent never ran
+                    else:
+                        termination_reason = "submitted"
                 else:
                     termination_reason = "unknown"
             except Exception:

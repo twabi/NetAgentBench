@@ -12,7 +12,7 @@ TURN_LIMIT=100
 TIME_LIMIT=1800  # 30 minutes
 CONTEXT_LENGTH=120000
 # Repetitions per configuration
-REPETITIONS=3
+REPETITIONS=1
 
 # Multi-turn tasks
 TASKS=(
@@ -34,8 +34,9 @@ AGENT_CONFIGS=(
 
 # Models to test (provider:model)
 MODELS=(
-    "ollama:qwen3-coder:30b"
+    #"ollama:qwen3-coder:30b"
     #"ollama:llama3.3:70b"
+    "openai:gpt-5-mini-2025-08-07"
 )
 
 # Create dated session folder

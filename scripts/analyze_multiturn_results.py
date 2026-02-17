@@ -215,8 +215,9 @@ def filter_valid_results(results: List[Dict]) -> Tuple[List[Dict], int]:
     filtered = 0
     
     for r in results:
-        syntactic_validity = r.get("scoring", {}).get("syntactic_validity", 1.0)
-        if syntactic_validity == 0.0:
+        # Filter out results where no commands were executed (true failures)
+        total_commands = r.get("metrics", {}).get("total_commands", 0)
+        if total_commands == 0:
             filtered += 1
         else:
             valid.append(r)
@@ -1579,13 +1580,21 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
     
     rq1 = research_metrics.get("rq1_architecture_comparison", {})
     if rq1:
+        difference = rq1.get('difference', 0)
+        if difference > 0:
+            diff_text = f"Single outperforms Multi by **{difference:.3f}** points"
+        elif difference < 0:
+            diff_text = f"Multi outperforms Single by **{abs(difference):.3f}** points"
+        else:
+            diff_text = "Single and Multi perform equally"
+        
         lines.extend([
             "| Architecture | Avg Score | Std Dev |",
             "|--------------|-----------|---------|",
             f"| Single-Agent | {rq1.get('single_avg', 0):.3f} | {rq1.get('single_std', 0):.3f} |",
             f"| Multi-Agent | {rq1.get('multi_avg', 0):.3f} | {rq1.get('multi_std', 0):.3f} |",
             "",
-            f"**Difference:** Single outperforms multi by **{rq1.get('difference', 0):.3f}** points",
+            f"**Difference:** {diff_text}",
             "",
         ])
     else:
@@ -1752,9 +1761,9 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         data = exploration["by_pattern"].get(pattern, {})
         if data:
             lines.append(
-                f"| {pattern} | {data.get('exploration_rate', 0)*100:.1f}% | "
-                f"{data.get('construction_rate', 0)*100:.1f}% | "
-                f"{data.get('destruction_rate', 0)*100:.1f}% | "
+                f"| {pattern} | {data.get('exploration_rate', 0):.3f} | "
+                f"{data.get('construction_rate', 0):.3f} | "
+                f"{data.get('destruction_rate', 0):.3f} | "
                 f"{data.get('avg_backtracking', 0):.1f} |"
             )
     lines.append("")
@@ -1875,8 +1884,11 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
     ])
     
     # Generate recommendations based on data
-    if rq1 and rq1.get("difference", 0) > 0.1:
+    difference = rq1.get("difference", 0) if rq1 else 0
+    if difference > 0.1:
         lines.append("1. **Investigate Multi-Agent Patterns**: Single-agent significantly outperforms multi-agent. Check dagent pattern implementations for timeouts or incorrect command sequences.")
+    elif difference < -0.1:
+        lines.append("1. **Multi-Agent Advantage**: Multi-agent patterns outperform single-agent. Consider expanding multi-agent usage for similar tasks.")
     
     if cmd_analysis["by_type"].get("destructive", 0) > cmd_analysis["by_type"].get("constructive", 0) * 0.3:
         lines.append("2. **Reduce Destructive Commands**: High ratio of destructive commands (e.g., `no router ospf`) suggests agents are removing config before adding. Consider prompt engineering to prefer additive configuration.")
@@ -2180,11 +2192,11 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
             for j in range(len(patterns_present)):
                 val = matrix[i, j]
                 color = 'white' if val < 0.3 or val > 0.7 else 'black'
-                ax.text(j, i, f'{val:.0%}', ha='center', va='center', 
+                ax.text(j, i, f'{val:.2f}', ha='center', va='center', 
                        fontsize=8, fontweight='bold', color=color)
         
         cbar = plt.colorbar(im, ax=ax, shrink=0.8)
-        cbar.set_label('Satisfaction Rate', fontweight='bold')
+        cbar.set_label('Satisfaction Rate (0-1)', fontweight='bold')
         
         plt.tight_layout()
         chart_path = charts_dir / "property_heatmap.png"
@@ -2247,16 +2259,16 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
         ]
         
         for i, (metric_key, label, color) in enumerate(metrics):
-            values = [exploration["by_pattern"].get(p, {}).get(metric_key, 0) * 100 for p in patterns_present]
+            values = [exploration["by_pattern"].get(p, {}).get(metric_key, 0) for p in patterns_present]
             ax.bar(x + i * width, values, width, label=label, color=color, edgecolor='black', linewidth=0.5)
         
-        ax.set_ylabel('Rate (%)', fontweight='bold')
+        ax.set_ylabel('Rate', fontweight='bold')
         ax.set_xlabel('Agent Pattern', fontweight='bold')
         ax.set_title('Command Strategy by Pattern (RQ4: Exploration Patterns)')
         ax.set_xticks(x + width)
         ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
         ax.legend(loc='upper right', frameon=True, fancybox=False, edgecolor='black')
-        ax.set_ylim(0, 100)
+        ax.set_ylim(0, 1.0)
         
         plt.tight_layout()
         chart_path = charts_dir / "exploration_patterns.png"
@@ -2283,7 +2295,7 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
         for pattern in patterns_present:
             pattern_metrics = pattern_task_fit["pattern_x_task"].get(task_id, {}).get(pattern)
             if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
-                score = pattern_metrics.get("avg_final_score", 0) * 100  # Convert to percentage
+                score = pattern_metrics.get("avg_final_score", 0)  # Keep as 0-1 scale
                 complexity_data[pattern].append((complexity, score))
     
     # Create line plot
@@ -2303,11 +2315,11 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
                        linewidth=2, markersize=10, alpha=0.8)
         
         ax.set_xlabel('Task Complexity Score', fontweight='bold', fontsize=11)
-        ax.set_ylabel('Performance (%)', fontweight='bold', fontsize=11)
+        ax.set_ylabel('Final Score', fontweight='bold', fontsize=11)
         ax.set_title('Performance vs Task Complexity', fontsize=12, fontweight='bold', pad=15)
         ax.set_xticks([1, 2, 3])
         ax.set_xticklabels(['Basic\n(CCNA)', 'Intermediate\n(CCNP)', 'Expert\n(CCIE)'], fontsize=9)
-        ax.set_ylim(0, 100)
+        ax.set_ylim(0, 1.0)
         ax.grid(True, alpha=0.3, linestyle='--')
         ax.legend(loc='best', frameon=True, fancybox=False, edgecolor='0.8', fontsize=9)
         
@@ -2378,7 +2390,7 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
                 diff_data = pattern_task_fit["pattern_x_difficulty"].get(difficulty, {})
                 pattern_metrics = diff_data.get(pattern)
                 if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0:
-                    scores.append(pattern_metrics.get("avg_final_score", 0) * 100)
+                    scores.append(pattern_metrics.get("avg_final_score", 0))  # Keep as 0-1 scale
                 else:
                     scores.append(None)
             
@@ -2394,22 +2406,23 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
                        linewidth=2.5, markersize=10, alpha=0.85)
         
         ax.set_xlabel('Task Difficulty', fontweight='bold', fontsize=12)
-        ax.set_ylabel('Performance (%)', fontweight='bold', fontsize=12)
+        ax.set_ylabel('Final Score', fontweight='bold', fontsize=12)
         ax.set_title('Agent Performance Across Difficulty Levels', 
                     fontsize=13, fontweight='bold', pad=15)
         ax.set_xticks(x_pos)
         ax.set_xticklabels(['Basic', 'Intermediate', 'Expert'], fontsize=10)
-        ax.set_ylim(0, 100)
+        ax.set_ylim(0, 1.0)
         ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.8)
         ax.legend(loc='best', frameon=True, fancybox=False, edgecolor='0.8', 
                  fontsize=10, ncol=1)
         
-        # Add difficulty labels with task info
+        # Add difficulty labels with task info (use axis coords so layout is not broken)
         for i, (pos, diff) in enumerate(zip(x_pos, difficulties)):
             tasks_at_level = [t for t, m in TASK_METADATA.items() 
                             if m.get('difficulty') == diff]
-            ax.text(pos, -8, f'({len(tasks_at_level)} tasks)', 
-                   ha='center', va='top', fontsize=8, style='italic', color='gray')
+            ax.text(pos, -0.12, f'({len(tasks_at_level)} tasks)', 
+                   ha='center', va='top', fontsize=8, style='italic', color='gray',
+                   transform=ax.get_xaxis_transform())
         
         plt.tight_layout()
         chart_path = charts_dir / "difficulty_performance.png"
@@ -2525,8 +2538,8 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
     
     if depth_plotted:
         plt.xlabel("Sequential Depth")
-        plt.ylabel("Avg Final Score")
-        plt.title("Scaling Principle: Performance vs. Task Sequential Depth")
+        plt.ylabel("Success Rate")
+        plt.title("Scaling Principle: Success Rate vs. Task Sequential Depth")
         plt.legend()
         plt.grid(True, alpha=0.3)
         plt.ylim(-0.05, 1.05)
