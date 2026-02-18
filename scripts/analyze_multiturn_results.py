@@ -1476,6 +1476,44 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         
         lines.append(row)
     
+    # Turns by Task matrix
+    lines.extend([
+        "",
+        "### Pattern Performance Matrix (Turns by Task)",
+        "",
+        "| Task | Single | Sequential | Debate | Group Chat | Concurrent |",
+        "|------|--------|-----------|--------|-----------|-------------|",
+    ])
+    for task_id, metadata in sorted_tasks:
+        display_name = metadata.get('display_name', task_id)
+        row = f"| {display_name} |"
+        for pattern in pattern_order:
+            pattern_metrics = pattern_task_fit["pattern_x_task"].get(task_id, {}).get(pattern)
+            if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0 and pattern_metrics.get("avg_turns") is not None:
+                row += f" {pattern_metrics['avg_turns']:.1f} |"
+            else:
+                row += " - |"
+        lines.append(row)
+    
+    # Tokens by Task matrix
+    lines.extend([
+        "",
+        "### Pattern Performance Matrix (Tokens by Task)",
+        "",
+        "| Task | Single | Sequential | Debate | Group Chat | Concurrent |",
+        "|------|--------|-----------|--------|-----------|-------------|",
+    ])
+    for task_id, metadata in sorted_tasks:
+        display_name = metadata.get('display_name', task_id)
+        row = f"| {display_name} |"
+        for pattern in pattern_order:
+            pattern_metrics = pattern_task_fit["pattern_x_task"].get(task_id, {}).get(pattern)
+            if pattern_metrics and pattern_metrics.get("valid_count", 0) > 0 and pattern_metrics.get("avg_tokens") is not None:
+                row += f" {int(pattern_metrics['avg_tokens']):,} |"
+            else:
+                row += " - |"
+        lines.append(row)
+    
     lines.extend([
         "",
         "### Pattern Performance by Difficulty",
