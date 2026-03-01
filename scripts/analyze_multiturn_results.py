@@ -22,6 +22,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -99,17 +100,27 @@ def load_session_results(session_dir: Path) -> List[Dict[str, Any]]:
 
 
 def normalize_model_name(result: Dict) -> str:
-    """Extract and normalize model name from result."""
+    """Extract and normalize model name from result. Differentiates Qwen3 variants."""
     model = result.get("model_version") or ""
     
-    # Remove provider prefix if present
+    # Remove provider prefix if present (check case-insensitively)
+    model_lower = model.lower()
     for provider in ["ollama:", "openai:", "gemini:"]:
-        if model.lower().startswith(provider):
-            model = model[len(provider):]
+        if model_lower.startswith(provider):
+            model = model[len(provider):].strip()
+            model_lower = model.lower()
             break
             
     # Simplify long model names by removing date suffixes
     model = model.replace("-2025-08-07", "").replace("2025-08-07", "")
+    model_lower = model.lower()
+
+    # Differentiate Qwen3 variants for consistent display
+    if "qwen3-coder-next" in model_lower:
+        return "Qwen3-Coder-Next"
+    if "qwen3-coder" in model_lower:
+        match = re.search(r':(\d+b)', model_lower)
+        return f"Qwen3-Coder-{match.group(1)}" if match else "Qwen3-Coder"
     
     return model or "unknown"
 
@@ -1868,6 +1879,11 @@ def generate_report(session_dir: Path, results: List[Dict]) -> str:
         "",
         "Applying principles from frontier research to understand agent performance at scale.",
         "",
+        "### Context Management (Verbosity & Accumulation)",
+        "Studies how context accumulation (tokens, turns, thoughts) affects performance. Patterns that \"talk too much\" may increase tokens per turn and hurt scores.",
+        "",
+        "![Context Management](charts/context_management.png)",
+        "",
         "### Information Fragmentation (Context Loss)",
         "Measures how coordination overhead leads to redundant actions or conflicting configurations.",
         "",
@@ -1964,48 +1980,51 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
     if len(patterns_present) >= 2:
         fig, axes = plt.subplots(1, 2, figsize=(12, 5))
         
-        # Left: Score comparison
+        # Left: Score comparison (box plot)
         ax = axes[0]
-        scores = [compute_metrics(by_pattern[p])["avg_final_score"] for p in patterns_present]
-        stds = [compute_metrics(by_pattern[p]).get("std_final_score", 0) for p in patterns_present]
+        data = [[r.get("scoring", {}).get("final_score", 0) for r in by_pattern[p]] for p in patterns_present]
         colors = [COLORS.get(p, '#888888') for p in patterns_present]
-        
-        x = np.arange(len(patterns_present))
-        bars = ax.bar(x, scores, yerr=stds, color=colors, edgecolor='black', linewidth=0.8, capsize=4)
-        for bar, hatch in zip(bars, HATCHES):
-            bar.set_hatch(hatch)
-        
+        bp = ax.boxplot(data, patch_artist=True, notch=False, widths=0.5,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], colors):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        for i, (vals, color) in enumerate(zip(data, colors), 1):
+            jitter = np.random.normal(0, 0.05, len(vals))
+            ax.scatter([i] * len(vals) + jitter, vals, color=color, alpha=0.6, zorder=5,
+                       s=25, edgecolors='white', linewidths=0.5)
         ax.set_ylabel('Final Score', fontweight='bold')
         ax.set_xlabel('Agent Pattern', fontweight='bold')
         ax.set_title('Score by Agent Pattern')
-        ax.set_xticks(x)
+        ax.set_xticks(range(1, len(patterns_present) + 1))
         ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
-        ax.set_ylim(0, 1.0)
-        ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5, label='50% threshold')
+        ax.set_ylim(-0.05, 1.05)
+        ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5)
         
-        for bar, val in zip(bars, scores):
-            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.03, 
-                   f'{val:.2f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
-        
-        # Right: Turns comparison
+        # Right: Turns comparison (box plot)
         ax = axes[1]
-        turns = [compute_metrics(by_pattern[p]).get("avg_turns", 0) for p in patterns_present]
-        turns_std = [compute_metrics(by_pattern[p]).get("std_turns", 0) for p in patterns_present]
-        
-        bars = ax.bar(x, turns, yerr=turns_std, color=colors, edgecolor='black', linewidth=0.8, capsize=4)
-        for bar, hatch in zip(bars, HATCHES):
-            bar.set_hatch(hatch)
-        
+        turns_data = [[r.get("metrics", {}).get("turns_to_complete", 0) for r in by_pattern[p]
+                      if r.get("metrics", {}).get("turns_to_complete") is not None] for p in patterns_present]
+        turns_data = [d if d else [0] for d in turns_data]
+        bp = ax.boxplot(turns_data, patch_artist=True, notch=False, widths=0.5,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], colors):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        for i, (vals, color) in enumerate(zip(turns_data, colors), 1):
+            if vals:
+                jitter = np.random.normal(0, 0.05, len(vals))
+                ax.scatter([i] * len(vals) + jitter, vals, color=color, alpha=0.6, zorder=5,
+                           s=25, edgecolors='white', linewidths=0.5)
         ax.set_ylabel('Turns to Complete', fontweight='bold')
         ax.set_xlabel('Agent Pattern', fontweight='bold')
         ax.set_title('Efficiency: Turns Required')
-        ax.set_xticks(x)
+        ax.set_xticks(range(1, len(patterns_present) + 1))
         ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
-        
-        for bar, val in zip(bars, turns):
-            if val > 0:
-                ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1, 
-                       f'{val:.0f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
         
         plt.tight_layout()
         chart_path = charts_dir / "pattern_comparison.png"
@@ -2015,30 +2034,31 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
     
     # ========== Chart 2: Model Comparison ==========
     if len(by_model) >= 2:
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(max(8, len(by_model) * 1.8), 5))
         
         models = sorted(by_model.keys())
-        scores = [compute_metrics(by_model[m])["avg_final_score"] for m in models]
-        stds = [compute_metrics(by_model[m]).get("std_final_score", 0) for m in models]
-        
-        x = np.arange(len(models))
+        data = [[r.get("scoring", {}).get("final_score", 0) for r in by_model[m]] for m in models]
         model_colors = [COLORS.get('gpt', '#74AA9C') if 'gpt' in m.lower() else COLORS.get('gemini', '#4285F4') for m in models]
         
-        bars = ax.bar(x, scores, yerr=stds, color=model_colors, edgecolor='black', linewidth=0.8, capsize=5)
-        for bar, hatch in zip(bars, HATCHES):
-            bar.set_hatch(hatch)
+        bp = ax.boxplot(data, patch_artist=True, notch=False, widths=0.5,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], model_colors):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        for i, (vals, color) in enumerate(zip(data, model_colors), 1):
+            jitter = np.random.normal(0, 0.05, len(vals))
+            ax.scatter([i] * len(vals) + jitter, vals, color=color, alpha=0.6, zorder=5,
+                       s=25, edgecolors='white', linewidths=0.5)
         
-        ax.set_ylabel('Avg Final Score', fontweight='bold')
+        ax.set_ylabel('Final Score', fontweight='bold')
         ax.set_xlabel('Model', fontweight='bold')
         ax.set_title('Model Performance Comparison')
-        ax.set_xticks(x)
-        ax.set_xticklabels(models, fontsize=10, fontweight='bold')
-        ax.set_ylim(0, 1.0)
+        ax.set_xticks(range(1, len(models) + 1))
+        ax.set_xticklabels(models, fontsize=10, fontweight='bold', rotation=20, ha='right')
+        ax.set_ylim(-0.05, 1.05)
         ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5)
-        
-        for bar, val in zip(bars, scores):
-            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.03, 
-                   f'{val:.3f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
         
         plt.tight_layout()
         chart_path = charts_dir / "model_comparison.png"
@@ -2052,44 +2072,60 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
         
         tasks = sorted(by_task.keys())
         task_labels = [t.replace('_', '\n') for t in tasks]
+        task_colors = plt.cm.Blues(np.linspace(0.4, 0.8, len(tasks)))
         
-        # Left: Score by task
+        # Left: Score by task (box plot)
         ax = axes[0]
-        scores = [compute_metrics(by_task[t])["avg_final_score"] for t in tasks]
-        stds = [compute_metrics(by_task[t]).get("std_final_score", 0) for t in tasks]
-        
-        x = np.arange(len(tasks))
-        colors = plt.cm.Blues(np.linspace(0.4, 0.8, len(tasks)))
-        
-        bars = ax.bar(x, scores, yerr=stds, color=colors, edgecolor='black', linewidth=0.8, capsize=4)
-        
+        data = [[r.get("scoring", {}).get("final_score", 0) for r in by_task[t]] for t in tasks]
+        bp = ax.boxplot(data, patch_artist=True, notch=False, widths=0.5,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], task_colors):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        for i, (vals, color) in enumerate(zip(data, task_colors), 1):
+            jitter = np.random.normal(0, 0.05, len(vals))
+            ax.scatter([i] * len(vals) + jitter, vals, color=color, alpha=0.6, zorder=5,
+                       s=25, edgecolors='white', linewidths=0.5)
         ax.set_ylabel('Final Score', fontweight='bold')
         ax.set_xlabel('Task', fontweight='bold')
         ax.set_title('Score by Task')
-        ax.set_xticks(x)
+        ax.set_xticks(range(1, len(tasks) + 1))
         ax.set_xticklabels(task_labels, fontsize=9)
-        ax.set_ylim(0, 1.0)
+        ax.set_ylim(-0.05, 1.05)
         
-        for bar, val in zip(bars, scores):
-            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.03, 
-                   f'{val:.2f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
-        
-        # Right: Completeness by task
+        # Right: Completeness vs Robustness by task (grouped box plot)
         ax = axes[1]
-        comp = [compute_metrics(by_task[t])["avg_completeness"] for t in tasks]
-        rob = [compute_metrics(by_task[t])["avg_robustness"] for t in tasks]
-        
-        width = 0.35
-        bars1 = ax.bar(x - width/2, comp, width, label='Completeness', color='#2E86AB', edgecolor='black')
-        bars2 = ax.bar(x + width/2, rob, width, label='Robustness', color='#A23B72', edgecolor='black')
-        
+        comp_data = [[r.get("scoring", {}).get("completeness", 0) for r in by_task[t]] for t in tasks]
+        rob_data = [[r.get("scoring", {}).get("robustness", 0) for r in by_task[t]] for t in tasks]
+        n = len(tasks)
+        positions = []
+        all_data = []
+        colors_list = []
+        for i in range(n):
+            positions.append(2 * i + 1)
+            all_data.append(comp_data[i])
+            colors_list.append('#2E86AB')
+        for i in range(n):
+            positions.append(2 * i + 2)
+            all_data.append(rob_data[i])
+            colors_list.append('#A23B72')
+        bp = ax.boxplot(all_data, positions=positions, widths=0.6, patch_artist=True,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], colors_list):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        ax.set_xticks([2 * i + 1.5 for i in range(n)])
+        ax.set_xticklabels(task_labels, fontsize=9)
         ax.set_ylabel('Score', fontweight='bold')
         ax.set_xlabel('Task', fontweight='bold')
         ax.set_title('Completeness vs Robustness by Task')
-        ax.set_xticks(x)
-        ax.set_xticklabels(task_labels, fontsize=9)
-        ax.set_ylim(0, 1.0)
-        ax.legend(loc='upper right', frameon=True, fancybox=False, edgecolor='black')
+        ax.set_ylim(-0.05, 1.05)
+        ax.legend([mpatches.Patch(color='#2E86AB', alpha=0.7), mpatches.Patch(color='#A23B72', alpha=0.7)],
+                  ['Completeness', 'Robustness'], loc='upper right')
         
         plt.tight_layout()
         chart_path = charts_dir / "task_breakdown.png"
@@ -2148,23 +2184,19 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
         
         error_rates = [error_analysis["error_rate_by_pattern"].get(p, 0) * 100 for p in patterns_present]
         colors = [COLORS.get(p, '#888888') for p in patterns_present]
-        
         x = np.arange(len(patterns_present))
         bars = ax.bar(x, error_rates, color=colors, edgecolor='black', linewidth=0.8)
         for bar, hatch in zip(bars, HATCHES):
             bar.set_hatch(hatch)
-        
         ax.set_ylabel('Error Rate (%)', fontweight='bold')
         ax.set_xlabel('Agent Pattern', fontweight='bold')
         ax.set_title('Error Rate by Agent Pattern')
         ax.set_xticks(x)
         ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
         ax.set_ylim(0, 100)
-        
         for bar, val in zip(bars, error_rates):
             ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2, 
                    f'{val:.0f}%', ha='center', va='bottom', fontsize=9, fontweight='bold')
-        
         plt.tight_layout()
         chart_path = charts_dir / "error_rates.png"
         plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
@@ -2174,25 +2206,41 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
     # ========== NEW Chart 6: Command Type Distribution ==========
     cmd_analysis = analyze_execution_logs(results)
     if cmd_analysis.get("total_commands", 0) > 0 and len(patterns_present) >= 2:
-        fig, ax = plt.subplots(figsize=(10, 5))
+        fig, ax = plt.subplots(figsize=(max(10, len(patterns_present) * 2.5), 5))
         
         cmd_types = ["constructive", "diagnostic", "destructive"]
-        x = np.arange(len(patterns_present))
-        width = 0.25
-        
         type_colors = {'constructive': '#2E86AB', 'diagnostic': '#74AA9C', 'destructive': '#C73E1D'}
-        
-        for i, cmd_type in enumerate(cmd_types):
-            counts = [cmd_analysis["by_pattern"].get(p, {}).get(cmd_type, 0) for p in patterns_present]
-            bars = ax.bar(x + i * width, counts, width, label=cmd_type.capitalize(), 
-                         color=type_colors[cmd_type], edgecolor='black', linewidth=0.5)
-        
-        ax.set_ylabel('Command Count', fontweight='bold')
+        n_patterns = len(patterns_present)
+        n_types = len(cmd_types)
+        positions = []
+        all_data = []
+        colors_list = []
+        for i, pattern in enumerate(patterns_present):
+            pattern_results = by_pattern[pattern]
+            for j, cmd_type in enumerate(cmd_types):
+                counts = []
+                for r in pattern_results:
+                    parsed = parse_execution_log(r)
+                    counts.append(sum(1 for e in parsed if e["type"] == cmd_type))
+                pos = i * (n_types + 1) + j + 1
+                positions.append(pos)
+                all_data.append(counts if counts else [0])
+                colors_list.append(type_colors[cmd_type])
+        bp = ax.boxplot(all_data, positions=positions, widths=0.6, patch_artist=True,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], colors_list):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        tick_pos = [i * (n_types + 1) + (n_types + 1) / 2 for i in range(n_patterns)]
+        ax.set_xticks(tick_pos)
+        ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
+        ax.set_ylabel('Command Count per Run', fontweight='bold')
         ax.set_xlabel('Agent Pattern', fontweight='bold')
         ax.set_title('Command Type Distribution by Pattern')
-        ax.set_xticks(x + width)
-        ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
-        ax.legend(loc='upper right', frameon=True, fancybox=False, edgecolor='black')
+        ax.legend([mpatches.Patch(color=type_colors[t], alpha=0.7) for t in cmd_types],
+                  [t.capitalize() for t in cmd_types], loc='upper right')
         
         plt.tight_layout()
         chart_path = charts_dir / "command_distribution.png"
@@ -2285,28 +2333,54 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
     # ========== NEW Chart 9: Exploration Patterns ==========
     exploration = analyze_exploration_patterns(results)
     if exploration["by_pattern"] and len(patterns_present) >= 2:
-        fig, ax = plt.subplots(figsize=(10, 5))
-        
-        x = np.arange(len(patterns_present))
-        width = 0.2
+        fig, ax = plt.subplots(figsize=(max(10, len(patterns_present) * 2.5), 5))
         
         metrics = [
             ("exploration_rate", "Exploration (Diagnostic)", "#74AA9C"),
             ("construction_rate", "Construction", "#2E86AB"),
             ("destruction_rate", "Destruction", "#C73E1D"),
         ]
-        
-        for i, (metric_key, label, color) in enumerate(metrics):
-            values = [exploration["by_pattern"].get(p, {}).get(metric_key, 0) for p in patterns_present]
-            ax.bar(x + i * width, values, width, label=label, color=color, edgecolor='black', linewidth=0.5)
-        
+        n_patterns = len(patterns_present)
+        n_metrics = len(metrics)
+        positions, all_data, colors_list = [], [], []
+        for i, pattern in enumerate(patterns_present):
+            pattern_results = by_pattern[pattern]
+            for j, (metric_key, _, color) in enumerate(metrics):
+                rates = []
+                for r in pattern_results:
+                    parsed = parse_execution_log(r)
+                    total = len(parsed)
+                    if total == 0:
+                        rates.append(0)
+                    elif metric_key == "exploration_rate":
+                        diag = sum(1 for e in parsed if e["type"] == "diagnostic")
+                        rates.append(diag / total)
+                    elif metric_key == "construction_rate":
+                        const = sum(1 for e in parsed if e["type"] == "constructive")
+                        rates.append(const / total)
+                    else:  # destruction_rate
+                        dest = sum(1 for e in parsed if e["type"] == "destructive")
+                        rates.append(dest / total)
+                pos = i * (n_metrics + 1) + j + 1
+                positions.append(pos)
+                all_data.append(rates if rates else [0])
+                colors_list.append(color)
+        bp = ax.boxplot(all_data, positions=positions, widths=0.6, patch_artist=True,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], colors_list):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        tick_pos = [i * (n_metrics + 1) + (n_metrics + 1) / 2 for i in range(n_patterns)]
+        ax.set_xticks(tick_pos)
+        ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
         ax.set_ylabel('Rate', fontweight='bold')
         ax.set_xlabel('Agent Pattern', fontweight='bold')
         ax.set_title('Command Strategy by Pattern (RQ4: Exploration Patterns)')
-        ax.set_xticks(x + width)
-        ax.set_xticklabels([p.replace('_', '\n') for p in patterns_present], fontsize=9)
-        ax.legend(loc='upper right', frameon=True, fancybox=False, edgecolor='black')
-        ax.set_ylim(0, 1.0)
+        ax.legend([mpatches.Patch(color=m[2], alpha=0.7) for m in metrics],
+                  [m[1] for m in metrics], loc='upper right')
+        ax.set_ylim(-0.05, 1.05)
         
         plt.tight_layout()
         chart_path = charts_dir / "exploration_patterns.png"
@@ -2514,36 +2588,107 @@ def generate_charts(session_dir: Path, results: List[Dict]) -> List[Path]:
     if len(patterns_present) >= 2:
         fig, ax = plt.subplots(figsize=(8, 6))
         
-        avg_tokens = []
-        token_stds = []
-        
+        data = []
         for pattern in patterns_present:
-            m = compute_metrics(by_pattern[pattern])
-            avg_tokens.append(m.get("avg_tokens", 0))
-            token_stds.append(m.get("std_tokens", 0))
-            
-        x = np.arange(len(patterns_present))
+            tokens = []
+            for r in by_pattern[pattern]:
+                usage = r.get("metrics", {}).get("token_usage", {})
+                t = usage.get("total_tokens") if usage else None
+                if t and t > 0:
+                    tokens.append(t)
+            data.append(tokens if tokens else [0])
         colors = [COLORS.get(p, '#888888') for p in patterns_present]
-        
-        bars = ax.bar(x, avg_tokens, yerr=token_stds, color=colors, edgecolor='black', linewidth=0.8, capsize=4)
-        for bar, hatch in zip(bars, HATCHES):
-            bar.set_hatch(hatch)
-            
-        ax.set_ylabel('Average Tokens Consumed', fontweight='bold', fontsize=11)
+        bp = ax.boxplot(data, patch_artist=True, notch=False, widths=0.5,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], colors):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        for i, (vals, color) in enumerate(zip(data, colors), 1):
+            valid = [v for v in vals if v > 0]
+            if valid:
+                jitter = np.random.normal(0, 0.05, len(valid))
+                ax.scatter([i] * len(valid) + jitter, valid, color=color, alpha=0.6, zorder=5,
+                           s=25, edgecolors='white', linewidths=0.5)
+        ax.set_ylabel('Tokens Consumed per Run', fontweight='bold', fontsize=11)
         ax.set_xlabel('Agent Pattern', fontweight='bold', fontsize=11)
-        ax.set_title('Average Token Consumption by Pattern', fontsize=12, fontweight='bold', pad=15)
-        ax.set_xticks(x)
+        ax.set_title('Token Consumption by Pattern', fontsize=12, fontweight='bold', pad=15)
+        ax.set_xticks(range(1, len(patterns_present) + 1))
         ax.set_xticklabels([p.replace('_', '\n').title() for p in patterns_present], fontsize=9)
         ax.grid(True, alpha=0.3, axis='y', linestyle='--')
         
-        # Add value labels on top of bars
-        for i, (bar, val) in enumerate(zip(bars, avg_tokens)):
-            if val > 0:
-                ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + token_stds[i] * 0.1 + 1000, 
-                       f'{val:,.0f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
-        
         plt.tight_layout()
         chart_path = charts_dir / "avg_tokens_by_pattern.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
+        chart_paths.append(chart_path)
+
+    # ========== Chart 14b: Context Management — Verbosity and Accumulation Impact ==========
+    # Studies how context (turns, tokens) affects performance; patterns that "talk too much"
+    tpt_data, tpt_scores, tpt_patterns = [], [], []
+    for r in results:
+        usage = r.get("metrics", {}).get("token_usage")
+        turns = r.get("metrics", {}).get("turns_to_complete")
+        tokens = usage.get("total_tokens") if usage else None
+        if tokens and turns and turns > 0:
+            mode, structure = extract_agent_config(r)
+            pattern = "single" if mode == "single" else structure
+            tpt_data.append(tokens / turns)
+            tpt_scores.append(r.get("scoring", {}).get("final_score", 0))
+            tpt_patterns.append(pattern)
+
+    if tpt_data and len(patterns_present) >= 2:
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+        # Left: Tokens per turn (verbosity) by pattern — who talks too much?
+        ax = axes[0]
+        tpt_by_pattern = {p: [] for p in patterns_present}
+        for tpt, pat in zip(tpt_data, tpt_patterns):
+            if pat in tpt_by_pattern:
+                tpt_by_pattern[pat].append(tpt)
+        data = [tpt_by_pattern[p] if tpt_by_pattern[p] else [0] for p in patterns_present]
+        colors = [COLORS.get(p, '#888888') for p in patterns_present]
+        bp = ax.boxplot(data, patch_artist=True, notch=False, widths=0.5,
+                        medianprops=dict(color='black', linewidth=2),
+                        whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5),
+                        flierprops=dict(marker='o', markersize=4, alpha=0.5))
+        for patch, color in zip(bp['boxes'], colors):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        for i, (vals, color) in enumerate(zip(data, colors), 1):
+            valid = [v for v in vals if v > 0]
+            if valid:
+                jitter = np.random.normal(0, 0.05, len(valid))
+                ax.scatter([i] * len(valid) + jitter, valid, color=color, alpha=0.6, zorder=5,
+                           s=25, edgecolors='white', linewidths=0.5)
+        ax.set_xticks(range(1, len(patterns_present) + 1))
+        ax.set_xticklabels([p.replace('_', '\n').title() for p in patterns_present], fontsize=9)
+        ax.set_ylabel('Tokens per Turn (Verbosity)', fontweight='bold')
+        ax.set_title('Context Accumulation Rate by Pattern\n(high = more thoughts/history per turn)')
+        ax.grid(True, alpha=0.3, axis='y')
+
+        # Right: Score vs tokens-per-turn — does verbosity hurt performance?
+        ax = axes[1]
+        for pattern in patterns_present:
+            idx = [i for i, p in enumerate(tpt_patterns) if p == pattern]
+            if idx:
+                tpt_vals = [tpt_data[i] for i in idx]
+                scores_vals = [tpt_scores[i] for i in idx]
+                ax.scatter(tpt_vals, scores_vals, c=COLORS.get(pattern, '#888888'),
+                          label=pattern.replace('_', ' ').title(), s=60, alpha=0.7, edgecolors='black')
+        ax.set_xlabel('Tokens per Turn (Verbosity)', fontweight='bold')
+        ax.set_ylabel('Final Score', fontweight='bold')
+        ax.set_title('Performance vs Verbosity\n(does context bloat hurt score?)')
+        ax.legend(fontsize=8)
+        ax.set_ylim(-0.05, 1.05)
+        ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5)
+        ax.grid(True, alpha=0.3)
+
+        fig.suptitle('Context Management: How context accumulation affects performance',
+                     fontsize=12, fontweight='bold', y=1.02)
+        plt.tight_layout()
+        chart_path = charts_dir / "context_management.png"
         plt.savefig(chart_path, dpi=300, bbox_inches='tight', facecolor='white')
         plt.close()
         chart_paths.append(chart_path)
