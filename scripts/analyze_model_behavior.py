@@ -50,6 +50,8 @@ plt.rcParams.update({
 MODEL_COLORS = {
     'GPT-5':    '#74AA9C', 'GPT-4':    '#A1C3BA',
     'Gemini-3': '#4285F4', 'Gemini-2': '#8AB4F8',
+    'Llama-3.3':'#0064E0', 'Qwen-3':   '#722ED1',
+    'Qwen3-Coder-Next': '#9B59B6', 'Qwen3-Coder-30b': '#8E44AD',
     'Llama-3.3':'#0064E0', 'Qwen3-Coder': '#722ED1', 'Qwen3-Coder-Next': '#B37FEB',
     'Kimi-K2.5':'#F5222D',
 }
@@ -633,6 +635,113 @@ def plot_convergence_cost(profiles: List[Dict], models: List[str], out: Path) ->
     plt.close(fig)
 
 
+def plot_context_vs_performance(profiles: List[Dict], models: List[str], out: Path) -> None:
+    """Figure 9: Context management — performance vs context size and turns."""
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Left: Score vs total tokens (context size at completion)
+    ax = axes[0]
+    for m in models:
+        ps = [p for p in profiles if p["model"] == m and p["total_tokens"] > 0]
+        if not ps:
+            continue
+        xs = [p["total_tokens"] / 1000 for p in ps]
+        ys = [p["final_score"] for p in ps]
+        ax.scatter(xs, ys, label=m, color=model_color(m), alpha=0.65, s=50,
+                   edgecolors='white', linewidths=0.5)
+    ax.set_xlabel("Total Context (K tokens)")
+    ax.set_ylabel("Final Score")
+    ax.set_title("Score vs Context Size (as it accumulates)")
+    ax.legend(fontsize=8)
+    ax.set_ylim(-0.05, 1.05)
+    ax.axhline(0.5, linestyle='--', color='gray', alpha=0.4)
+
+    # Right: Score vs turns (context length via interaction depth)
+    ax = axes[1]
+    for m in models:
+        ps = [p for p in profiles if p["model"] == m and p["turns"] > 0]
+        if not ps:
+            continue
+        xs = [p["turns"] for p in ps]
+        ys = [p["final_score"] for p in ps]
+        ax.scatter(xs, ys, label=m, color=model_color(m), alpha=0.65, s=50,
+                   edgecolors='white', linewidths=0.5)
+    ax.set_xlabel("Turns to Complete (history length)")
+    ax.set_ylabel("Final Score")
+    ax.set_title("Score vs Turn Count (context accumulation)")
+    ax.legend(fontsize=8)
+    ax.set_ylim(-0.05, 1.05)
+    ax.axhline(0.5, linestyle='--', color='gray', alpha=0.4)
+
+    fig.suptitle("Context Management: Does accumulated context affect performance?",
+                 fontsize=12, fontweight='bold', y=1.02)
+    fig.tight_layout()
+    fig.savefig(out / "fig9_context_vs_performance.png")
+    plt.close(fig)
+
+
+def plot_context_verbosity_efficiency(profiles: List[Dict], models: List[str], out: Path) -> None:
+    """Figure 10: Tokens per turn (verbosity) vs score — do verbose runs perform differently?"""
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Left: Tokens per turn vs score scatter by model
+    ax = axes[0]
+    for m in models:
+        ps = [p for p in profiles if p["model"] == m and p["turns"] > 0 and p["total_tokens"] > 0]
+        if not ps:
+            continue
+        tpt = [p["tokens_per_turn"] for p in ps]
+        ys = [p["final_score"] for p in ps]
+        ax.scatter(tpt, ys, label=m, color=model_color(m), alpha=0.65, s=50,
+                   edgecolors='white', linewidths=0.5)
+    ax.set_xlabel("Tokens per Turn (verbosity)")
+    ax.set_ylabel("Final Score")
+    ax.set_title("Score vs Verbosity (tokens/turn)")
+    ax.legend(fontsize=8)
+    ax.set_ylim(-0.05, 1.05)
+    ax.axhline(0.5, linestyle='--', color='gray', alpha=0.4)
+
+    # Right: Binned context size — mean score per bin
+    ax = axes[1]
+    all_tokens = [p["total_tokens"] / 1000 for p in profiles if p["total_tokens"] > 0]
+    if all_tokens:
+        bins = [0, 25, 50, 100, 200, 500, 10000]  # 500K+ catches large contexts
+        bin_labels = ["0–25K", "25–50K", "50–100K", "100–200K", "200–500K", "500K+"]
+        for m in models:
+            ps = [p for p in profiles if p["model"] == m and p["total_tokens"] > 0]
+            if not ps:
+                continue
+            bin_means, bin_stds, bin_counts = [], [], []
+            for i in range(len(bins) - 1):
+                in_bin = [p for p in ps if bins[i] <= p["total_tokens"] / 1000 < bins[i + 1]]
+                if in_bin:
+                    bin_means.append(np.mean([p["final_score"] for p in in_bin]))
+                    bin_stds.append(np.std([p["final_score"] for p in in_bin]))
+                    bin_counts.append(len(in_bin))
+                else:
+                    bin_means.append(np.nan)
+                    bin_stds.append(0)
+                    bin_counts.append(0)
+            x = np.arange(len(bin_labels))
+            valid = ~np.isnan(bin_means)
+            if np.any(valid):
+                ax.plot(x[valid], np.array(bin_means)[valid], 'o-', label=m,
+                        color=model_color(m), linewidth=2, markersize=8)
+        ax.set_xticks(range(len(bin_labels)))
+        ax.set_xticklabels(bin_labels, rotation=20, ha='right')
+        ax.set_xlabel("Context Size Bin (tokens)")
+        ax.set_ylabel("Mean Final Score")
+        ax.set_title("Performance by Context Size Bin")
+        ax.legend(fontsize=8)
+        ax.set_ylim(-0.05, 1.05)
+
+    fig.suptitle("Context Management: Verbosity and context-size bins",
+                 fontsize=12, fontweight='bold', y=1.02)
+    fig.tight_layout()
+    fig.savefig(out / "fig10_context_verbosity.png")
+    plt.close(fig)
+
+
 # ─── Statistical Tests ─────────────────────────────────────────────────────────
 
 def run_statistical_tests(profiles: List[Dict], models: List[str]) -> List[Dict]:
@@ -731,6 +840,8 @@ def main():
             "total_tokens": agg([p["total_tokens"] for p in ps]),
             "eff_score_1k": agg([p["score_per_1k_tokens"] for p in ps if p["total_tokens"] > 0]),
             "exec_time":    agg([p["exec_time"] for p in ps if p["exec_time"] > 0]),
+            "tokens_per_turn": agg([p["tokens_per_turn"] for p in ps if p["turns"] > 0 and p["total_tokens"] > 0]),
+            "prompt_tokens":   agg([p["prompt_tokens"] for p in ps if p.get("prompt_tokens", 0) > 0]),
         }
 
     # ── Print summary table ─────────────────────────────────────────────────
@@ -762,6 +873,10 @@ def main():
     print("  ✓ fig7_command_analysis.png")
     plot_convergence_cost(profiles, models, out)
     print("  ✓ fig8_convergence_cost.png")
+    plot_context_vs_performance(profiles, models, out)
+    print("  ✓ fig9_context_vs_performance.png")
+    plot_context_verbosity_efficiency(profiles, models, out)
+    print("  ✓ fig10_context_verbosity.png")
 
     # ── Statistical tests ────────────────────────────────────────────────────
     stat_rows = run_statistical_tests(profiles, models)
@@ -882,6 +997,12 @@ def main():
 
 ### Fig 8 – Convergence Cost Curves
 ![Convergence Cost](fig8_convergence_cost.png)
+
+### Fig 9 – Context vs Performance (context accumulation impact)
+![Context vs Performance](fig9_context_vs_performance.png)
+
+### Fig 10 – Context Verbosity & Size Bins
+![Context Verbosity](fig10_context_verbosity.png)
 
 ---
 

@@ -11,11 +11,10 @@ echo "============================================================"
 echo "Starting Background Study Session"
 echo "============================================================"
 
-# Handing existing dagent processes
-if pgrep -f "uvicorn dagent.main:app" > /dev/null; then
-    echo "Warning: dagent server seems to be running already."
-    echo "Please kill it first if you want to restart it from this script."
-    # Optional: pkill -f "uvicorn dagent.main:app"
+# Use port 8000 as source of truth (study expects dagent on 8000)
+DAGENT_PORT=8000
+if ss -tlnp 2>/dev/null | grep -q ":${DAGENT_PORT}[^0-9]" || netstat -tlnp 2>/dev/null | grep -q ":${DAGENT_PORT}[^0-9]"; then
+    echo "dagent already listening on port ${DAGENT_PORT}; skipping server start."
 else
     echo "Starting dagent server in background..."
     echo "  > Log: ${DAGENT_LOG}"
@@ -49,8 +48,12 @@ echo ""
 echo "Starting benchmark study in background..."
 echo "  > Log: ${LOG_FILE}"
 
-# Run study in background
-nohup ${STUDY_SCRIPT} > "${LOG_FILE}" 2>&1 &
+# Run study in its own process group so stopping kills shell + all children (benchmark, MCP on 8001)
+if command -v setsid >/dev/null 2>&1; then
+    setsid nohup ${STUDY_SCRIPT} > "${LOG_FILE}" 2>&1 &
+else
+    nohup ${STUDY_SCRIPT} > "${LOG_FILE}" 2>&1 &
+fi
 STUDY_PID=$!
 echo "${STUDY_PID}" > study.pid
 
@@ -62,6 +65,7 @@ echo "To monitor:"
 echo "  tail -f ${LOG_FILE}"
 echo "  tail -f ${DAGENT_LOG}"
 echo ""
-echo "To stop:"
-echo "  kill \$(cat study.pid dagent.pid 2>/dev/null) # Or use pkill -f \"run_comparative_multiturn_study.sh\""
+echo "To stop (kills study + all benchmark children, e.g. MCP on 8001):"
+echo "  kill -TERM -\$(cat study.pid 2>/dev/null) 2>/dev/null; kill \$(cat dagent.pid 2>/dev/null) 2>/dev/null"
+echo "  # If no setsid: pkill -f run_comparative_multiturn_study.sh; pkill -f 'benchmark run-task'; kill \$(cat dagent.pid 2>/dev/null)"
 echo "============================================================"

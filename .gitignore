@@ -76,3 +76,5 @@ dmypy.json
 
 results/
 .agent/
+
+*.pid

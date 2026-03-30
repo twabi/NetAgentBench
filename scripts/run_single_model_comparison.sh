@@ -12,7 +12,7 @@ TURN_LIMIT=100
 TIME_LIMIT=1800  # 30 minutes
 CONTEXT_LENGTH=120000
 # Repetitions per configuration
-REPETITIONS=3
+REPETITIONS=2
 
 # Multi-turn tasks
 TASKS=(
@@ -28,15 +28,15 @@ AGENT_CONFIGS=(
 
 # Models to test (provider:model)
 MODELS=(
-    "ollama:qwen3-coder:30b"
-    "ollama:kimi-k2.5:cloud"
-    "ollama:llama3.3:70b"
-    "openai:gpt-5-2025-08-07"
+    #"ollama:qwen3-coder:30b"
+    #"ollama:kimi-k2.5:cloud"
+    #"ollama:llama3.3:70b"
+    #"openai:gpt-5-2025-08-07"
     "gemini:gemini-3-pro-preview"
 )
 
 # Create dated session folder
-SESSION_NAME="comparative_study_$(date +%Y%m%d_%H%M%S)"
+SESSION_NAME="single_model_study_$(date +%Y%m%d_%H%M%S)"
 OUTPUT_DIR="results/single_study/${SESSION_NAME}"
 mkdir -p "${OUTPUT_DIR}/runs"
 
@@ -168,5 +168,5 @@ echo ""
 echo "Results saved to: ${OUTPUT_DIR}"
 echo ""
 echo "To analyze:"
-echo "  python scripts/analyze_multiturn_results.py ${OUTPUT_DIR}"
+echo "  python scripts/analyze_model_behavior.py ${OUTPUT_DIR}"
 echo ""

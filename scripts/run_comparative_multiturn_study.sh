@@ -37,10 +37,10 @@ AGENT_CONFIGS=(
 
 # Models to test (provider:model)
 MODELS=(
-    #"ollama:qwen3-coder:30b"
-    #"ollama:kimi-k2.5:cloud"
-    "openai:gpt-5-nano-2025-08-07"
-    #"gemini:gemini-3-flash-preview"
+    "ollama:qwen3-coder-next:latest"
+    "ollama:qwen3-coder:30b"
+    "ollama:llama3.3:70b"
+    "openai:gpt-5-mini-2025-08-07"
 )
 
 # Create dated session folder
