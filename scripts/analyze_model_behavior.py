@@ -50,7 +50,7 @@ plt.rcParams.update({
 MODEL_COLORS = {
     'GPT-5':    '#74AA9C', 'GPT-4':    '#A1C3BA',
     'Gemini-3': '#4285F4', 'Gemini-2': '#8AB4F8',
-    'Llama-3.3':'#0064E0', 'Qwen-3':   '#722ED1',
+    'Llama-3.3':'#0064E0', 'Qwen3-Coder': '#722ED1', 'Qwen3-Coder-Next': '#B37FEB',
     'Kimi-K2.5':'#F5222D',
 }
 DEFAULT_COLOR = '#888888'
@@ -68,7 +68,7 @@ TASK_METADATA = {
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
-def load_results(session_dir: Path) -> List[Dict]:
+def load_results(session_dir: Path, single_only: bool = False) -> List[Dict]:
     results = []
     runs_dir = session_dir / "runs"
     if not runs_dir.exists():
@@ -78,7 +78,12 @@ def load_results(session_dir: Path) -> List[Dict]:
             continue
         try:
             with open(f) as fh:
-                results.append(json.load(fh))
+                data = json.load(fh)
+                if single_only:
+                    testee_id = data.get("testee_id", "")
+                    if "single" not in testee_id.lower():
+                        continue
+                results.append(data)
         except Exception:
             continue
     return results
@@ -92,7 +97,12 @@ def normalize_model_name(result: Dict) -> str:
     if "gemini-3" in model: return "Gemini-3"
     if "gemini-2" in model: return "Gemini-2"
     if "llama3.3" in model or "llama-3.3" in model: return "Llama-3.3"
-    if "qwen3" in model:    return "Qwen-3"
+    if "qwen3" in model:
+        if "codernext" in model or "coder-next" in model:
+            return "Qwen3-Coder-Next"
+        if "qwen3-coder" in model or "coder:30b" in model:
+            return "Qwen3-Coder"
+        return "Qwen3-Coder"  # fallback for other qwen3
     if "kimi" in model:     return "Kimi-K2.5"
     return model
 
@@ -240,6 +250,22 @@ def detect_meltdowns(result: Dict) -> Dict:
     return {"meltdown_detected": len(signals) > 0, "signals": signals}
 
 
+def _pattern_from_testee(testee_id: str) -> str:
+    """Map testee_id to pattern name (single, sequential, debate, group_chat, concurrent)."""
+    t = (testee_id or "").lower()
+    if "_multi_sequential" in t:
+        return "sequential"
+    if "_multi_debate" in t:
+        return "debate"
+    if "_multi_group_chat" in t:
+        return "group_chat"
+    if "_multi_concurrent" in t:
+        return "concurrent"
+    if "_multi" in t:
+        return "sequential"
+    return "single"
+
+
 def build_profiles(results: List[Dict]) -> List[Dict]:
     profiles = []
     for r in results:
@@ -249,6 +275,7 @@ def build_profiles(results: List[Dict]) -> List[Dict]:
         meta = TASK_METADATA.get(tid, {})
         profiles.append({
             "model":            normalize_model_name(r),
+            "pattern":          _pattern_from_testee(r.get("testee_id", "")),
             "task_id":          tid,
             "task":             meta.get("display_name", tid),
             "difficulty":       meta.get("difficulty", "unknown"),
@@ -663,12 +690,19 @@ def generate_case_studies(profiles: List[Dict], results: List[Dict], models: Lis
 # ─── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Analyze model behavioral results.")
+    parser.add_argument("session_dir", type=str, help="Path to the session directory")
+    parser.add_argument("--single", action="store_true", help="Only analyze single agent results")
+    
     if len(sys.argv) < 2:
-        print("Usage: poetry run python scripts/analyze_model_behavior.py <session_dir>")
+        parser.print_help()
         sys.exit(1)
+        
+    args = parser.parse_args()
+    session_dir = Path(args.session_dir)
 
-    session_dir = Path(sys.argv[1])
-    results     = load_results(session_dir)
+    results     = load_results(session_dir, single_only=args.single)
     print(f"✓ Loaded {len(results)} results from {session_dir}")
 
     if not results:

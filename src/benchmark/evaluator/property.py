@@ -59,15 +59,30 @@ class PropertyEvaluator:
             
             # Check if observation itself failed
             if not observation_result.success:
-                execution_time = time.time() - start_time
-                return PropertyEvaluationResult(
-                    property_id=property_spec.id,
-                    satisfied=False,
-                    observation_raw=observation_result.raw_output,
-                    observation_parsed=None,
-                    evaluation_time_seconds=execution_time,
-                    error_message=observation_result.error or "Observation command failed"
+                cond = (
+                    property_spec.evaluation.success_condition
+                    if property_spec.evaluation else {}
+                ) or {}
+                has_text_cond = any(
+                    k in cond
+                    for k in (
+                        "contains_text",
+                        "not_contains_text",
+                        "contains_all",
+                        "not_contains_all",
+                    )
                 )
+                if not has_text_cond or observation_result.exit_code == -1:
+                    execution_time = time.time() - start_time
+                    return PropertyEvaluationResult(
+                        property_id=property_spec.id,
+                        satisfied=False,
+                        observation_raw=observation_result.raw_output,
+                        observation_parsed=None,
+                        evaluation_time_seconds=execution_time,
+                        error_message=observation_result.error or "Observation command failed"
+                    )
+                # else: command ran but returned non-zero — try text-based evaluation
             
             # Step 2: Get parser for this evaluation
             try:

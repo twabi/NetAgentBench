@@ -12,7 +12,7 @@ TURN_LIMIT=100
 TIME_LIMIT=1800  # 30 minutes
 CONTEXT_LENGTH=120000
 # Repetitions per configuration
-REPETITIONS=3
+REPETITIONS=1
 
 # Multi-turn tasks
 TASKS=(
@@ -25,11 +25,14 @@ TASKS=(
 
 # Agent configurations: mode:structure
 AGENT_CONFIGS=(
-    "single:sequential"
-    "multi:sequential"
-    "multi:debate"
-    "multi:group_chat"
-    "multi:concurrent"
+    #"single:sequential"
+    #"multi:sequential"
+    #"multi:debate"
+    #"multi:group_chat"
+    #"multi:concurrent"
+    "multi:adaptive"
+    #"multi:hybrid"
+    #"multi:guarded"
 )
 
 # Models to test (provider:model)
@@ -41,7 +44,7 @@ MODELS=(
 )
 
 # Create dated session folder
-SESSION_NAME="comparative_study_$(date +%Y%m%d_%H%M%S)"
+SESSION_NAME="new_patterns_$(date +%Y%m%d_%H%M%S)"
 OUTPUT_DIR="results/comparative_study/${SESSION_NAME}"
 mkdir -p "${OUTPUT_DIR}/runs"
 
@@ -68,7 +71,7 @@ FAILED=0
 cat > "${OUTPUT_DIR}/session_info.json" << EOF
 {
   "session_name": "${SESSION_NAME}",
-  "study_type": "comparative_multi_turn",
+  "study_type": "new_patterns_comparative_multi_turn",
   "started_at": "$(date -Iseconds)",
   "tasks": $(printf '%s\n' "${TASKS[@]}" | jq -R . | jq -s .),
   "agent_configs": $(printf '%s\n' "${AGENT_CONFIGS[@]}" | jq -R . | jq -s .),
@@ -146,7 +149,7 @@ done
 cat > "${OUTPUT_DIR}/session_info.json" << EOF
 {
   "session_name": "${SESSION_NAME}",
-  "study_type": "comparative_multi_turn",
+  "study_type": "new_patterns_comparative_multi_turn",
   "started_at": "$(date -Iseconds)",
   "completed_at": "$(date -Iseconds)",
   "tasks": $(printf '%s\n' "${TASKS[@]}" | jq -R . | jq -s .),

@@ -280,7 +280,7 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @click.option("--provider", default="openai", help="LLM provider: openai, anthropic, gemini, ollama (default: openai)")
 @click.option("--model", default=None, help="Model name (e.g., gpt-4o, gemini-2.0-flash, claude-3-5-sonnet)")
 @click.option("--agent-mode", type=click.Choice(["single", "multi"]), default="single", help="Agent mode: single (one agent) or multi (multi-agent)")
-@click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
+@click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat", "adaptive"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
 @click.option("--turn-limit", type=int, default=50, help="Max config commands (default: 50)")
 @click.option("--time-limit", type=float, default=600.0, help="Max session time in seconds (default: 600)")
 @click.option("--output-dir", type=click.Path(), help="Custom output directory for results")
@@ -575,7 +575,7 @@ def run_llm(property_type, provider, model, base_url, platform, limit, output_di
 @click.option("--provider", default="openai", help="LLM provider (default: openai)")
 @click.option("--model", default=None, help="LLM model name")
 @click.option("--agent-mode", type=click.Choice(["single", "multi"]), default="single", help="Agent mode: single (one agent) or multi (multi-agent)")
-@click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
+@click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat", "adaptive"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
 @click.option("--provider-host", help="Host URL for provider (e.g., http://oai:11434)")
 def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_limit, time_limit, provider, model, provider_host, agent_mode, structure):
     """
