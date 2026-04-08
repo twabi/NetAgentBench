@@ -4,6 +4,7 @@ Shared run loader and utilities for deep analysis modules.
 
 Provides:
 - load_runs(): Load all run JSONs from a session directory
+- load_and_enrich(): Load runs, drop GPT-5-nano and adaptive-pattern rows, attach derived fields
 - normalize_model_name(): Consistent model name normalization
 - extract_agent_config(): Extract (mode, pattern) from testee_id
 - classify_command(): Classify commands as constructive/diagnostic/destructive
@@ -16,6 +17,8 @@ import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from scripts.deep_analysis.run_filters import is_adaptive_pattern_run, is_gpt5_nano_run
 
 import matplotlib
 matplotlib.use('Agg')
@@ -54,20 +57,17 @@ PATTERN_COLORS = {
     'debate':     '#029E73',
     'group_chat': '#CC78BC',
     'concurrent': '#CA9161',
-    'adaptive':   '#56B4E9',
 }
 
 PATTERN_MARKERS = {
     'single': 'o', 'sequential': 's', 'debate': '^',
     'group_chat': 'D', 'concurrent': 'v',
-    'adaptive': 'p',
 }
 
-PATTERN_ORDER = ['single', 'sequential', 'debate', 'group_chat', 'concurrent', 'adaptive']
+PATTERN_ORDER = ['single', 'sequential', 'debate', 'group_chat', 'concurrent']
 PATTERN_LABELS = {
     'single': 'Single', 'sequential': 'Sequential', 'debate': 'Debate',
     'group_chat': 'Group Chat', 'concurrent': 'Concurrent',
-    'adaptive': 'Adaptive',
 }
 
 
@@ -113,6 +113,10 @@ def normalize_model_name(result: Dict) -> str:
     model = result.get("model_version") or result.get("agent_config", {}).get("model", "unknown")
     model = re.sub(r'^(openai|ollama|gemini|anthropic):', '', str(model).lower())
     model = model.replace("-2025-08-07", "").replace("2025-08-07", "")
+    if "gpt5nano" in model or "gpt-5-nano" in model:
+        return "GPT-5-nano"
+    if "gpt5mini" in model or "gpt-5-mini" in model:
+        return "GPT-5-mini"
     if "gpt-5" in model or "gpt5" in model:
         return "GPT-5-mini"
     if "gpt-4" in model:
@@ -149,8 +153,6 @@ def extract_agent_config(result: Dict) -> Tuple[str, str]:
         return "multi", "group_chat"
     if "_multi_concurrent" in testee_id:
         return "multi", "concurrent"
-    if "_multi_adaptive" in testee_id:
-        return "multi", "adaptive"
     if "_multi" in testee_id:
         return "multi", "sequential"
     return "single", "single"
@@ -210,6 +212,10 @@ def enrich_run(run: Dict) -> Dict:
 
 
 def load_and_enrich(session_dir: Path | None = None) -> List[Dict]:
-    """Load all runs and add derived fields."""
-    runs = load_runs(session_dir)
+    """Load all runs, exclude GPT-5-nano and adaptive-pattern runs, add derived fields."""
+    runs = [
+        r
+        for r in load_runs(session_dir)
+        if not is_gpt5_nano_run(r) and not is_adaptive_pattern_run(r)
+    ]
     return [enrich_run(r) for r in runs]

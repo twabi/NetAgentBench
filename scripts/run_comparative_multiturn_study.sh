@@ -23,14 +23,14 @@ TASKS=(
     "tasks/multi_turn/troubleshoot_ospf_adjacency_issue.json"
 )
 
-# Agent configurations: mode:structure
+# Agent configurations: mode:structure (adaptive omitted — separate validation; see run_adaptive_validation.sh)
 AGENT_CONFIGS=(
-    #"single:sequential"
-    #"multi:sequential"
-    #"multi:debate"
-    #"multi:group_chat"
-    #"multi:concurrent"
-    "multi:adaptive"
+    "single:sequential"
+    "multi:sequential"
+    "multi:debate"
+    "multi:group_chat"
+    "multi:concurrent"
+    #"multi:adaptive"
     #"multi:hybrid"
     #"multi:guarded"
 )

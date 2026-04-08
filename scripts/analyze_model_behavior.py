@@ -25,6 +25,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from scripts.deep_analysis.run_filters import is_adaptive_pattern_run, is_gpt5_nano_run
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -85,6 +91,8 @@ def load_results(session_dir: Path, single_only: bool = False) -> List[Dict]:
                     testee_id = data.get("testee_id", "")
                     if "single" not in testee_id.lower():
                         continue
+                if is_gpt5_nano_run(data) or is_adaptive_pattern_run(data):
+                    continue
                 results.append(data)
         except Exception:
             continue
@@ -94,7 +102,12 @@ def load_results(session_dir: Path, single_only: bool = False) -> List[Dict]:
 def normalize_model_name(result: Dict) -> str:
     model = result.get("model_version") or result.get("agent_config", {}).get("model", "unknown")
     model = re.sub(r'^(openai|ollama|gemini|anthropic):', '', str(model).lower())
-    if "gpt-5" in model:    return "GPT-5"
+    if "gpt5nano" in model or "gpt-5-nano" in model:
+        return "GPT-5-nano"
+    if "gpt5mini" in model or "gpt-5-mini" in model:
+        return "GPT-5-mini"
+    if "gpt-5" in model or "gpt5" in model:
+        return "GPT-5-mini"
     if "gpt-4" in model:    return "GPT-4"
     if "gemini-3" in model: return "Gemini-3"
     if "gemini-2" in model: return "Gemini-2"
@@ -255,6 +268,8 @@ def detect_meltdowns(result: Dict) -> Dict:
 def _pattern_from_testee(testee_id: str) -> str:
     """Map testee_id to pattern name (single, sequential, debate, group_chat, concurrent)."""
     t = (testee_id or "").lower()
+    if "_multi_adaptive" in t:
+        return "adaptive"
     if "_multi_sequential" in t:
         return "sequential"
     if "_multi_debate" in t:
@@ -276,6 +291,7 @@ def build_profiles(results: List[Dict]) -> List[Dict]:
         tid = r.get("task_id", "unknown")
         meta = TASK_METADATA.get(tid, {})
         profiles.append({
+            "run_id":           r.get("run_id", ""),
             "model":            normalize_model_name(r),
             "pattern":          _pattern_from_testee(r.get("testee_id", "")),
             "task_id":          tid,

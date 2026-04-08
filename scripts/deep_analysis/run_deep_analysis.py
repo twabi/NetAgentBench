@@ -27,7 +27,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from scripts.deep_analysis.merge_comparatives import merge, OUTPUT_DIR
-from scripts.deep_analysis.run_loader import load_and_enrich, get_output_dir
+from scripts.deep_analysis.run_filters import is_adaptive_pattern_run, is_gpt5_nano_run
+from scripts.deep_analysis.run_loader import load_and_enrich, load_runs, get_output_dir
 
 
 def main():
@@ -56,7 +57,14 @@ def main():
     else:
         modules_to_run = set(int(m.strip()) for m in args.modules.split(","))
 
-    # Verify data loads
+    # Verify data loads (GPT-5-nano runs excluded — see run_loader.load_and_enrich)
+    raw = load_runs(session_dir)
+    n_nano = sum(1 for r in raw if is_gpt5_nano_run(r))
+    n_adapt = sum(1 for r in raw if is_adaptive_pattern_run(r))
+    if n_nano:
+        print(f"GPT-5-nano exclusion: skipping {n_nano} run(s).")
+    if n_adapt:
+        print(f"Adaptive-pattern exclusion: skipping {n_adapt} run(s).")
     runs = load_and_enrich(session_dir)
     print(f"Loaded {len(runs)} runs from {session_dir.name}")
     out_dir = get_output_dir(session_dir)
