@@ -652,7 +652,7 @@ class TestValidityChecker:
             ),
         ]
         
-        validity = checker.check_validity(property_results, execution_log)
+        validity = checker.check_validity(property_results, execution_log, final_score=1.0)
         
         assert isinstance(validity, ValidityCheck)
         assert validity.condition_a_syntactic is True

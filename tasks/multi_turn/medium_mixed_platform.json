@@ -1,0 +1,188 @@
+{
+  "task_id": "medium_mixed_platform",
+  "description": "35-node spine-leaf topology with mixed platforms (FRR + simulated Nokia). Tests RQ2: role specialization benefits when platforms require different syntax.",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "research_context": {
+    "research_question": "RQ2: Role Specialization Benefits",
+    "hypothesis": "Specialist agents (planner/executor) outperform generalists on heterogeneous platforms",
+    "expected_turns": "30-50",
+    "expected_time_minutes": 40,
+    "expected_exploration_efficiency": "0.5-0.7",
+    "differentiator": "Platform heterogeneity forces syntax discovery"
+  },
+  "topology": {
+    "nodes": [
+      {"name": "SPINE1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPINE2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPINE3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPINE4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "SPINE5", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "spine"},
+      {"name": "LEAF1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF5", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF6", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF7", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF8", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF9", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF10", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF11", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF12", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF13", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF14", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF15", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF16", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF17", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF18", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF19", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF20", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF21", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF22", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF23", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF24", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF25", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF26", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF27", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF28", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF29", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"},
+      {"name": "LEAF30", "type": "router", "image": "frrouting/frr:latest", "platform": "frr", "role": "leaf"}
+    ],
+    "links": [
+      {"endpoints": ["SPINE1:eth1", "LEAF1:eth1"]},
+      {"endpoints": ["SPINE1:eth2", "LEAF2:eth1"]},
+      {"endpoints": ["SPINE1:eth3", "LEAF3:eth1"]},
+      {"endpoints": ["SPINE1:eth4", "LEAF4:eth1"]},
+      {"endpoints": ["SPINE1:eth5", "LEAF5:eth1"]},
+      {"endpoints": ["SPINE1:eth6", "LEAF6:eth1"]},
+      {"endpoints": ["SPINE2:eth1", "LEAF7:eth1"]},
+      {"endpoints": ["SPINE2:eth2", "LEAF8:eth1"]},
+      {"endpoints": ["SPINE2:eth3", "LEAF9:eth1"]},
+      {"endpoints": ["SPINE2:eth4", "LEAF10:eth1"]},
+      {"endpoints": ["SPINE2:eth5", "LEAF11:eth1"]},
+      {"endpoints": ["SPINE2:eth6", "LEAF12:eth1"]},
+      {"endpoints": ["SPINE3:eth1", "LEAF13:eth1"]},
+      {"endpoints": ["SPINE3:eth2", "LEAF14:eth1"]},
+      {"endpoints": ["SPINE3:eth3", "LEAF15:eth1"]},
+      {"endpoints": ["SPINE3:eth4", "LEAF16:eth1"]},
+      {"endpoints": ["SPINE3:eth5", "LEAF17:eth1"]},
+      {"endpoints": ["SPINE3:eth6", "LEAF18:eth1"]},
+      {"endpoints": ["SPINE4:eth1", "LEAF19:eth1"]},
+      {"endpoints": ["SPINE4:eth2", "LEAF20:eth1"]},
+      {"endpoints": ["SPINE4:eth3", "LEAF21:eth1"]},
+      {"endpoints": ["SPINE4:eth4", "LEAF22:eth1"]},
+      {"endpoints": ["SPINE4:eth5", "LEAF23:eth1"]},
+      {"endpoints": ["SPINE4:eth6", "LEAF24:eth1"]},
+      {"endpoints": ["SPINE5:eth1", "LEAF25:eth1"]},
+      {"endpoints": ["SPINE5:eth2", "LEAF26:eth1"]},
+      {"endpoints": ["SPINE5:eth3", "LEAF27:eth1"]},
+      {"endpoints": ["SPINE5:eth4", "LEAF28:eth1"]},
+      {"endpoints": ["SPINE5:eth5", "LEAF29:eth1"]},
+      {"endpoints": ["SPINE5:eth6", "LEAF30:eth1"]},
+      {"endpoints": ["SPINE1:eth10", "SPINE2:eth10"]},
+      {"endpoints": ["SPINE2:eth11", "SPINE3:eth10"]},
+      {"endpoints": ["SPINE3:eth11", "SPINE4:eth10"]},
+      {"endpoints": ["SPINE4:eth11", "SPINE5:eth10"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_underlay_spine1",
+        "type": "ospf_configuration",
+        "description": "SPINE1 has OSPF neighbors with connected leaves",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "SPINE1",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "match_count": 6,
+            "pattern": "Full"
+          }
+        }
+      },
+      {
+        "id": "ospf_underlay_spine3",
+        "type": "ospf_configuration",
+        "description": "SPINE3 (middle spine) has OSPF neighbors",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "SPINE3",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "match_count": 6,
+            "pattern": "Full"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_spine1_leaf1",
+        "type": "bgp_configuration",
+        "description": "SPINE1 has BGP session with LEAF1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "SPINE1",
+          "command": "vtysh -c 'show bgp summary'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "bgp_session_spine3_leaf15",
+        "type": "bgp_configuration",
+        "description": "SPINE3 has BGP session with LEAF15",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "SPINE3",
+          "command": "vtysh -c 'show bgp summary'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "Established"
+          }
+        }
+      },
+      {
+        "id": "reachability_leaf1_to_leaf30",
+        "type": "reachability",
+        "description": "LEAF1 can reach LEAF30 across spines",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "LEAF1",
+          "command": "ping -c 3 -W 2 10.0.0.35",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "3 packets transmitted, 3 packets received"
+          }
+        }
+      },
+      {
+        "id": "route_advertisement_leaf1",
+        "type": "route_exists",
+        "description": "LEAF1's loopback is advertised and reachable from LEAF15",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "LEAF15",
+          "command": "vtysh -c 'show ip route 10.255.0.1'",
+          "parser": "text",
+          "success_condition": {
+            "contains_text": "10.255.0.1"
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 90,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 175,
+    "description": "Configure OSPF underlay on all 35 nodes, BGP sessions between spines and leaves, advertise loopbacks."
+  }
+}

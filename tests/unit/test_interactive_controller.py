@@ -26,7 +26,7 @@ class TestRunIdGeneration:
         assert len(run_id) > 20  # Should include timestamp and uuid
 
     def test_generate_run_id_with_model_name(self):
-        """Test run_id with model name."""
+        """run_id embeds testee_id; model is folded into CLI-built testee_id, not duplicated here."""
         from benchmark.interactive_controller import InteractiveBenchmarkController
 
         controller = InteractiveBenchmarkController()
@@ -35,21 +35,18 @@ class TestRunIdGeneration:
             model_name="gpt-4o",
         )
 
-        # Model name should be normalized
-        assert "dagent_gpt4o_mt_" in run_id
+        assert run_id.startswith("dagent_mt_")
 
     def test_generate_run_id_with_model_name_special_chars(self):
-        """Test run_id handles special characters in model name."""
         from benchmark.interactive_controller import InteractiveBenchmarkController
 
         controller = InteractiveBenchmarkController()
         run_id = controller.generate_run_id(
-            testee_id="dagent",
+            testee_id="openai_gpt4omini20250807",
             model_name="gpt-4o-mini",
         )
 
-        # Special chars should be removed
-        assert "dagent_gpt4omini_mt_" in run_id
+        assert run_id.startswith("openai_gpt4omini20250807_mt_")
 
     def test_generate_run_id_single_mode(self):
         """Test run_id with single-turn mode."""
@@ -253,7 +250,7 @@ class TestRunInteractiveWorkflow:
                 model_name="gpt-4o",
             )
 
-        assert "dagent_gpt4o_mt_" in result.run_id
+        assert result.run_id.startswith("dagent_mt_")
 
     def test_run_interactive_with_turn_limit(self, mock_controller, mock_task):
         """Test run_interactive respects turn limit."""

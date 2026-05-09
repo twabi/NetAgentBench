@@ -158,5 +158,5 @@ class TestSchemaValidation:
         assert "enum" in property_type_def
         property_type_values = property_type_def["enum"]
         assert "reachability" in property_type_values
-        assert "bgp_session" in property_type_values
-        assert "ospf_adjacency" in property_type_values
+        assert "bgp_configuration" in property_type_values
+        assert "ospf_configuration" in property_type_values
