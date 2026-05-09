@@ -25,7 +25,7 @@ This benchmark evaluates whether configurations (human, scripted, LLM-guided, or
 
 | Mode | CLI | Typical tasks | Role |
 |------|-----|---------------|------|
-| **Multi-turn agentic** | `benchmark run-task` | [`tasks/multi_turn/`](tasks/multi_turn/) | **Primary.** Paper-aligned interactive evaluation; requires a separately run **agent HTTP service** (commonly **dagent**) reachable via `--dagent-endpoint`. |
+| **Multi-turn agentic** | `benchmark run-task` | [`tasks/multi_turn/`](tasks/multi_turn/) | **Primary.** Paper-aligned interactive evaluation; requires a separately run **agent HTTP service** reachable via `--dagent-endpoint`. Use the bundled **[`agent_harness/`](agent_harness/)** (recommended) or any compatible agent. |
 | **Single-turn submission** | `benchmark run`, `benchmark run-llm`, … | Top-level [`tasks/*.json`](tasks/), [`tasks/sample/`](tasks/sample/) | **Legacy/auxiliary.** One-shot submissions and property-batch sweeps. |
 
 Orchestration examples live under [`scripts/`](scripts/); conceptual diagram and MCP boundaries are in **[Agentic evaluation](docs/AGENTIC_EVALUATION.md)**.
@@ -47,7 +47,18 @@ Configure provider secrets in `.env` (ignored by git) when using cloud LLM APIs 
 
 ### Multi-turn (recommended)
 
-After **dagent** (or compatible agent) is reachable:
+Install and start the **in-tree harness** (trimmed MCP-facing HTTP agent):
+
+```bash
+cd agent_harness && poetry install
+# On headless Linux without a desktop keyring, use:
+# PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry install
+poetry run uvicorn dagent.harness_main:app --host 0.0.0.0 --port 8000
+```
+
+This snapshot supports agent structures `sequential`, `concurrent`, `debate`, and `group_chat` in multi mode (**not** `adaptive`). Details: [`agent_harness/README.md`](agent_harness/README.md).
+
+Then from the benchmark repo:
 
 ```bash
 poetry run benchmark run-task tasks/multi_turn/ccna_rip_routing_basic.json \
@@ -99,6 +110,7 @@ benchmark list-tasks
 | [Architecture](docs/ARCHITECTURE.md), [Formalization](docs/FORMALIZATION_ALIGNMENT.md) | Design references |
 | [Public Release](docs/PUBLIC_RELEASE.md) | Mirrors, rewritten history guidance |
 | [Security](SECURITY.md) | Disclosure policy |
+| [Agent harness](agent_harness/README.md) | In-tree HTTP agent (`dagent.harness_main`) for `run-task` (no `adaptive` in this snapshot) |
 
 Full index: [docs/README.md](docs/README.md)
 
@@ -119,6 +131,7 @@ Weighted combination of completeness, robustness, syntactic validity, and effici
 ```bash
 poetry run pytest tests/unit/
 poetry run pytest tests/integration/ -m integration   # slow; needs Containerlab
+(cd agent_harness && poetry run pytest tests/unit/ -q) # harness-only (separate Poetry project)
 ```
 
 ## Contributing

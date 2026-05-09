@@ -496,7 +496,7 @@ This plan consolidates implementation tasks from:
   ```bash
   # Terminal 1: Start dagent
   cd ~/python_projects/dagent
-  poetry run uvicorn dagent.main:app --port 8000
+  poetry run uvicorn dagent.harness_main:app --port 8000  # from agent_harness/
   
   # Terminal 2: Run benchmark
   cd ~/python_projects/benchmark

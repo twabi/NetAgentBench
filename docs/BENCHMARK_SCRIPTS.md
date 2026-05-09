@@ -7,7 +7,7 @@ Helper shell code falls into **two families**:
 | **Multi-turn** | [`scripts/`](../scripts/) | `benchmark run-task` | Paper-aligned sweeps across `tasks/multi_turn/`, multiple models & agent patterns ([arXiv:2604.09678](https://arxiv.org/abs/2604.09678)). |
 | **Single-turn / legacy** | Repository root (`run_quick_benchmark.sh`, `run_full_benchmark.sh`) | `benchmark run-llm` property batches | Faster checks of the older catalogued task families. |
 
-Every `scripts/*.sh` file `cd`s to the benchmark root automatically (relative to the script path). Common environment variables: **`DAGENT_ENDPOINT`**, **`OLLAMA_HOST`**, **`RERUN_PLAN_FILE`** (for reruns), **`DAGENT_DIR`** / **`STUDY_SCRIPT`** (for `start_study_background.sh`).
+Every `scripts/*.sh` file `cd`s to the benchmark root automatically (relative to the script path). Common environment variables: **`DAGENT_ENDPOINT`**, **`OLLAMA_HOST`**, **`RERUN_PLAN_FILE`** (for reruns), **`DAGENT_DIR`** / **`STUDY_SCRIPT`** (for `start_study_background.sh`). By default **`DAGENT_DIR`** resolves to **`agent_harness/`** inside this repo; override to point at a full **dagent** checkout if needed (for example workflows that rely on `--structure adaptive`, which this harness omits).
 
 ### `scripts/` inventory
 
@@ -17,11 +17,11 @@ Every `scripts/*.sh` file `cd`s to the benchmark root automatically (relative to
 | `run_single_model_comparison.sh` | Narrowed comparative matrix (tweak in-file arrays for ablations). |
 | `run_multiturn_study.sh` | Multi-task sweep with GPT + Gemini defaults. |
 | `run_ollama_multiturn_study.sh` | Multi-turn study targeting Ollama-hosted weights. |
-| `run_adaptive_validation.sh` | Focused adaptive-pattern validation ladder. |
+| `run_adaptive_validation.sh` | Focused adaptive-structure validation ladder. Requires an agent checkout that still exposes **`structure=adaptive`** — not supported by **[`agent_harness/`](../agent_harness/)**. |
 | `dry_run_study.sh` | Low turn/time limits for plumbing tests. |
 | `run_bugfix_validation.sh` | Targeted regression checklist (edit `TASKS`/`AGENT_CONFIGS` as needed). |
 | `rerun_failed_study_runs.sh` | Replays JSON plans (`scripts/rerun_plan.json`, see `rerun_plan.example.json`). |
-| `start_study_background.sh` | Launches dagent (if not already listening) + comparative study via `nohup`/`setsid`. |
+| `start_study_background.sh` | Launches **`agent_harness`** (if nothing listens on port 8000) + comparative study via `nohup`/`setsid`. Override **`DAGENT_DIR`** for another agent checkout. |
 | `run_baseline_study.sh` | Legacy property-level sweeps into `results/sessions/`. |
 | `run_ollama_study.sh` | Legacy Ollama-facing property sweeps. |
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # start_study_background.sh
-# Uses nohup to run both dagent and the study in background for persistent sessions.
+# Uses nohup to run both the agent harness (`agent_harness/`) and the study in background.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -10,7 +10,7 @@ cd "${REPO_ROOT}" || exit 1
 LOG_FILE="${STUDY_LOG_FILE:-${REPO_ROOT}/study.log}"
 DAGENT_LOG="${DAGENT_LOG_FILE:-${REPO_ROOT}/dagent_server.log}"
 STUDY_SCRIPT="${STUDY_SCRIPT:-${REPO_ROOT}/scripts/run_comparative_multiturn_study.sh}"
-DAGENT_DIR="${DAGENT_DIR:-${REPO_ROOT}/../dagent}"
+DAGENT_DIR="${DAGENT_DIR:-${REPO_ROOT}/agent_harness}"
 
 echo "============================================================"
 echo "Starting Background Study Session"
@@ -19,25 +19,26 @@ echo "============================================================"
 # Use port 8000 as source of truth (study expects dagent on 8000)
 DAGENT_PORT=8000
 if ss -tlnp 2>/dev/null | grep -q ":${DAGENT_PORT}[^0-9]" || netstat -tlnp 2>/dev/null | grep -q ":${DAGENT_PORT}[^0-9]"; then
-    echo "dagent already listening on port ${DAGENT_PORT}; skipping server start."
+    echo "Agent harness already listening on port ${DAGENT_PORT}; skipping server start."
 else
-    echo "Starting dagent server in background..."
+    echo "Starting agent harness in background..."
     echo "  > Log: ${DAGENT_LOG}"
 
     if [ ! -d "$DAGENT_DIR" ]; then
-        echo "Error: dagent directory not found at ${DAGENT_DIR}. Clone dagent beside this repo or set DAGENT_DIR."
+        echo "Error: agent harness not found at ${DAGENT_DIR}. Install from repo agent_harness/ or set DAGENT_DIR to your checkout."
         exit 1
     fi
 
     cd "$DAGENT_DIR" || exit 1
-    nohup poetry run uvicorn dagent.main:app --host 0.0.0.0 --port 8000 > "${DAGENT_LOG}" 2>&1 &
+    nohup env PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
+      poetry run uvicorn dagent.harness_main:app --host 0.0.0.0 --port 8000 > "${DAGENT_LOG}" 2>&1 &
     DAGENT_PID=$!
     cd "${REPO_ROOT}" || exit 1
 
     echo "  > DAGENT_PID: ${DAGENT_PID}"
     echo "${DAGENT_PID}" > "${REPO_ROOT}/dagent.pid"
 
-    echo "Waiting 10s for dagent to initialize..."
+    echo "Waiting 10s for agent harness to initialize..."
     sleep 10
 fi
 

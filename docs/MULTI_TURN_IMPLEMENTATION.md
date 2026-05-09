@@ -410,7 +410,7 @@ poetry run pytest tests/integration/test_interactive_benchmark.py -v -m integrat
 
 ### Manual Verification
 
-1. **Start dagent server**: `uvicorn dagent.main:app --reload`
+1. **Start agent harness**: `cd agent_harness && poetry run uvicorn dagent.harness_main:app --reload`
 
 2. **Run interactive session**:
    ```bash

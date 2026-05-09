@@ -1,6 +1,6 @@
 # Agentic evaluation (multi-turn)
 
-NetAgentBench evaluates **multi-turn** agent behavior: an external **agent runtime** (commonly **dagent**, maintained in a separate repository) connects to this benchmark’s MCP/tooling surface while the lab runs under **Containerlab**.
+NetAgentBench evaluates **multi-turn** agent behavior: an external **agent HTTP harness** (included in this repo as [`agent_harness/`](../agent_harness/) running `dagent.harness_main`) connects to this benchmark’s MCP/tooling surface while the lab runs under **Containerlab**. Other compatible agent services are also allowed as long as they implement the same `/benchmark/solve` contract.
 
 ## Architecture
 

@@ -166,14 +166,18 @@ groups | grep docker
 
 ---
 
-## Part 2: Dagent Deployment
+## Part 2: Agent harness deployment
 
-### Step 2.1: Build Dagent Docker Image
+Public reproduction uses the trimmed **[`agent_harness/`](../agent_harness/)** subtree of this benchmark repo instead of the full historical dagent checkout. Build from `agent_harness/` (copy **`pyproject.toml`**, **`poetry.lock`**, and the **`dagent/`** package folder into the image).
 
-Navigate to your dagent repository:
+The steps below show a generic pattern; adjust `COPY` paths to match whether you use **`agent_harness/`** or an external monorepo.
+
+### Step 2.1: Build agent Docker image
+
+Navigate to your agent project root (recommended: `agent_harness/` inside NetAgentBench):
 
 ```bash
-cd $DAGENT_REPO
+cd $DAGENT_REPO   # e.g. export DAGENT_REPO=/path/to/network-benchmark/agent_harness
 ```
 
 **Create Dockerfile (if not using existing):**
@@ -197,23 +201,18 @@ RUN pip install --no-cache-dir poetry
 # Copy project files
 COPY pyproject.toml poetry.lock* ./
 COPY dagent ./dagent
-COPY static ./static
-COPY README.md ./
-RUN touch __init__.py
 
-# Install dependencies (without dev dependencies for production)
+# Install runtime dependencies (omit --no-dev / --only main if your Poetry version differs)
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-dev --no-interaction --no-ansi
-
-# Expose port
+    poetry install --without dev --no-interaction --no-ansi
 EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/ || exit 1
+    CMD curl -f http://localhost:8000/benchmark/health || exit 1
 
-# Run dagent
-CMD ["uvicorn", "dagent.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Agent harness
+CMD ["uvicorn", "dagent.harness_main:app", "--host", "0.0.0.0", "--port", "8000"]
 EOF
 ```
 

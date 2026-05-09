@@ -584,7 +584,7 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
     Connects to a running dagent instance to generate configurations
     using multi-agent orchestration (DAG, FSM, or automated handoff).
     
-    Start dagent first: uvicorn dagent.main:app --reload
+    Start agent harness first: `cd agent_harness && poetry run uvicorn dagent.harness_main:app --reload`
     
     Examples:
     
@@ -687,7 +687,11 @@ def run_dagent(property_type, endpoint, platform, limit, output_dir, mode, turn_
         sys.exit(1)
     except ConnectionError as e:
         click.echo(f"Error: Could not connect to dagent: {e}", err=True)
-        click.echo("Make sure dagent is running: uvicorn dagent.main:app --reload")
+        click.echo(
+            "Make sure the agent harness is running, e.g.: "
+            "`cd agent_harness && poetry run uvicorn dagent.harness_main:app --reload`",
+            err=True,
+        )
         sys.exit(1)
     except Exception as e:
         logger.error(f"Dagent benchmark execution failed: {e}")

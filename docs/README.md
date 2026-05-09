@@ -5,6 +5,7 @@ Welcome to the NetAgentBench / network configuration benchmark docs. **Multi-tur
 ### Getting Started
 - **[Getting Started Guide](GETTING_STARTED.md)** — Install stack, then pick multi-turn vs legacy flow
 - **[Agentic Evaluation](AGENTIC_EVALUATION.md)** — Agent / MCP / Containerlab diagram & narrative
+- **[Agent harness](../agent_harness/README.md)** — In-tree `uvicorn dagent.harness_main` for `run-task`
 - **[Architecture Overview](ARCHITECTURE.md)** — System design
 
 ### User Guides
@@ -54,7 +55,7 @@ docs/
 
 ## Overview
 
-This project couples FSM-style task definitions with Containerlab for repeatable network emulation. **Interactive studies** require both this repository and a separate **agent HTTP runtime** (typically `dagent`) as described in **[Agentic Evaluation](AGENTIC_EVALUATION.md)**.
+This project couples FSM-style task definitions with Containerlab for repeatable network emulation. **Interactive studies** require both this repository and the **`agent_harness/`** HTTP runtime (or another compatible `/benchmark/solve` implementation); see **[Agentic Evaluation](AGENTIC_EVALUATION.md)** and **[`agent_harness/README.md`](../agent_harness/README.md)**.
 
 ### Highlights
 

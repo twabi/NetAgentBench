@@ -1,0 +1,13 @@
+NOTICE — agent harness snapshot
+================================
+
+This directory contains a trimmed copy of benchmark-related modules originally
+developed as part of the broader "dagent" agent framework.
+
+Upstream attribution (conceptual lineage):
+
+  - Yepeng Ding and contributors (authors listed in the upstream dagent pyproject).
+
+The full dagent codebase is intentionally not shipped here; only paths needed
+for NetAgentBench multi-turn evaluation via FastAPI (/benchmark/solve,
+/benchmark/generate, /benchmark/health) are included.
