@@ -1,13 +1,11 @@
 # LLM Integration Guide
 
-This document describes how to integrate and use Large Language Models (LLMs) with the Network Configuration Benchmark system.
+## Overview & supported providers
 
-## Overview
+**Operational note:** today's primary experiments call **`benchmark run-task`** ([CLI usage](CLI_USAGE.md)), which executes multi-turn workloads under [`tasks/multi_turn/`](../tasks/multi_turn/). Provider settings still apply via the detached **dagent**/agent runtime you operate alongside this repo; **`benchmark run-llm`** workflows below are legacy property batches.
 
-The benchmark system supports multiple LLM providers for automated network configuration generation:
-
-- **OpenAI** - GPT-4, GPT-3.5, and other OpenAI models
-- **Anthropic** - Claude models
+- **OpenAI** — GPT-family models via API
+- **Anthropic** — Claude models
 - **Google Gemini** - Gemini 2.5 Flash, Pro, and other models
 - **Ollama** - Local models (experimental)
 

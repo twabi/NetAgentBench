@@ -1,8 +1,31 @@
 # Benchmark Execution Scripts
 
-This document describes the automated benchmark execution scripts for running comprehensive LLM comparisons.
+Helper shell code falls into **two families**:
 
-## Available Scripts
+| Family | Location | CLI | When to use |
+|--------|----------|-----|-------------|
+| **Multi-turn** | [`scripts/`](../scripts/) | `benchmark run-task` | Paper-aligned sweeps across `tasks/multi_turn/`, multiple models & agent patterns ([arXiv:2604.09678](https://arxiv.org/abs/2604.09678)). |
+| **Single-turn / legacy** | Repository root (`run_quick_benchmark.sh`, `run_full_benchmark.sh`) | `benchmark run-llm` property batches | Faster checks of the older catalogued task families. |
+
+Every `scripts/*.sh` file `cd`s to the benchmark root automatically (relative to the script path). Common environment variables: **`DAGENT_ENDPOINT`**, **`OLLAMA_HOST`**, **`RERUN_PLAN_FILE`** (for reruns), **`DAGENT_DIR`** / **`STUDY_SCRIPT`** (for `start_study_background.sh`).
+
+### `scripts/` inventory
+
+| Script | Role |
+|--------|------|
+| `run_comparative_multiturn_study.sh` | Full factorial over default multi-turn tasks × agent patterns × listed models. Writes `results/comparative_study/<session>/`. |
+| `run_single_model_comparison.sh` | Narrowed comparative matrix (tweak in-file arrays for ablations). |
+| `run_multiturn_study.sh` | Multi-task sweep with GPT + Gemini defaults. |
+| `run_ollama_multiturn_study.sh` | Multi-turn study targeting Ollama-hosted weights. |
+| `run_adaptive_validation.sh` | Focused adaptive-pattern validation ladder. |
+| `dry_run_study.sh` | Low turn/time limits for plumbing tests. |
+| `run_bugfix_validation.sh` | Targeted regression checklist (edit `TASKS`/`AGENT_CONFIGS` as needed). |
+| `rerun_failed_study_runs.sh` | Replays JSON plans (`scripts/rerun_plan.json`, see `rerun_plan.example.json`). |
+| `start_study_background.sh` | Launches dagent (if not already listening) + comparative study via `nohup`/`setsid`. |
+| `run_baseline_study.sh` | Legacy property-level sweeps into `results/sessions/`. |
+| `run_ollama_study.sh` | Legacy Ollama-facing property sweeps. |
+
+## Available Scripts (repo root)
 
 ### 1. `run_quick_benchmark.sh` - Quick Test
 **Purpose**: Fast validation and testing  

@@ -1,0 +1,24 @@
+cff-version: "1.2.0"
+title: "NetAgentBench / network-config-benchmark"
+message: "If you use this software, please cite the NetAgentBench paper."
+authors:
+  - family-names: Twabi
+    given-names: Ahmed
+  - family-names: Ding
+    given-names: Yepeng
+  - family-names: Kondo
+    given-names: Tohru
+url: "https://github.com/twabi/network-benchmark"
+preferred-citation:
+  type: article
+  title: "NetAgentBench: A State-Centric Benchmark for Evaluating Agentic Network Configuration"
+  authors:
+    - family-names: Twabi
+      given-names: Ahmed
+    - family-names: Ding
+      given-names: Yepeng
+    - family-names: Kondo
+      given-names: Tohru
+  year: 2026
+  journal: "arXiv preprint"
+  doi: "10.48550/arXiv.2604.09678"

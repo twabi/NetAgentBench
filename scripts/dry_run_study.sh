@@ -7,6 +7,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${REPO_ROOT}" || exit 1
+
 # Configuration
 DAGENT_ENDPOINT="${DAGENT_ENDPOINT:-http://localhost:8000}"
 OLLAMA_HOST="http://localhost:11434"
@@ -72,13 +76,6 @@ cat > "${OUTPUT_DIR}/session_info.json" << EOF
   "total_planned_runs": ${TOTAL}
 }
 EOF
-
-# Ensure we're in the project root
-if [ -d "/home/grimm/python_projects/benchmark" ]; then
-    cd /home/grimm/python_projects/benchmark
-elif [ -d "/root/network-benchmark" ]; then
-    cd /root/network-benchmark
-fi
 
 run_multiturn() {
     local task_file=$1

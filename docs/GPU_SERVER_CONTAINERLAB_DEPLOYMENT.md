@@ -4,6 +4,13 @@
 
 This guide provides all the technical details for manually deploying the network benchmark and dagent on a GPU server using containerlab. Containerlab runs on the host, while the benchmark executes from your existing Ubuntu container.
 
+**Path placeholders used below** (adapt to your layout):
+
+- `$BENCHMARK_REPO` — checkout of this benchmark repository  
+- `$DAGENT_REPO` — checkout of the **dagent** agent service  
+- `$DAGENT_DATA_DIR` — persistent host or container path for dagent state (knowledge store, workspace, DB)  
+- `$WORKSPACE_ROOT` — optional parent directory mounting several repos
+
 ---
 
 ## Table of Contents
@@ -166,7 +173,7 @@ groups | grep docker
 Navigate to your dagent repository:
 
 ```bash
-cd /home/grimm/python_projects/dagent
+cd $DAGENT_REPO
 ```
 
 **Create Dockerfile (if not using existing):**
@@ -224,8 +231,8 @@ docker images | grep dagent
 Create the topology file:
 
 ```bash
-mkdir -p /home/grimm/python_projects/benchmark/containerlab
-cd /home/grimm/python_projects/benchmark/containerlab
+mkdir -p $BENCHMARK_REPO/containerlab
+cd $BENCHMARK_REPO/containerlab
 
 cat > dagent-service.clab.yml << 'EOF'
 name: dagent-service
@@ -260,7 +267,7 @@ topology:
       
       # Optional: Mount persistent storage
       # binds:
-      #   - /home/grimm/dagent-data:/app/data
+      #   - $DAGENT_DATA_DIR:/app/data
 EOF
 ```
 
@@ -285,7 +292,7 @@ export ANTHROPIC_API_KEY="sk-ant-your-key-here"
 **Deploy dagent:**
 
 ```bash
-cd /home/grimm/python_projects/benchmark/containerlab
+cd $BENCHMARK_REPO/containerlab
 
 # Deploy with containerlab
 sudo -E containerlab deploy -t dagent-service.clab.yml
@@ -349,7 +356,7 @@ Your Ubuntu container needs access to the host's Docker socket to use containerl
 ```bash
 docker run -it \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /home/grimm/python_projects:/workspace \
+  -v $WORKSPACE_ROOT:/workspace \
   --name my-ubuntu-container \
   ubuntu:22.04 /bin/bash
 ```
@@ -394,7 +401,7 @@ poetry --version
 ### Step 3.4: Setup Benchmark Repository
 
 ```bash
-cd /home/grimm/python_projects/benchmark
+cd $BENCHMARK_REPO
 
 # Install benchmark dependencies
 poetry install
@@ -408,7 +415,7 @@ poetry run benchmark --help
 Create or update `.env` file:
 
 ```bash
-cd /home/grimm/python_projects/benchmark
+cd $BENCHMARK_REPO
 
 cat > .env << 'EOF'
 # Dagent endpoint
@@ -466,7 +473,7 @@ curl http://172.17.0.1:8000
 ### Step 4.2: Run Single Task with Dagent
 
 ```bash
-cd /home/grimm/python_projects/benchmark
+cd $BENCHMARK_REPO
 
 # Run a single task using dagent
 poetry run benchmark run-task \
@@ -539,7 +546,7 @@ docker logs -f clab-dagent-service-dagent
 ### Step 4.5: Review Results
 
 ```bash
-cd /home/grimm/python_projects/benchmark
+cd $BENCHMARK_REPO
 
 # List recent runs
 poetry run benchmark list-runs --limit 20
@@ -800,7 +807,7 @@ Waiting for dagent response...
 
 ```bash
 # From Ubuntu container
-cd /home/grimm/python_projects/benchmark
+cd $BENCHMARK_REPO
 
 # Clean all benchmark networks
 poetry run python scripts/cleanup_benchmark_networks.py
@@ -826,7 +833,7 @@ sudo containerlab destroy --all
 
 ```bash
 # On host
-cd /home/grimm/python_projects/benchmark/containerlab
+cd $BENCHMARK_REPO/containerlab
 sudo containerlab destroy -t dagent-service.clab.yml
 
 # Verify
@@ -919,7 +926,7 @@ To persist dagent data across restarts:
 
 ```bash
 # Create storage directory on host
-mkdir -p /home/grimm/dagent-data/{knowledge_store,execution_workspace,db}
+mkdir -p $DAGENT_DATA_DIR/{knowledge_store,execution_workspace,db}
 
 # Update topology file
 ```
@@ -931,9 +938,9 @@ topology:
   nodes:
     dagent:
       binds:
-        - /home/grimm/dagent-data/knowledge_store:/app/knowledge_store
-        - /home/grimm/dagent-data/execution_workspace:/app/execution_workspace
-        - /home/grimm/dagent-data/db:/app/db
+        - $DAGENT_DATA_DIR/knowledge_store:/app/knowledge_store
+        - $DAGENT_DATA_DIR/execution_workspace:/app/execution_workspace
+        - $DAGENT_DATA_DIR/db:/app/db
       env:
         DB_URL: sqlite:////app/db/dagent.sqlite3
 ```

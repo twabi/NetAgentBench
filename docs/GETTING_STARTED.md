@@ -171,18 +171,32 @@ source venv/bin/activate
 python -c "import benchmark; print('Installation successful!')"
 ```
 
-## Quick Start
+## Quick start (choose a lane)
 
-### Your First Benchmark
+- **Multi-turn (NetAgentBench-style):** provision **dagent**, then run `benchmark run-task tasks/multi_turn/<task>.json …` (details: [Research usage](RESEARCH_USAGE.md), [Agentic evaluation](AGENTIC_EVALUATION.md)).
+- **Single-turn (legacy classroom / regression):** craft a submission JSON and invoke `benchmark run <task> <submission>`.
 
-1. **Create a task definition** (or use an existing one):
+### Multi-turn smoke test
 
 ```bash
-# View available tasks
+poetry shell
+benchmark run-task tasks/multi_turn/ccna_rip_routing_basic.json \
+  --dagent-endpoint http://localhost:8000 \
+  --provider openai \
+  --model gpt-4o-mini \
+  --turn-limit 25 \
+  --time-limit 600
+```
+
+### Legacy: first single-shot benchmark
+
+1. **Inspect catalogued tasks**
+
+```bash
 benchmark list-tasks
 ```
 
-2. **Create a submission file**:
+2. **Author a submission**
 
 ```json
 {
@@ -212,6 +226,8 @@ benchmark list-tasks
 ```bash
 benchmark run <task_file> <submission_file>
 ```
+
+See [Submission Format](SUBMISSION_FORMAT.md).
 
 ## Development Workflow
 

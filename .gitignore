@@ -77,4 +77,7 @@ dmypy.json
 results/
 .agent/
 
+# Local experiment payloads
+scripts/rerun_plan.json
+
 *.pid

@@ -4,6 +4,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${REPO_ROOT}" || exit 1
+
 # Configuration
 DAGENT_ENDPOINT="${DAGENT_ENDPOINT:-http://localhost:8000}"
 OLLAMA_HOST="http://localhost:11434"
@@ -26,17 +30,11 @@ echo "Session: ${SESSION_NAME}"
 echo "Output:  ${OUTPUT_DIR}"
 echo "============================================================"
 
-# Ensure we're in the project root
-if [ -d "/home/grimm/python_projects/benchmark" ]; then
-    cd /home/grimm/python_projects/benchmark
-elif [ -d "/root/network-benchmark" ]; then
-    cd /root/network-benchmark
-fi
-
-# Load the rerun plan
-PLAN_FILE="/root/rerun_plan.json"
+# Load the rerun plan (override with env RERUN_PLAN_FILE)
+PLAN_FILE="${RERUN_PLAN_FILE:-${REPO_ROOT}/scripts/rerun_plan.json}"
+# Example shape: [{"task":"tasks/multi_turn/foo.json","provider":"openai","model":"gpt-4o-mini","agent_mode":"multi","structure":"sequential"}]
 if [ ! -f "$PLAN_FILE" ]; then
-    echo "Error: Rerun plan $PLAN_FILE not found!"
+    echo "Error: Rerun plan $PLAN_FILE not found! Set RERUN_PLAN_FILE or create ${REPO_ROOT}/scripts/rerun_plan.json"
     exit 1
 fi
 

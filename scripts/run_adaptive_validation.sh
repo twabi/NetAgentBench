@@ -5,6 +5,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${REPO_ROOT}" || exit 1
+
 DAGENT_ENDPOINT="${DAGENT_ENDPOINT:-http://localhost:8000}"
 OLLAMA_HOST="${OLLAMA_HOST:-http://localhost:11434}"
 TURN_LIMIT=100
@@ -25,10 +29,6 @@ MODELS=(
 SESSION_NAME="adaptive_validation_$(date +%Y%m%d_%H%M%S)"
 OUTPUT_DIR="results/adaptive_validation/${SESSION_NAME}"
 mkdir -p "${OUTPUT_DIR}"
-
-if [ -d "/home/grimm/python_projects/benchmark" ]; then
-    cd /home/grimm/python_projects/benchmark
-fi
 
 TOTAL=$((${#TASKS[@]} * ${#MODELS[@]}))
 CURRENT=0

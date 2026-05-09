@@ -4,6 +4,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${REPO_ROOT}" || exit 1
+
 # Configuration
 DAGENT_ENDPOINT="${DAGENT_ENDPOINT:-http://localhost:8000}"
 TURN_LIMIT="${TURN_LIMIT:-100}"
@@ -70,8 +74,6 @@ cat > "${OUTPUT_DIR}/session_info.json" << EOF
   "total_planned_runs": ${TOTAL}
 }
 EOF
-
-cd ~/python_projects/benchmark
 
 run_multiturn() {
     local task_file=$1

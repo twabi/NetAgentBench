@@ -1,17 +1,53 @@
 # Research Usage Guide
 
-This document describes how to use the Network Configuration Benchmark system for academic research, including running studies, analyzing results, and exporting data for publication.
+This document describes how to use the benchmark for academic research: **multi-turn agentic studies** (primary, paper-aligned) and **single-turn submissions** (legacy).
+
+## Single-turn vs multi-turn
+
+| | Multi-turn (primary) | Single-turn (legacy) |
+|--|--|--|
+| Goal | Bounded interactive episodes; rich traces for behavioral analysis. | One-shot evaluation of a frozen `Submission` JSON. |
+| Tasks | [`tasks/multi_turn/*.json`](../tasks/multi_turn/) | Root [`tasks/`](../tasks/), `tasks/sample/`. |
+| CLI | `benchmark run-task` + [`scripts/`](../scripts/) batch drivers | `benchmark run`, `benchmark run-llm`, etc. |
+| Paper | [arXiv:2604.09678](https://arxiv.org/abs/2604.09678) | Exploratory unless explicitly compared. |
+| Extra runtime | **Agent HTTP service** (e.g. **dagent**) at `--dagent-endpoint` | None beyond task execution. |
+
+Prefer **multi-turn** runs for NetAgentBench reproducibility discussions.
+
+## Multi-turn workflow
+
+1. Launch **dagent** (or compatible agent) and benchmark dependencies (Docker, Containerlab).
+2. Fire `benchmark run-task <task.json> ...` or a study script that loops over tasks/models/patterns.
+3. Collect JSON under `results/` and analyze with the helpers below.
+
+Typical session roots created by helper scripts:
+
+| Pattern | Example path | Notes |
+|---------|--------------|-------|
+| Comparative sweeps | `results/comparative_study/<session>/` | `run_comparative_multiturn_study.sh`; contains `session_info.json` plus `runs/`. |
+| Adaptive validation | `results/adaptive_validation/<session>/` | `run_adaptive_validation.sh`. |
+| Ollama-heavy runs | `results/ollama_multiturn_runs/<session>/` | Extended local model studies. |
+
+### Analyze multi-turn batches
+
+Aggregate a finished session folder (median turns, meltdown proxies, exports — see script `--help`):
+
+```bash
+poetry run python scripts/analyze_multiturn_results.py results/comparative_study/<session_name>
+```
+
+Re-run selective configurations with **`scripts/rerun_failed_study_runs.sh`**; provide `scripts/rerun_plan.json` (gitignored template: `rerun_plan.example.json`). Override with **`RERUN_PLAN_FILE`**.
 
 ## Overview
 
-The benchmark system is designed for academic research on network configuration automation, particularly evaluating LLM-based approaches. It provides:
+The benchmark system supports research on autonomous configuration agents. It emphasizes:
 
-- **Reproducible results** - Deterministic execution with full traceability
-- **Comprehensive metrics** - Multiple scoring dimensions for analysis
-- **Statistical analysis** - Built-in tools for comparing testee groups
-- **Export formats** - JSON, CSV, and LaTeX table formats for papers
+- **Reproducible results** — Deterministic execution with full traceability
+- **Comprehensive metrics** — Multiple scoring dimensions for analysis
+- **Statistical analysis** — Built-in tools for comparing testee groups when using legacy aggregates
+- **Export formats** — JSON, CSV, and LaTeX-friendly summaries
 
-## Running Studies
+## Running studies (legacy single-turn)
 
 ### Single Benchmark Run
 
@@ -316,14 +352,16 @@ export_latex_table(runs, "table.tex")
 3. **Visualization**: Use appropriate visualizations (box plots, bar charts)
 4. **Limitations**: Discuss limitations and threats to validity
 
-## Related Documentation
+## Related documentation
 
-- [Task Format](TASK_FORMAT.md) - Task definition specification
-- [Submission Format](SUBMISSION_FORMAT.md) - Submission format guide
-- [CLI Usage](CLI_USAGE.md) - Command-line interface reference
-- [Architecture](ARCHITECTURE.md) - System architecture
+- [Agentic Evaluation](AGENTIC_EVALUATION.md)
+- [Task Format](TASK_FORMAT.md)
+- [Submission Format](SUBMISSION_FORMAT.md)
+- [CLI Usage](CLI_USAGE.md)
+- [Benchmark Scripts](BENCHMARK_SCRIPTS.md)
+- [Architecture](ARCHITECTURE.md)
 
 ---
 
-**Last Updated**: Phase 12 - Documentation Consolidation
+**Last updated:** Multi-turn workflows, comparative study paths, rerun tooling.
 

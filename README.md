@@ -1,57 +1,73 @@
-# Network Configuration Benchmark
+# Network Configuration Benchmark (NetAgentBench)
 
-A formal verification system for evaluating network configuration approaches using Finite State Machine (FSM) theory and Containerlab.
+Formal evaluation of network configuration behaviors using Finite State Machine (FSM) structure and Containerlab emulation. Companion software to [*NetAgentBench: A State-Centric Benchmark for Evaluating Agentic Network Configuration*](https://arxiv.org/abs/2604.09678).
 
 ## Overview
 
-This benchmark evaluates whether network configurations (from LLMs, humans, or automated systems) correctly achieve specified network intent. It provides **provably correct** evaluation based on rigorous FSM formalization.
+This benchmark evaluates whether configurations (human, scripted, LLM-guided, or autonomous agents) satisfy stated network intent while recording execution traces suited to research analysis.
 
-### Key Features
+### Key features
 
-- ✅ **Formal verification** - Based on FSM theory with proven correctness
-- ✅ **JSON-based standardization** - Structured input/output for testees
-- ✅ **Task-driven evaluation** - Task definitions specify topology, intent, and evaluation procedures
-- ✅ **Platform-agnostic design** - Abstracts infrastructure and configuration platforms
-- ✅ **Research-ready** - Collects comprehensive metrics for publication
-- ✅ **Containerlab integration** - Dynamic topology provisioning
+- **Formal grounding** — FSM-oriented task definitions with deterministic evaluation pipelines
+- **JSON task specs** — Topology, intent, and property checks standardized for tooling
+- **Multi-turn agentic runs** — Primary research path (`benchmark run-task`), with bounded episodes and MCP-mediated lab control
+- **Single-turn submissions** — Legacy/auxiliary workflows using static submissions (`benchmark run`, `benchmark run-llm`, …)
+- **Containerlab integration** — Emulated routers and links for repeatable experiments
 
-### Design Philosophy
+### Design philosophy
 
-1. **Task definitions are king** - JSON-based specs guide everything
-2. **Simplest solutions first** - No overengineering
-3. **Test-driven development** - Tests before code
-4. **Platform-agnostic** - Abstract design, Containerlab implementation
-5. **Research-ready** - Metrics suitable for publication
+1. Task definitions remain the contracts for evaluation
+2. Prefer the smallest change that solves the problem
+3. Test-driven iteration for correctness-critical pieces
+4. Keep infrastructure adapters swappable beyond Containerlab defaults
 
-## Quick Start
+## Evaluation modes
 
-### Installation
+| Mode | CLI | Typical tasks | Role |
+|------|-----|---------------|------|
+| **Multi-turn agentic** | `benchmark run-task` | [`tasks/multi_turn/`](tasks/multi_turn/) | **Primary.** Paper-aligned interactive evaluation; requires a separately run **agent HTTP service** (commonly **dagent**) reachable via `--dagent-endpoint`. |
+| **Single-turn submission** | `benchmark run`, `benchmark run-llm`, … | Top-level [`tasks/*.json`](tasks/), [`tasks/sample/`](tasks/sample/) | **Legacy/auxiliary.** One-shot submissions and property-batch sweeps. |
+
+Orchestration examples live under [`scripts/`](scripts/); conceptual diagram and MCP boundaries are in **[Agentic evaluation](docs/AGENTIC_EVALUATION.md)**.
+
+## Quick start
+
+### Install
 
 ```bash
 # Prerequisites: Docker, Containerlab, Poetry
-
-# Install Poetry (if not already installed)
 curl -sSL https://install.python-poetry.org | python3 -
-
-# Install project dependencies
+git clone https://github.com/twabi/network-benchmark.git
+cd network-benchmark
 poetry install
-
-# Activate Poetry shell
 poetry shell
 ```
 
-### Run a Benchmark
+Configure provider secrets in `.env` (ignored by git) when using cloud LLM APIs — see **[LLM integration](docs/LLM_INTEGRATION.md)**.
+
+### Multi-turn (recommended)
+
+After **dagent** (or compatible agent) is reachable:
 
 ```bash
-# Using Poetry
-poetry run benchmark run <task_file> <submission_file>
-
-# Or from within Poetry shell
-poetry shell
-benchmark run <task_file> <submission_file>
+poetry run benchmark run-task tasks/multi_turn/ccna_rip_routing_basic.json \
+  --dagent-endpoint http://localhost:8000 \
+  --provider openai \
+  --model gpt-4o-mini \
+  --turn-limit 50 \
+  --time-limit 600
 ```
 
-### Example Task Definition
+For large studies, wrapper scripts call `benchmark run-task` repeatedly (see **[Benchmark scripts](docs/BENCHMARK_SCRIPTS.md)**).
+
+### Legacy single-turn
+
+```bash
+poetry run benchmark run tasks/bgp_basic.json examples/human_submissions/bgp_2as_example.json
+benchmark list-tasks
+```
+
+### Example task excerpt (BGP property)
 
 ```json
 {
@@ -64,212 +80,72 @@ benchmark run <task_file> <submission_file>
     ],
     "links": [{"endpoints": ["R1:eth1", "R2:eth1"]}]
   },
-  "intent": {
-    "properties": [
-      {
-        "id": "bgp_session",
-        "type": "bgp_session",
-        "evaluation": {
-          "method": "exec_and_parse",
-          "target_node": "R1",
-          "command": "vtysh -c 'show bgp summary json'",
-          "parser": "json",
-          "success_condition": {
-            "json_path": "$.peers['192.168.1.2'].state",
-            "expected_value": "Established"
-          }
-        }
-      }
-    ]
-  }
+  "intent": { "properties": [] }
 }
 ```
 
-### Example Submission
+## Documentation index
 
-```json
-{
-  "task_id": "bgp_basic_001",
-  "testee_id": "gpt4",
-  "testee_type": "llm",
-  "approach": {
-    "description": "Configure eBGP peering",
-    "commands": [
-      {
-        "node": "R1",
-        "commands": [
-          "vtysh -c 'conf t' -c 'router bgp 65001'",
-          "vtysh -c 'conf t' -c 'neighbor 192.168.1.2 remote-as 65002'"
-        ]
-      }
-    ]
-  }
-}
-```
+| Guide | Purpose |
+|-------|---------|
+| [Getting Started](docs/GETTING_STARTED.md) | Prerequisites and first notebooks |
+| [Agentic Evaluation](docs/AGENTIC_EVALUATION.md) | Multi-turn setup, MCP/agent split, diagram |
+| [CLI Usage](docs/CLI_USAGE.md) | `run-task`, `run`, `run-llm`, utilities |
+| [Research Usage](docs/RESEARCH_USAGE.md) | Session folders, comparative studies, analyzers |
+| [Benchmark Scripts](docs/BENCHMARK_SCRIPTS.md) | `scripts/*.sh` catalog |
+| [LLM Integration](docs/LLM_INTEGRATION.md) | Provider keys & configuration |
+| [Task Format](docs/TASK_FORMAT.md) | JSON schema reference |
+| [Submission Format](docs/SUBMISSION_FORMAT.md) | Single-turn submission JSON |
+| [Architecture](docs/ARCHITECTURE.md), [Formalization](docs/FORMALIZATION_ALIGNMENT.md) | Design references |
+| [Public Release](docs/PUBLIC_RELEASE.md) | Mirrors, rewritten history guidance |
+| [Security](SECURITY.md) | Disclosure policy |
 
-## Documentation
+Full index: [docs/README.md](docs/README.md)
 
-Comprehensive documentation is available in the [`docs/`](docs/) directory:
+## Architecture (FSM view)
 
-- **[Getting Started](docs/GETTING_STARTED.md)** - Installation, setup, and first steps
-- **[Architecture](docs/ARCHITECTURE.md)** - System design and components
-- **[Task Format](docs/TASK_FORMAT.md)** - Task definition specification
-- **[Submission Format](docs/SUBMISSION_FORMAT.md)** - Submission format guide
-- **[CLI Usage](docs/CLI_USAGE.md)** - Command-line interface reference
-- **[Human Benchmark Guide](docs/HUMAN_BENCHMARK_GUIDE.md)** - Guide for human participants
-- **[LLM Integration](docs/LLM_INTEGRATION.md)** - LLM provider setup and usage
-- **[Research Usage](docs/RESEARCH_USAGE.md)** - Running studies and analyzing results
-- **[Testing Guide](docs/TESTING.md)** - Running and writing tests
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
-- **[Formalization Alignment](docs/FORMALIZATION_ALIGNMENT.md)** - Theory and implementation alignment
+1. **Infrastructure** — Provision Containerlab topology
+2. **SUT layer** — Apply candidate configuration and probe state
+3. **Controller** — Schedule evaluation, MCP bridges, telemetry
 
-See [docs/README.md](docs/README.md) for the complete documentation index.
+Interactive multi-turn runs add an **external agent tier** coordinating through MCP — see **[Agentic evaluation](docs/AGENTIC_EVALUATION.md)**.
 
-## Architecture
+## Scores
 
-The system follows a three-layer FSM architecture:
-
-1. **Infrastructure Layer**: Provisions network topology (Containerlab)
-2. **System Under Test (SUT) Layer**: Applies and evaluates configurations
-3. **Controller Layer**: Orchestrates the entire benchmark workflow
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentation.
-
-## Scoring Metrics
-
-Based on the formal model, the system computes:
-
-- **Completeness**: Fraction of properties satisfied (Score_C)
-- **Robustness**: Idempotency - can safely re-apply (Score_R)
-- **Syntactic Validity**: Fraction of valid commands (Score_X)
-- **Efficiency**: Optimality vs. reference solution (Score_E)
-- **Final Score**: Weighted combination
-
-Default weights: `{C: 0.4, R: 0.3, X: 0.2, E: 0.1}`
-
-## Project Status
-
-**Current Phase**: Phase 12 - CLI & Documentation
-
-See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for detailed progress tracking.
+Weighted combination of completeness, robustness, syntactic validity, and efficiency metrics (defaults documented in codebase and theory notes).
 
 ## Development
 
-### Running Tests
-
 ```bash
-# Unit tests (fast)
 poetry run pytest tests/unit/
-
-# Integration tests (slow, requires Containerlab)
-poetry run pytest tests/integration/ -m integration
-
-# All tests with coverage
-poetry run pytest --cov=benchmark --cov-report=html
+poetry run pytest tests/integration/ -m integration   # slow; needs Containerlab
 ```
-
-### Project Structure
-
-```
-benchmark/
-├── src/benchmark/          # Main package
-│   ├── models/            # Pydantic models
-│   ├── infrastructure/    # Containerlab provider
-│   ├── executor/          # Command execution
-│   ├── evaluator/         # Property evaluation
-│   ├── scoring/           # Metrics calculation
-│   ├── controller.py      # Main orchestrator
-│   └── storage.py         # Results persistence
-├── tasks/                 # Task definitions
-├── results/               # Benchmark results
-└── tests/                 # Test suite
-```
-
-## Research Usage
-
-This system is designed for academic research on network configuration automation, particularly LLM-based approaches.
-
-### Running a Study
-
-```bash
-# Run multiple submissions
-benchmark run tasks/bgp_basic.json submission1.json
-benchmark run tasks/bgp_basic.json submission2.json
-
-# Analyze results
-benchmark analyze study_001 run_001 run_002 run_003
-
-# Results saved to results/analysis/study_001.json
-```
-
-See [docs/RESEARCH_USAGE.md](docs/RESEARCH_USAGE.md) for detailed research workflows.
-
-## Theoretical Foundation
-
-This implementation is based on formal FSM theory. Key theoretical contributions:
-
-- **Two-layer FSM architecture** separating infrastructure from configuration
-- **Proven benchmark correctness** (Theorem: Benchmark Correctness)
-- **Valid solution characterization** (Theorem: Valid Solution)
-- **Robustness formalization** (Theorem: Robust Solution)
-
-Alignment with theory is tracked in [docs/FORMALIZATION_ALIGNMENT.md](docs/FORMALIZATION_ALIGNMENT.md).
 
 ## Contributing
 
-This is a research project. Contributions welcome following TDD principles:
+Prefer focused pull requests with tests for behavior changes. Larger design shifts should cite discussion in issues first.
 
-1. Write tests first
-2. Keep solutions simple
-3. Follow the formal model
-4. Document divergences from theory
-
-# Usage
+### Legacy batch LLM sweep (optional)
 
 ```bash
-# Step 1: Run reachability tasks (20 runs total)
 benchmark run-llm reachability --provider openai --model gpt-5-mini --limit 10
-benchmark run-llm reachability --provider gemini --model gemini-2.5-pro --limit 10
-
-# Step 2: Run BGP tasks (20 runs total)
-benchmark run-llm bgp_configuration --provider openai --model gpt-5-mini --limit 10
-benchmark run-llm bgp_configuration --provider gemini --model gemini-2.5-pro --limit 10
-
-# Step 3: Run OSPF tasks (20 runs total)
-benchmark run-llm ospf_configuration --provider openai --model gpt-5-mini --limit 10
-benchmark run-llm ospf_configuration --provider gemini --model gemini-2.5-pro --limit 10
-
-# Step 4: Verify storage
 benchmark list-runs --limit 30
-
-# Step 5: Check a specific result
-benchmark show-result <run_id> --verbose
-
-# Step 6: Analysis - Comparison
 benchmark analyze gpt-5-mini,gemini-2.5-pro
-
-# Step 7: Analysis - Property type
-benchmark analyze reachability
-benchmark analyze bgp_configuration
-benchmark analyze ospf_configuration
-
-# Step 8: Analysis - Individual testee
-benchmark analyze gpt-5-mini
-benchmark analyze gemini-2.5-pro
 ```
 
 ## License
 
-[To be determined]
+Licensed under **Apache License 2.0** — see [LICENSE](LICENSE).
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for coordinated disclosure. Assume any historically committed secret is burned; rotate keys regardless of cleanup.
 
 ## Citation
 
-[To be added upon publication]
+Twabi, A., Ding, Y., Kondo, T., *NetAgentBench: A State-Centric Benchmark for Evaluating Agentic Network Configuration*, arXiv:2604.09678, 2026.  
+Metadata for GitHub: [CITATION.cff](CITATION.cff).
 
 ## Contact
 
-[Your contact information]
-
----
-
-**Status**: 🚧 Under active development - Phase 12 in progress
+Open an issue at [github.com/twabi/network-benchmark](https://github.com/twabi/network-benchmark) for bugs and feature discussions.

@@ -6,15 +6,17 @@ Complete reference for the Network Configuration Benchmark CLI.
 
 1. [Installation](#installation)
 2. [Quick Start](#quick-start)
-3. [Task Management](#task-management)
-4. [Running Benchmarks](#running-benchmarks)
+3. [Single-turn vs multi-turn tasks](#single-turn-vs-multi-turn-tasks)
+4. [Multi-turn benchmark (`run-task`)](#multi-turn-benchmark-run-task)
+5. [Task Management](#task-management)
+6. [Running Benchmarks](#running-benchmarks)
    - [Single Task Execution](#single-task-execution)
    - [Property-Based Execution](#property-based-execution)
    - [LLM Testees](#llm-testees)
    - [Human Testees](#human-testees)
    - [Baseline Testees](#baseline-testees)
-5. [Results Management](#results-management)
-6. [Advanced Usage](#advanced-usage)
+7. [Results Management](#results-management)
+8. [Advanced Usage](#advanced-usage)
 
 ---
 
@@ -38,17 +40,62 @@ benchmark --help
 ## Quick Start
 
 ```bash
-# List all available tasks
+# List catalogued single-turn tasks (multi-turn JSONs live in tasks/multi_turn/)
 benchmark list-tasks
 
-# Run reachability tasks with baseline testee
+# Primary: multi-turn evaluation (start dagent/similar first)
+benchmark run-task tasks/multi_turn/ccna_rip_routing_basic.json \
+  --dagent-endpoint http://localhost:8000 \
+  --provider openai --model gpt-4o-mini
+
+# Legacy property batches
 benchmark run-baseline reachability
-
-# Run BGP tasks with OpenAI (requires API key in .env)
 benchmark run-llm bgp_configuration --provider openai
-
-# Run tasks interactively (human testee)
 benchmark run-human reachability --limit 3
+```
+
+---
+
+## Single-turn vs multi-turn tasks
+
+| | Multi-turn | Single-turn |
+|--|------------|-------------|
+| **`benchmark` entrypoint** | **`run-task`** | **`run`**, **`run-llm`**, **`run-baseline`**, **`run-human`** |
+| Task location | [`tasks/multi_turn/`](../tasks/multi_turn/) | Repo `tasks/`, `tasks/sample/`, registered catalog |
+| Paper track | [NetAgentBench (arXiv:2604.09678)](https://arxiv.org/abs/2604.09678) | auxiliary / regression |
+
+More context: [Research usage](RESEARCH_USAGE.md), [Agentic evaluation](AGENTIC_EVALUATION.md).
+
+---
+
+## Multi-turn benchmark (`run-task`)
+
+Runs a **single** multi-turn task JSON; provisions the lab, spins up the interactive controller/MCP path, and binds to an external `--dagent-endpoint`.
+
+```bash
+benchmark run-task <task_file> [OPTIONS]
+```
+
+| Option | Purpose |
+|--------|---------|
+| `--dagent-endpoint URL` | Agent HTTP base (typically required). |
+| `--provider` / `--model` | LLM routing (OpenAI, Gemini, Ollama, …). |
+| `--agent-mode` | `single` or `multi`. |
+| `--structure` | `sequential`, `concurrent`, `debate`, `group_chat`, `adaptive`. |
+| `--turn-limit` / `--time-limit` | Step and wall-clock guards. |
+| `--context-length`, `--provider-host`, `--mcp-host` | Extended provider / networking hints. |
+| `--output-dir` | Session root under `results/` (script-dependent layout). |
+| `--wait-for-submit` | Pause for hand-injected agents. |
+| `-v` | Verbose logging. |
+
+Examples:
+
+```bash
+benchmark run-task tasks/multi_turn/ccie_bgp_dual_homing_expert.json \
+  --dagent-endpoint http://localhost:8000 \
+  --provider openai --model gpt-4o \
+  --agent-mode multi --structure debate \
+  --turn-limit 100 --time-limit 1800
 ```
 
 ---
@@ -100,9 +147,11 @@ benchmark show-task reachability_triangle_001
 
 ## Running Benchmarks
 
+The subcommands below cover **single-turn** workloads. For **multi-turn** research, prefer [`run-task`](#multi-turn-benchmark-run-task).
+
 ### Single Task Execution
 
-Run a single task with a pre-written submission file (useful for debugging):
+**Single-turn (legacy):** supply a complete submission JSON for one evaluation pass.
 
 ```bash
 benchmark run <task_file> <submission_file> [OPTIONS]

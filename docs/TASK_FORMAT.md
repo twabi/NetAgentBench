@@ -2,6 +2,8 @@
 
 This document describes the format for defining benchmark tasks in the Network Configuration Benchmark system.
 
+**Where tasks ship:** Interactive research uses JSON under [`tasks/multi_turn/`](../tasks/multi_turn/) via **`benchmark run-task`** (see [Research usage](RESEARCH_USAGE.md), [CLI usage](CLI_USAGE.md)). That path matches the NetAgentBench study in [arXiv:2604.09678](https://arxiv.org/abs/2604.09678). Older single-turn catalogs live at the repository root [`tasks/`](../tasks/) and in [`tasks/sample/`](../tasks/sample/).
+
 ## Overview
 
 A task definition (`TaskDefinition`) specifies:

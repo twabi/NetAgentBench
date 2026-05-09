@@ -4,6 +4,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${REPO_ROOT}" || exit 1
+
 # Configuration
 LIMIT=30
 DAGENT_ENDPOINT="http://localhost:8000"
@@ -34,8 +38,6 @@ cat > "${OUTPUT_DIR}/session_info.json" << EOF
   "dagent_endpoint": "${DAGENT_ENDPOINT}"
 }
 EOF
-
-cd ~/python_projects/benchmark
 
 # Track progress
 TOTAL=6

@@ -2,6 +2,8 @@
 
 This document describes the format for creating benchmark submissions in the Network Configuration Benchmark system.
 
+**Scope:** Submissions are consumed by **`benchmark run`** and related single-shot tooling. **Multi-turn** **`run-task`** runs never take a `Submission` JSON as their driver—agent transcripts are emitted directly into `results/` instead.
+
 ## Overview
 
 A submission (`Submission`) specifies:
