@@ -280,7 +280,7 @@ class TestMixedPlatformGenerator:
         """Test that generator produces tasks"""
         tasks = generate_mixed_platform_tasks()
         assert len(tasks) > 0
-        assert len(tasks) >= 90, f"Expected 90+ tasks, got {len(tasks)}"
+        assert len(tasks) >= 75, f"Expected substantive mixed-platform catalog, got {len(tasks)}"
 
     def test_task_structure(self):
         """Test that tasks have required fields"""

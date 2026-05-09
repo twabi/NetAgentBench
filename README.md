@@ -30,7 +30,7 @@ This benchmark evaluates whether configurations (human, scripted, LLM-guided, or
 
 Orchestration examples live under [`scripts/`](scripts/); conceptual diagram and MCP boundaries are in **[Agentic evaluation](docs/AGENTIC_EVALUATION.md)**.
 
-## Quick start
+## Quick Start
 
 ### Install
 

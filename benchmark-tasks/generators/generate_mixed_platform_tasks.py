@@ -53,32 +53,6 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         )
         tasks.append(task)
 
-    # Two-platform combinations: FRR + Nokia
-    for node_count in [2, 3, 4, 5, 6]:
-        generator.reset_ip_counter()
-        topo = generator.generate_linear(node_count)
-        
-        task = create_mixed_platform_task(
-            topology=topo,
-            task_id=f"mixed_frr_nokia_linear_{node_count}n",
-            platforms=["frr", "nokia_srl"],
-            description=f"Linear {node_count}-node: FRR and Nokia mixed topology"
-        )
-        tasks.append(task)
-
-    # Two-platform combinations: FRR + Nokia
-    for node_count in [2, 3, 4, 5, 6]:
-        generator.reset_ip_counter()
-        topo = generator.generate_linear(node_count)
-        
-        task = create_mixed_platform_task(
-            topology=topo,
-            task_id=f"mixed_frr_nokia_linear_{node_count}n",
-            platforms=["frr", "nokia_srl"],
-            description=f"Linear {node_count}-node: FRR and Nokia mixed topology"
-        )
-        tasks.append(task)
-
     # Two-platform combinations: Nokia + Nokia
     for node_count in [2, 3, 4, 5]:
         generator.reset_ip_counter()
@@ -228,41 +202,14 @@ def generate_mixed_platform_tasks() -> List[Dict[str, Any]]:
         )
         tasks.append(task)
 
-    # Nokia-Nokia combinations
-    for node_count in [2, 3, 4, 5]:
-        generator.reset_ip_counter()
-        topo = generator.generate_linear(node_count)
-        
-        task = create_mixed_platform_task(
-            topology=topo,
-            task_id=f"mixed_nokia_nokia_{node_count}n",
-            platforms=["nokia_srl", "nokia_srl"],
-            description=f"Linear {node_count}-node: Nokia and Nokia mixed"
-        )
-        tasks.append(task)
-
-    # Star with Nokia hub
+    # Star with Nokia hub, all-Nokia spokes (distinct from FRR-spoke variant above)
     for node_count in [3, 4, 5, 6]:
         generator.reset_ip_counter()
         topo = generator.generate_star(node_count)
         
         task = create_mixed_platform_task(
             topology=topo,
-            task_id=f"mixed_nokia_hub_star_{node_count}n",
-            platforms=["nokia_srl", "frr"],
-            hub_platform="nokia_srl",
-            description=f"Star {node_count}-node: Nokia hub, FRR spokes"
-        )
-        tasks.append(task)
-
-    # Star with Nokia hub
-    for node_count in [3, 4, 5, 6]:
-        generator.reset_ip_counter()
-        topo = generator.generate_star(node_count)
-        
-        task = create_mixed_platform_task(
-            topology=topo,
-            task_id=f"mixed_nokia_hub_star_{node_count}n",
+            task_id=f"mixed_nokia_only_hub_star_{node_count}n",
             platforms=["nokia_srl", "nokia_srl"],
             hub_platform="nokia_srl",
             description=f"Star {node_count}-node: Nokia hub, Nokia spokes"
