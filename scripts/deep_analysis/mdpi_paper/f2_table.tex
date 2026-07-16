@@ -1,0 +1,31 @@
+\begin{table}[H]
+\caption{Per-intent-property satisfaction rates pooled across all patterns and models ($N=70$ per task) for BGP and multi-area OSPF tasks. Properties visible purely locally (e.g., session establishment) are satisfied more often than those requiring cross-router coherence (e.g., missing area routes, absent leak block).\label{tab:property_satisfaction}}
+\centering
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\textbf{Task} & \textbf{Property} & \textbf{Scope} & \textbf{Satisfaction Rate} \\
+\midrule
+\multirow{4}{*}{\parbox{2.5cm}{CCNP multi-area OSPF}}
+  & Area 0 Adjacency & Local & $41.4\%$ \\
+  & End-to-end reachability & Remote & $8.6\%$ \\
+  & Area 1 routes visible & Remote & $0.0\%$ \\
+  & Route summarization & Remote & $0.0\%$ \\
+\midrule
+\multirow{6}{*}{\parbox{2.5cm}{CCIE BGP dual-homing}}
+  & eBGP ISP1 established & Local & $44.3\%$ \\
+  & eBGP ISP2 established & Local & $35.7\%$ \\
+  & Convergence time optimized & Local & $34.3\%$ \\
+  & Route filtering outbound & Remote & $20.0\%$ \\
+  & Primary path preference & Local & $17.1\%$ \\
+  & AS-path prepending & Local & $12.9\%$ \\
+\midrule
+\multirow{5}{*}{\parbox{2.5cm}{Troubleshoot BGP route filtering}}
+  & Filtering verified (auth.\ permitted) & Remote & $100.0\%$ \\
+  & Route map applied & Local & $1.4\%$ \\
+  & Problem identified & Remote & $0.0\%$ \\
+  & Route map issue diagnosed & Local & $0.0\%$ \\
+  & Internal routes blocked & Remote & $0.0\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}

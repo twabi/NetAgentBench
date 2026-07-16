@@ -30,6 +30,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.deep_analysis.run_filters import is_adaptive_pattern_run, is_gpt5_nano_run
+from scripts.macro_pooled_stats import write_macro_pooled_artifacts
 
 import matplotlib
 matplotlib.use('Agg')
@@ -909,6 +910,9 @@ def main():
         writer.writeheader()
         for p in profiles:
             writer.writerow({k: p.get(k, "") for k in csv_fields})
+
+    write_macro_pooled_artifacts(profiles, out)
+    print("  ✓ macro_pooled_report.md, macro_pooled_kpis.csv, macro_pooled_by_protocol.csv")
 
     # ── Markdown report ──────────────────────────────────────────────────────
     def summary_table() -> str:

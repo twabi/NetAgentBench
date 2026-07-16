@@ -34,9 +34,6 @@ AGENT_CONFIGS=(
     "multi:debate"
     "multi:group_chat"
     "multi:concurrent"
-    #"multi:adaptive"
-    #"multi:hybrid"
-    #"multi:guarded"
 )
 
 # Models to test (provider:model)
