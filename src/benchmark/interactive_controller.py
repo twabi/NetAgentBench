@@ -34,9 +34,34 @@ from benchmark.models.results import (
 from benchmark.session.session import InteractiveSession
 from benchmark.session.mcp_server import BenchmarkMCPServer
 from benchmark.session.models import SubmitResult
+from benchmark.session.transcript import build_saved_command_logs
 
 # Setup logging
 logger = logging.getLogger(__name__)
+
+_LIMIT_ERRORS = ("time_limit_exceeded", "turn_limit_exceeded")
+
+
+def infer_termination_reason(
+    actions: List[Dict[str, Any]],
+    session_inactive: bool,
+    turns_used: int,
+    errors: List[str],
+) -> str:
+    """Label how a session ended. A time or turn limit is not a submit."""
+    if any("timed out" in err.lower() for err in errors):
+        return "dagent_timeout"
+    for action in reversed(actions or []):
+        err = (action.get("result") or {}).get("error")
+        if err in _LIMIT_ERRORS:
+            return err
+    if any(action.get("action") == "submit" for action in (actions or [])):
+        return "submitted"
+    if not session_inactive:
+        return "unknown"
+    if turns_used == 0:
+        return "dagent_timeout"
+    return "submitted"
 
 # Suppress noisy MCP library errors (ClosedResourceError on normal session close)
 logging.getLogger("mcp.server.streamable_http").setLevel(logging.CRITICAL)
@@ -129,7 +154,10 @@ class InteractiveBenchmarkController:
         dagent_structure: str = "sequential",
         context_length: Optional[int] = None,
         verbose: bool = False,
-    ) -> BenchmarkResult:
+        interactive_human: bool = False,
+        feedback_arm: Optional[str] = None,
+        reveal_snapshots: bool = False,
+    ) -> Optional[BenchmarkResult]:
         """
         Run an interactive benchmark session.
 
@@ -158,9 +186,10 @@ class InteractiveBenchmarkController:
             dagent_mode: Agent mode ('single' for single-agent, 'multi' for multi-agent)
             dagent_structure: Multi-agent structure ('sequential', 'concurrent', 'debate', 'group_chat')
             verbose: Print each agent action as it executes
+            interactive_human: Run local human REPL (no MCP server)
 
         Returns:
-            BenchmarkResult with evaluation and scores
+            BenchmarkResult with evaluation and scores, or None if human quit without submit
         """
         # Generate run ID
         run_id = self.generate_run_id(testee_id, model_name, "multi")
@@ -174,6 +203,7 @@ class InteractiveBenchmarkController:
         property_results: List[PropertyEvaluationResult] = []
         submit_result: Optional[SubmitResult] = None
         reasoning_trace: List[Dict[str, Any]] = []
+        actions: List[Dict[str, Any]] = []
 
         # Timing
         start_time = time.time()
@@ -199,10 +229,23 @@ class InteractiveBenchmarkController:
                 turn_limit=turn_limit,
                 time_limit=time_limit,
                 convergence_timeout=convergence_timeout,
+                log_property_snapshots=reveal_snapshots,
             )
 
             # Start session (provisions topology)
-            session_context = self._session.start()
+            if interactive_human:
+                from rich.console import Console
+                from rich.status import Status
+
+                console = Console()
+                with console.status("[bold green]Provisioning topology..."):
+                    session_context = self._session.start()
+                console.print(
+                    f"[green]✓[/green] Provisioned in {time.time() - provision_start:.1f}s "
+                    f"({len(session_context.nodes)} nodes ready)"
+                )
+            else:
+                session_context = self._session.start()
             provision_time = time.time() - provision_start
 
             logger.info(
@@ -210,180 +253,176 @@ class InteractiveBenchmarkController:
                 f"({len(session_context.nodes)} nodes, {provision_time:.2f}s)"
             )
 
-            # ============================================================
-            # STEP 2: Create and Configure MCP Server
-            # ============================================================
-            logger.info("Step 2: Setting up MCP server")
-            self._mcp_server = BenchmarkMCPServer(
-                session=self._session,
-                name=f"Benchmark_{task.task_id}",
-            )
-
-            # Start the MCP server on HTTP port in background thread
-            mcp_app = self._mcp_server.streamable_http_app()
-            config = uvicorn.Config(
-                mcp_app,
-                host="0.0.0.0",
-                port=mcp_port,
-                log_level="warning",
-            )
-            self._uvicorn_server = uvicorn.Server(config)
-            
-            def run_server():
-                asyncio.run(self._uvicorn_server.serve())
-            
-            self._server_thread = threading.Thread(target=run_server, daemon=True)
-            self._server_thread.start()
-            
-            # Give the server time to start
-            time.sleep(0.5)
-
-            logger.info(f"MCP server running on http://0.0.0.0:{mcp_port}")
-
-            # ============================================================
-            # STEP 3: Trigger Dagent (if endpoint provided)
-            # ============================================================
             dagent_result = None
             token_usage = None
             tool_usage = None
             agent_conversations = None
             total_commands = None
             failed_commands = None
-            if dagent_endpoint:
-                logger.info(f"Step 3: Triggering dagent at {dagent_endpoint}")
-                import httpx
-                
-                # Prepare task info for dagent
-                dagent_request = {
-                    # COMPLETE task definition for model context
-                    "task_definition": task.model_dump() if hasattr(task, 'model_dump') else task.dict(),
-                    # Individual fields (backwards compatibility)
-                    "task_id": task.task_id,
-                    "description": task.description,
-                    "nodes": [n.name for n in task.topology.nodes],
-                    "properties": [
-                        {
-                            "id": p.id, 
-                            "type": p.type.value if hasattr(p.type, 'value') else str(p.type), 
-                            "description": p.description,
-                            "evaluation": p.evaluation.model_dump() if hasattr(p.evaluation, 'model_dump') else (p.evaluation.dict() if hasattr(p.evaluation, 'dict') else None)
-                        }
-                        for p in task.intent.properties
-                    ],
-                    "mcp_url": f"http://{mcp_host}:{mcp_port}/mcp",
-                    "turn_limit": turn_limit,
-                    "time_limit": time_limit,
-                    # Pass provider and model to dagent
-                    "provider": dagent_provider or "openai",
-                    "model": dagent_model,
-                    "host": dagent_host,
-                    "agent_mode": dagent_mode,
-                    "structure": dagent_structure,
-                    "context_length": context_length,
-                }
-                
-                try:
-                    with httpx.Client(timeout=time_limit + 30) as client:
-                        response = client.post(
-                            f"{dagent_endpoint}/benchmark/solve",
-                            json=dagent_request,
-                        )
-                        dagent_result = response.json()
-                        # Extract model_version from dagent response
-                        model_name = dagent_result.get("model_version", "unknown")
-                        reasoning_trace = dagent_result.get("reasoning_trace", [])
-                        # Extract new tracking metrics
-                        token_usage = dagent_result.get("token_usage", None)
-                        tool_usage = dagent_result.get("tool_usage", None)
-                        agent_conversations = dagent_result.get("agent_conversations", None)
-                        # Calculate failed commands from actions
-                        actions_list = dagent_result.get("actions", [])
-                        total_commands = len(actions_list)
-                        failed_commands = sum(
-                            1 for a in actions_list 
-                            if not a.get("result", {}).get("success", True)
-                        )
-                        logger.info(f"Dagent response: {dagent_result}")
-                        logger.info(f"Agent model: {model_name}")
-                        if token_usage:
-                            logger.info(f"Token usage: {token_usage}")
-                        
-                        # Verbose: print each action
-                        if verbose:
-                            actions = dagent_result.get("actions", [])
-                            print(f"\n{'='*60}")
-                            print(f"Agent Actions ({len(actions)} total)")
-                            print(f"{'='*60}")
-                            for i, action in enumerate(actions, 1):
-                                act_type = action.get("action", "unknown")
-                                inp = action.get("input", {})
-                                res = action.get("result", {})
-                                node = inp.get("node", "?")
-                                cmd = inp.get("command", "?")[:60]
-                                success = "✓" if res.get("success") else "✗"
-                                cmd_type = inp.get("command_type", "config")[:4]
-                                print(f"{i:3}. [{success}] {node} ({cmd_type}) {cmd}")
-                                # Show error or first line of output for failures
-                                if not res.get("success") and res.get("stdout"):
-                                    first_line = res["stdout"].split("\n")[0][:50]
-                                    print(f"     └─ {first_line}")
-                            print(f"{'='*60}\n")
-                except Exception as e:
-                    logger.error(f"Dagent call failed: {e}")
-                    errors.append(f"Dagent call failed: {e}")
-                    
-                    # RECOVERY: Try to get metrics from session if dagent failed/timed out
-                    try:
-                        exec_log_tuples = self._session.get_execution_log()
-                        if exec_log_tuples:
-                            total_commands = len(exec_log_tuples)
-                            failed_commands = sum(1 for _, _, success in exec_log_tuples if not success)
-                            tool_usage = {"exec_command": total_commands}
-                            logger.info(f"Recovered partial metrics from session: {total_commands} commands")
-                    except Exception as recovery_err:
-                        logger.warning(f"Could not recover metrics from session: {recovery_err}")
-                
-                session_time = time.time() - provision_start - provision_time
 
-            # ============================================================
-            # STEP 4: Wait for Session Completion (manual mode)
-            # ============================================================
-            elif wait_for_submit:
-                logger.info("Step 4: Waiting for session completion")
+            if interactive_human:
+                # ============================================================
+                # STEP 2: Human interactive shell (no MCP)
+                # ============================================================
+                from benchmark.human_shell import HumanShell
+
+                logger.info("Step 2: Starting human interactive shell")
                 session_start = time.time()
-
-                # Poll for session completion
-                while self._session.is_active:
-                    time.sleep(1.0)
-
-                    # Check time limit
-                    elapsed = time.time() - session_start
-                    if elapsed >= time_limit:
-                        logger.info(f"Time limit reached: {elapsed:.1f}s")
-                        break
-
+                shell = HumanShell(self._session, task)
+                submit_result = shell.run()
                 session_time = time.time() - session_start
 
-                # Get submit result if session was submitted
-                if not self._session.is_active:
-                    try:
-                        submit_result = self._session.submit()
-                    except Exception:
-                        # Session may have already been submitted
-                        pass
+                if submit_result is None:
+                    logger.info("Human session aborted by user")
+                    return None
 
-                logger.info(f"Session completed after {session_time:.2f}s")
             else:
-                logger.info("Step 3: Skipping wait (wait_for_submit=False)")
-                session_time = 0.0
+                # MCP path (all non-human interactive modes)
+                # ============================================================
+                # STEP 2: Create and Configure MCP Server
+                # ============================================================
+                logger.info("Step 2: Setting up MCP server")
+                self._mcp_server = BenchmarkMCPServer(
+                    session=self._session,
+                    name=f"Benchmark_{task.task_id}",
+                    feedback_arm=feedback_arm,
+                )
+
+                mcp_app = self._mcp_server.streamable_http_app()
+                config = uvicorn.Config(
+                    mcp_app,
+                    host="0.0.0.0",
+                    port=mcp_port,
+                    log_level="warning",
+                )
+                self._uvicorn_server = uvicorn.Server(config)
+
+                def run_server():
+                    asyncio.run(self._uvicorn_server.serve())
+
+                self._server_thread = threading.Thread(target=run_server, daemon=True)
+                self._server_thread.start()
+                time.sleep(0.5)
+
+                logger.info(f"MCP server running on http://0.0.0.0:{mcp_port}")
+
+                if dagent_endpoint:
+                    logger.info(f"Step 3: Triggering dagent at {dagent_endpoint}")
+                    import httpx
+
+                    dagent_request = {
+                        "task_definition": task.model_dump() if hasattr(task, 'model_dump') else task.dict(),
+                        "task_id": task.task_id,
+                        "description": task.description,
+                        "nodes": [n.name for n in task.topology.nodes],
+                        "properties": [
+                            {
+                                "id": p.id,
+                                "type": p.type.value if hasattr(p.type, 'value') else str(p.type),
+                                "description": p.description,
+                                "evaluation": p.evaluation.model_dump() if hasattr(p.evaluation, 'model_dump') else (p.evaluation.dict() if hasattr(p.evaluation, 'dict') else None)
+                            }
+                            for p in task.intent.properties
+                        ],
+                        "mcp_url": f"http://{mcp_host}:{mcp_port}/mcp",
+                        "turn_limit": turn_limit,
+                        "time_limit": time_limit,
+                        "provider": dagent_provider or "openai",
+                        "model": dagent_model,
+                        "host": dagent_host,
+                        "agent_mode": dagent_mode,
+                        "structure": dagent_structure,
+                        "context_length": context_length,
+                        "feedback_arm": feedback_arm,
+                    }
+
+                    try:
+                        with httpx.Client(timeout=time_limit + 30) as client:
+                            response = client.post(
+                                f"{dagent_endpoint}/benchmark/solve",
+                                json=dagent_request,
+                            )
+                            dagent_result = response.json()
+                            model_name = dagent_result.get("model_version", "unknown")
+                            reasoning_trace = dagent_result.get("reasoning_trace", [])
+                            token_usage = dagent_result.get("token_usage", None)
+                            tool_usage = dagent_result.get("tool_usage", None)
+                            agent_conversations = dagent_result.get("agent_conversations", None)
+                            actions_list = dagent_result.get("actions", [])
+                            actions = list(actions_list)
+                            total_commands = len(actions_list)
+                            failed_commands = sum(
+                                1 for a in actions_list
+                                if not a.get("result", {}).get("success", True)
+                            )
+                            logger.info(f"Dagent response: {dagent_result}")
+                            logger.info(f"Agent model: {model_name}")
+                            if token_usage:
+                                logger.info(f"Token usage: {token_usage}")
+
+                            if verbose:
+                                actions = dagent_result.get("actions", [])
+                                print(f"\n{'='*60}")
+                                print(f"Agent Actions ({len(actions)} total)")
+                                print(f"{'='*60}")
+                                for i, action in enumerate(actions, 1):
+                                    act_type = action.get("action", "unknown")
+                                    inp = action.get("input", {})
+                                    res = action.get("result", {})
+                                    node = inp.get("node", "?")
+                                    cmd = inp.get("command", "?")[:60]
+                                    success = "✓" if res.get("success") else "✗"
+                                    cmd_type = inp.get("command_type", "config")[:4]
+                                    print(f"{i:3}. [{success}] {node} ({cmd_type}) {cmd}")
+                                    if not res.get("success") and res.get("stdout"):
+                                        first_line = res["stdout"].split("\n")[0][:50]
+                                        print(f"     └─ {first_line}")
+                                print(f"{'='*60}\n")
+                    except Exception as e:
+                        logger.error(f"Dagent call failed: {e}")
+                        errors.append(f"Dagent call failed: {e}")
+                        try:
+                            exec_log_tuples = self._session.get_execution_log()
+                            if exec_log_tuples:
+                                total_commands = len(exec_log_tuples)
+                                failed_commands = sum(1 for _, _, success in exec_log_tuples if not success)
+                                tool_usage = {"exec_command": total_commands}
+                                logger.info(f"Recovered partial metrics from session: {total_commands} commands")
+                        except Exception as recovery_err:
+                            logger.warning(f"Could not recover metrics from session: {recovery_err}")
+
+                    session_time = time.time() - provision_start - provision_time
+
+                elif wait_for_submit:
+                    logger.info("Step 4: Waiting for session completion")
+                    session_start = time.time()
+
+                    while self._session.is_active:
+                        time.sleep(1.0)
+                        elapsed = time.time() - session_start
+                        if elapsed >= time_limit:
+                            logger.info(f"Time limit reached: {elapsed:.1f}s")
+                            break
+
+                    session_time = time.time() - session_start
+
+                    if not self._session.is_active:
+                        try:
+                            submit_result = self._session.submit()
+                        except Exception:
+                            pass
+
+                    logger.info(f"Session completed after {session_time:.2f}s")
+                else:
+                    logger.info("Step 3: Skipping wait (wait_for_submit=False)")
+                    session_time = 0.0
 
             # ============================================================
             # STEP 4: Evaluate Properties
             # ============================================================
             # Wait for protocol convergence before evaluation (especially for BGP/OSPF)
             convergence_wait = getattr(task.convergence, 'timeout_seconds', 10) if task.convergence else 10
-            # For multi-turn, use a portion of the convergence timeout after agent submits
-            pre_eval_wait = min(convergence_wait, 30)  # Cap at 30 seconds
+            pre_eval_wait = convergence_wait
             logger.info(f"Step 4: Waiting {pre_eval_wait}s for protocol convergence before evaluation")
             time.sleep(pre_eval_wait)
             
@@ -499,24 +538,41 @@ class InteractiveBenchmarkController:
 
             # Get turn info and termination reason from session
             try:
-                status = self._session.get_session_status()
-                turns_used = status.turns_used
-                # Get termination reason from submit_result or session
                 if submit_result:
-                    termination_reason = submit_result.reason
-                elif not self._session.is_active:
-                    # Check if it was a timeout vs actual submission
-                    if any("timed out" in e.lower() for e in errors):
-                        termination_reason = "dagent_timeout"
-                    elif turns_used == 0:
-                        termination_reason = "dagent_timeout"  # No turns means dagent never ran
-                    else:
-                        termination_reason = "submitted"
+                    termination_reason = submit_result.termination_reason
+                    turns_used = submit_result.total_turns
                 else:
-                    termination_reason = "unknown"
+                    status = self._session.get_session_status()
+                    turns_used = status.turns_used
+                    termination_reason = infer_termination_reason(
+                        actions,
+                        session_inactive=not self._session.is_active,
+                        turns_used=turns_used,
+                        errors=errors,
+                    )
             except Exception:
                 turns_used = 0
                 termination_reason = "error"
+
+            # Guide experiment metadata from session context
+            check_properties_count = None
+            property_trajectory = None
+            if self._session and self._session._context is not None:
+                check_properties_count = self._session._context.property_check_count
+                raw_trajectory = getattr(
+                    self._session._context, "property_trajectory", None
+                )
+                if isinstance(raw_trajectory, list) and raw_trajectory:
+                    property_trajectory = list(raw_trajectory)
+
+            try:
+                transcript_tuples = self._session.get_command_transcript()
+            except Exception:
+                transcript_tuples = []
+
+            command_transcript, execution_log_lines = build_saved_command_logs(
+                transcript_tuples
+            )
 
             result = BenchmarkResult(
                 run_id=run_id,
@@ -546,12 +602,15 @@ class InteractiveBenchmarkController:
                     failed_commands=failed_commands,
                     token_usage=token_usage if dagent_endpoint else None,
                     agent_conversations=agent_conversations if dagent_endpoint else None,
+                    guide_arm=feedback_arm,
+                    check_properties_count=check_properties_count,
+                    property_trajectory=property_trajectory,
                 ),
-                execution_log=[
-                    f"{node} | {cmd}" for node, cmd in approach_tuples
-                ],
+                command_transcript=command_transcript,
+                execution_log=execution_log_lines,
                 errors=errors,
                 reasoning_trace=reasoning_trace,
+                actions=actions,
             )
 
             logger.info(

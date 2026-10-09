@@ -179,11 +179,19 @@ def extract_execution_commands(execution_log: List) -> List[Tuple[str, str]]:
     for entry in execution_log:
         if not isinstance(entry, str):
             continue
-        if ' | ' in entry:
-            router, cmd = entry.split(' | ', 1)
+        parts = entry.split(" | ", 3)
+        if (
+            len(parts) == 4
+            and parts[1] in ("config", "read")
+            and parts[3] in ("ok", "fail")
+        ):
+            pairs.append((parts[0].strip(), parts[2].strip()))
+            continue
+        if " | " in entry:
+            router, cmd = entry.split(" | ", 1)
             pairs.append((router.strip(), cmd.strip()))
         else:
-            pairs.append(('unknown', entry.strip()))
+            pairs.append(("unknown", entry.strip()))
     return pairs
 
 

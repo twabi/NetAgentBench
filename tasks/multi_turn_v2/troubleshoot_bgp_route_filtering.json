@@ -1,0 +1,136 @@
+{
+  "task_id": "troubleshoot_bgp_route_filtering",
+  "description": "An enterprise edge router in AS 65000 is already peered with an ISP in AS 65001. The ISP is learning the edge's internal prefixes as well as its public prefix. When the task is done, the ISP learns 192.0.2.0/24 from the edge (203.0.113.2) and no other prefix from the edge, and the edge advertises that same public prefix to the ISP and no other prefix. The internal prefixes that must not be advertised are 10.0.0.1/32, 10.1.0.0/30, and 10.2.0.0/30.\n\nIP Addressing Plan:\n- EDGE: eth1=203.0.113.2/30 (to ISP), eth2=10.1.0.1/30, eth3=10.2.0.1/30, lo=10.0.0.1/32\n- ISP: eth1=203.0.113.1/30, lo=1.1.1.1/32\n- INTERNAL1: eth1=10.1.0.2/30, lo=10.10.1.1/32\n- INTERNAL2: eth1=10.2.0.2/30, lo=10.10.2.1/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "EDGE", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "ISP", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "INTERNAL1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "INTERNAL2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["EDGE:eth1", "ISP:eth1"]},
+      {"endpoints": ["EDGE:eth2", "INTERNAL1:eth1"]},
+      {"endpoints": ["EDGE:eth3", "INTERNAL2:eth1"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "filter_applied_outbound",
+        "type": "bgp_configuration",
+        "description": "EDGE advertises 192.0.2.0/24 to the ISP and no other prefix",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE",
+          "command": "vtysh -c 'show ip bgp neighbors 203.0.113.1 advertised-routes'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*^\\*\\S*\\s+192\\.0\\.2\\.0/24\\s+0\\.0\\.0\\.0\\s)(?!.*^\\*\\S*\\s+(?!192\\.0\\.2\\.0/24\\s)\\S+\\s+0\\.0\\.0\\.0\\s)",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "isp_receives_authorized_only",
+        "type": "bgp_configuration",
+        "description": "ISP learns 192.0.2.0/24 from EDGE (203.0.113.2) and no other prefix from EDGE",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "ISP",
+          "command": "vtysh -c 'show ip bgp'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*^\\*\\S*\\s+192\\.0\\.2\\.0/24\\s+203\\.0\\.113\\.2\\s[^\\n]*\\s\\d+(?: \\d+)* [ie?]$)(?!.*^\\*\\S*\\s+(?!192\\.0\\.2\\.0/24\\s)\\S+\\s+203\\.0\\.113\\.2\\s)",
+            "must_match": true
+          }
+        }
+      }
+    ]
+  },
+  "preconfiguration": [
+    {
+      "node": "EDGE",
+      "command": "vtysh -c 'conf t\n ip route 192.0.2.0/24 Null0\n ip prefix-list PL-PUBLIC-ONLY permit 192.0.2.0/24\n route-map FILTER-OUT permit 10\n  match ip address prefix-list PL-PUBLIC-ONLY\n exit\n route-map ALLOW-ALL permit 10\n exit\n interface lo\n  ip address 10.0.0.1/32\n exit\n interface eth1\n  ip address 203.0.113.2/30\n exit\n interface eth2\n  ip address 10.1.0.1/30\n exit\n interface eth3\n  ip address 10.2.0.1/30\n exit\n router bgp 65000\n  bgp router-id 10.0.0.1\n  neighbor 203.0.113.1 remote-as 65001\n  neighbor 203.0.113.1 route-map ALLOW-ALL in\n  neighbor 203.0.113.1 route-map ALLOW-ALL out\n  network 10.0.0.1/32\n  network 10.1.0.0/30\n  network 10.2.0.0/30\n  network 192.0.2.0/24'"
+    },
+    {
+      "node": "ISP",
+      "command": "vtysh -c 'conf t\n route-map ALLOW-ALL permit 10\n exit\n interface lo\n  ip address 1.1.1.1/32\n exit\n interface eth1\n  ip address 203.0.113.1/30\n exit\n router bgp 65001\n  bgp router-id 1.1.1.1\n  neighbor 203.0.113.2 remote-as 65000\n  neighbor 203.0.113.2 route-map ALLOW-ALL in\n  neighbor 203.0.113.2 route-map ALLOW-ALL out'"
+    },
+    {
+      "node": "INTERNAL1",
+      "command": "vtysh -c 'conf t\n interface eth1\n  ip address 10.1.0.2/30\n exit\n interface lo\n  ip address 10.10.1.1/32\n exit'"
+    },
+    {
+      "node": "INTERNAL2",
+      "command": "vtysh -c 'conf t\n interface eth1\n  ip address 10.2.0.2/30\n exit\n interface lo\n  ip address 10.10.2.1/32\n exit'"
+    }
+  ],
+  "fault_verification": [
+    {
+      "id": "verify_session_established",
+      "type": "bgp_configuration",
+      "description": "EDGE's session to the ISP is Established",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "EDGE",
+        "command": "vtysh -c 'show ip bgp neighbors 203.0.113.1'",
+        "parser": "regex",
+        "success_condition": {
+          "pattern": "remote AS 65001\\b.*BGP state = Established",
+          "must_match": true
+        }
+      }
+    },
+    {
+      "id": "verify_internal_leak",
+      "type": "bgp_configuration",
+      "description": "ISP has learned the internal prefix 10.0.0.1/32 from EDGE",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "ISP",
+        "command": "vtysh -c 'show ip bgp'",
+        "parser": "regex",
+        "success_condition": {
+          "pattern": "^\\*\\S*\\s+10\\.0\\.0\\.1/32\\s+203\\.0\\.113\\.2\\s",
+          "must_match": true
+        }
+      }
+    },
+    {
+      "id": "verify_filter_not_applied",
+      "type": "bgp_configuration",
+      "description": "FILTER-OUT is not the outgoing policy toward the ISP",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "EDGE",
+        "command": "vtysh -c 'show ip bgp neighbors 203.0.113.1'",
+        "parser": "regex",
+        "success_condition": {
+          "pattern": "^\\s*Route map for outgoing advertisements is \\*FILTER-OUT\\s*$",
+          "must_match": false
+        }
+      }
+    }
+  ],
+  "convergence": {
+    "timeout_seconds": 120,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 8,
+    "description": "Confirm FILTER-OUT is not attached, apply it outbound on neighbor 203.0.113.1, then clear the session soft out and confirm the ISP holds only 192.0.2.0/24 from EDGE."
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "20-40",
+    "expected_time_minutes": 30,
+    "citation": "BGP route filtering is a CCNP ENARSI and CCIE troubleshooting item. The injected fault is a route-map that is defined and not attached to the neighbor.",
+    "literature_basis": "Prefix-lists and route-maps for outbound filtering are standard BGP policy, documented with RFC 4271. The authorized prefix is 192.0.2.0/24 (documentation prefix), distinct from the EDGE-ISP peering subnet.",
+    "time_justification": "Thirty minutes covers reading the neighbor policy, attaching the existing route-map outbound, refreshing advertisements, and checking the ISP table."
+  },
+  "version": "v2"
+}

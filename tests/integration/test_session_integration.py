@@ -102,7 +102,7 @@ class TestInteractiveSessionWithContainerlab:
             # Check status
             status = session.get_session_status()
             assert status.is_active
-            assert status.turns_used == 0  # READ doesn't count
+            assert status.turns_used == 1
 
             # Execute config command
             config_result = session.exec_command(
@@ -114,12 +114,12 @@ class TestInteractiveSessionWithContainerlab:
 
             # Verify turn counted
             status = session.get_session_status()
-            assert status.turns_used == 1
+            assert status.turns_used == 2
 
             # Submit session
             submit_result = session.submit()
             assert submit_result.completed
-            assert submit_result.total_turns == 1
+            assert submit_result.total_turns == 2
             assert not session.is_active
 
         finally:

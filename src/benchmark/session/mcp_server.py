@@ -27,6 +27,7 @@ from benchmark.session.session import (
     TurnLimitExceededError,
     TimeLimitExceededError,
 )
+from benchmark.guide.arms import FeedbackArm, CHECK_PROPERTIES_CAP
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ class BenchmarkMCPServer:
         self,
         session: InteractiveSession,
         name: str = "BenchmarkServer",
+        feedback_arm: Optional[str] = None,
     ):
         """
         Initialize the MCP server.
@@ -54,9 +56,14 @@ class BenchmarkMCPServer:
         Args:
             session: The interactive session to expose via MCP
             name: Server name for MCP identification
+            feedback_arm: Guide experiment arm (blind/declared/feedback/placebo).
+                When None, legacy tool set only (no check tools).
         """
         self.session = session
         self._session_context: Optional[SessionContext] = None
+        self._feedback_arm: Optional[FeedbackArm] = (
+            FeedbackArm.from_str(feedback_arm) if feedback_arm else None
+        )
         self._mcp = FastMCP(name=name, stateless_http=True, json_response=True)
 
         # Register tools
@@ -82,8 +89,8 @@ class BenchmarkMCPServer:
             Args:
                 node: Name of the node to execute on (e.g., 'R1', 'R2')
                 command: Command string to execute (e.g., 'vtysh -c "show ip route"')
-                command_type: Type of command - 'config' (modifies state, counts as turn) 
-                              or 'read' (observes state, doesn't count as turn)
+                command_type: Label stored with the command ('config' or 'read').
+                              Every command counts as one turn, whichever label is sent.
 
             Returns:
                 Execution result with stdout, stderr, exit code, convergence status
@@ -179,7 +186,7 @@ class BenchmarkMCPServer:
 
             IMPORTANT: Call this BEFORE starting extensive work to understand your resource budget!
             This helps you plan effectively by showing:
-            - How many configuration turns you've used vs. remaining
+            - How many commands you've used vs. remaining (reads count too)
             - How much time has elapsed vs. remaining
             - Whether the session is still active
 
@@ -192,8 +199,8 @@ class BenchmarkMCPServer:
                 Session status with turns and time information:
                 - success: Whether the status check succeeded
                 - is_active: Whether the session is still accepting commands
-                - turns_used: Number of configuration commands executed
-                - turns_remaining: Number of configuration commands left
+                - turns_used: Number of commands executed
+                - turns_remaining: Number of commands left
                 - time_elapsed: Seconds elapsed since session start
                 - time_remaining: Seconds remaining before timeout
             """
@@ -254,9 +261,67 @@ class BenchmarkMCPServer:
                     "message": str(e),
                 }
 
+        if self._feedback_arm == FeedbackArm.FEEDBACK:
+
+            @self._mcp.tool()
+            def check_properties() -> Dict[str, Any]:
+                """
+                Check live satisfaction of declared intent properties on current network state.
+
+                Returns a boolean vector eval(s_t, P) plus completeness score.
+                Does not consume a configuration turn. Capped per episode.
+                """
+                try:
+                    return self.session.check_properties_live(CHECK_PROPERTIES_CAP)
+                except SessionNotActiveError as e:
+                    return {
+                        "success": False,
+                        "error": "session_not_active",
+                        "message": str(e),
+                    }
+                except Exception as e:
+                    logger.error(f"Error checking properties: {e}")
+                    return {
+                        "success": False,
+                        "error": "check_properties_error",
+                        "message": str(e),
+                    }
+
+        if self._feedback_arm == FeedbackArm.PLACEBO:
+
+            @self._mcp.tool()
+            def check_syntactic_validity() -> Dict[str, Any]:
+                """
+                Check whether recent commands executed without error (syntactic validity).
+
+                Returns command success rate for recent exec_command calls.
+                Does not consume a configuration turn. Capped per episode.
+                This is NOT a property satisfaction check.
+                """
+                try:
+                    return self.session.check_syntactic_validity_live(CHECK_PROPERTIES_CAP)
+                except SessionNotActiveError as e:
+                    return {
+                        "success": False,
+                        "error": "session_not_active",
+                        "message": str(e),
+                    }
+                except Exception as e:
+                    logger.error(f"Error checking syntactic validity: {e}")
+                    return {
+                        "success": False,
+                        "error": "check_syntactic_validity_error",
+                        "message": str(e),
+                    }
+
     def get_tool_list(self) -> List[str]:
         """Get list of registered tool names."""
-        return ["exec_command", "submit", "get_session_status", "get_nodes"]
+        tools = ["exec_command", "submit", "get_session_status", "get_nodes"]
+        if self._feedback_arm == FeedbackArm.FEEDBACK:
+            tools.append("check_properties")
+        elif self._feedback_arm == FeedbackArm.PLACEBO:
+            tools.append("check_syntactic_validity")
+        return tools
 
     def run(self, transport: str = "streamable-http") -> None:
         """
@@ -295,6 +360,7 @@ class BenchmarkMCPServer:
 def create_benchmark_mcp_server(
     session: InteractiveSession,
     name: str = "BenchmarkServer",
+    feedback_arm: Optional[str] = None,
 ) -> BenchmarkMCPServer:
     """
     Factory function to create a BenchmarkMCPServer.
@@ -302,8 +368,11 @@ def create_benchmark_mcp_server(
     Args:
         session: The interactive session to expose
         name: Server name
+        feedback_arm: Optional guide experiment arm
 
     Returns:
         Configured BenchmarkMCPServer instance
     """
-    return BenchmarkMCPServer(session=session, name=name)
+    return BenchmarkMCPServer(
+        session=session, name=name, feedback_arm=feedback_arm
+    )

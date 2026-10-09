@@ -25,8 +25,8 @@ This benchmark evaluates whether configurations (human, scripted, LLM-guided, or
 
 | Mode | CLI | Typical tasks | Role |
 |------|-----|---------------|------|
-| **Multi-turn agentic** | `benchmark run-task` | [`tasks/multi_turn/`](tasks/multi_turn/) | **Primary.** Paper-aligned interactive evaluation; requires a separately run **agent HTTP service** reachable via `--dagent-endpoint`. Use the bundled **[`agent_harness/`](agent_harness/)** (recommended) or any compatible agent. |
-| **Single-turn submission** | `benchmark run`, `benchmark run-llm`, … | Top-level [`tasks/*.json`](tasks/), [`tasks/sample/`](tasks/sample/) | **Legacy/auxiliary.** One-shot submissions and property-batch sweeps. |
+| **Multi-turn agentic** | `benchmark run-task` | [`tasks/multi_turn_v2/`](tasks/multi_turn_v2/) (changes from the earlier set: [`CHANGES.md`](tasks/multi_turn_v2/CHANGES.md)) | **Primary.** Paper-aligned interactive evaluation; requires a separately run **agent HTTP service** reachable via `--dagent-endpoint`. Use the bundled **[`agent_harness/`](agent_harness/)** (recommended) or any compatible agent. |
+| **Single-turn submission** | `benchmark run`, `benchmark run-llm`, … | [`tasks/archive/`](tasks/archive/) (with the earlier multi-turn set in `tasks/archive/multi_turn/`) | **Legacy/auxiliary.** One-shot submissions and property-batch sweeps. |
 
 Orchestration examples live under [`scripts/`](scripts/); conceptual diagram and MCP boundaries are in **[Agentic evaluation](docs/AGENTIC_EVALUATION.md)**.
 
@@ -37,8 +37,8 @@ Orchestration examples live under [`scripts/`](scripts/); conceptual diagram and
 ```bash
 # Prerequisites: Docker, Containerlab, Poetry
 curl -sSL https://install.python-poetry.org | python3 -
-git clone https://github.com/twabi/network-benchmark.git
-cd network-benchmark
+git clone https://github.com/twabi/NetAgentBench.git
+cd NetAgentBench
 poetry install
 poetry shell
 ```
@@ -61,7 +61,7 @@ This snapshot supports agent structures `sequential`, `concurrent`, `debate`, an
 Then from the benchmark repo:
 
 ```bash
-poetry run benchmark run-task tasks/multi_turn/ccna_rip_routing_basic.json \
+poetry run benchmark run-task tasks/multi_turn_v2/ccna_rip_routing_basic.json \
   --dagent-endpoint http://localhost:8000 \
   --provider openai \
   --model gpt-4o-mini \
@@ -74,7 +74,7 @@ For large studies, wrapper scripts call `benchmark run-task` repeatedly (see **[
 ### Legacy single-turn
 
 ```bash
-poetry run benchmark run tasks/bgp_basic.json examples/human_submissions/bgp_2as_example.json
+poetry run benchmark run tasks/archive/bgp_basic.json examples/human_submissions/bgp_2as_example.json
 benchmark list-tasks
 ```
 

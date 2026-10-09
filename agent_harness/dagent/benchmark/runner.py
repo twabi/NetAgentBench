@@ -11,14 +11,16 @@ from pathlib import Path
 from typing import Dict, Any
 
 from dagent.core.providers.factory import ModelProviderFactory
-from dagent.core.agent.patterns.single import SingleAgentPattern
+from dagent.core.agent.patterns.single import SingleAgentPattern, DEFAULT_SYSTEM_PROMPT
 from dagent.core.agent.patterns.sequential import SequentialPattern
 from dagent.core.agent.patterns.concurrent import ConcurrentPattern
 from dagent.core.agent.patterns.debate import DebatePattern
 from dagent.core.agent.patterns.group_chat import GroupChatPattern
 from dagent.core.agent.config import MASConfig
 from dagent.benchmark.mcp_client import BenchmarkMCPClient
+from dagent.benchmark.task import BenchmarkTask
 from dagent.benchmark.config import BenchmarkAgentConfig, AgentMode, AgentStructure
+from dagent.benchmark.arms import build_task_context, build_benchmark_instructions
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,7 @@ async def run_benchmark_agent(
     mcp_url: str,
     task_dict: Dict[str, Any],
     agent_config: Dict[str, Any] = None,
+    feedback_arm: str = None,
 ) -> Dict[str, Any]:
     """
     Run a benchmark agent on a task.
@@ -100,35 +103,18 @@ async def run_benchmark_agent(
 
         # Construct system prompt with tools and benchmark-specific instructions
         benchmark_instructions = """
-IMPORTANT: You are configuring network devices to satisfy specific properties.
+IMPORTANT: You are configuring network devices so the network reaches the goal in the task.
 
-IP ADDRESSING REQUIREMENTS:
-1. **Properties are your constraints**: Review ALL properties first to identify required IP addresses
-   - If a property tests 'ping 10.3.0.3', then 10.3.0.3 MUST exist in your design
-   - If a property checks for 'contains_text: "10.0.0.1"', you MUST configure 10.0.0.1
-   - Properties define the REQUIRED IPs - your job is to design a coherent scheme that includes them
+The goal describes the end state. Work from that description and from what you observe on the devices.
 
-2. **Design a coherent IP addressing scheme**:
-   - For loopback interfaces: Use 10.0.0.X/32 (where X matches node number or identifier)
-   - For point-to-point links: Use /30 or /31 subnets (e.g., 10.X.0.1/30 and 10.X.0.2/30)
-   - For shared segments: Use appropriate subnet masks (/24 for small networks)
-   - Maintain consistency across your design
-
-3. **Network design workflow**:
-   a) Read the complete task definition (topology + properties)
-   b) Extract all required IPs from property success_conditions
-   c) Design an IP scheme that satisfies these constraints
-   d) Configure interfaces with your planned IPs
-   e) Add routing (static routes, OSPF, BGP) as needed
-   f) Verify properties are satisfied
-
-4. **Platform-specific commands**:
-   - For FRR routers: Can use EITHER vtysh commands OR Linux ip commands
+1. Read the goal and the topology.
+2. Where the goal gives an addressing plan, use it. Where addresses are already configured, discover them by inspection.
+3. Platform commands:
+   - FRR routers: vtysh, or Linux `ip` commands for addresses.
      * vtysh: `vtysh -c "configure terminal" -c "interface eth1" -c "ip address 10.1.0.1/24"`
      * Linux: `ip addr add 10.1.0.1/24 dev eth1`
-   - For static routes: `ip route add 10.2.0.0/24 via 10.1.0.1`
-   - For OSPF: Must use vtysh with proper OSPF configuration
-   - Enable IP forwarding when needed: `sysctl -w net.ipv4.ip_forward=1`
+   - Routing protocols: configure via vtysh.
+   - Enable forwarding when needed: `sysctl -w net.ipv4.ip_forward=1`
 
 CRITICAL ERROR HANDLING RULES:
 After EVERY command, you MUST check the OBSERVATION response:
@@ -161,16 +147,19 @@ After EVERY command, you MUST check the OBSERVATION response:
    - Action: [retry with corrected command]
 
 5. **Verification before submit**:
-   - Before calling 'submit', run verification commands for EACH property
-   - Example: If property checks "ping 10.0.0.4", run that exact ping command
-   - Check that the verification output matches the expected success condition
-   - Only submit if ALL verifications pass
+   - Before calling 'submit', run show and ping commands that confirm the goal.
+   - Only submit when the live network matches that end state.
 
 Remember: A real network engineer would NEVER configure a network without testing it works!
 You must verify each step actually succeeded before moving on.
 
-After verifying your solution satisfies all properties, call the 'submit' tool to complete the task.
+After verifying the goal, call the 'submit' tool to complete the task.
 """
+        # Arm-aware instructions: blind hides declared criteria; feedback/placebo
+        # add a note to use the on-request progress-check tool.
+        benchmark_instructions = build_benchmark_instructions(
+            feedback_arm, benchmark_instructions
+        )
         system_prompt = f"""You are an AI assistant that solves tasks by executing tool actions.
 
 CRITICAL: You MUST respond with ONLY a valid JSON object. No explanations, no markdown, no text before or after the JSON.
@@ -263,17 +252,13 @@ AVAILABLE TOOLS:
             return {"success": False, "error": f"Unknown agent mode: {config.mode}", "turns_used": 0}
             
         # 6. Create task dictionary
-        # Pass the ENTIRE task definition as context so models have access to all information:
-        # - topology (nodes, links)
-        # - properties (requirements with success conditions)
-        # - optimal_solution (hints about expected approach)
-        # - research_context (complexity estimates)
-        # This eliminates the need for prompt engineering and ensures consistent information access.
+        # Context is arm-aware and excludes the injected fault, the reference
+        # solution, and property match commands.
         
         task = {
             "task_id": task_dict["task_id"],
             "description": task_dict["description"],
-            "context": task_dict,  # Pass complete task definition
+            "context": build_task_context(task_dict, feedback_arm),  # arm-aware: blind hides declared properties
             "turn_limit": task_dict.get("turn_limit", 50),
             "time_limit": task_dict.get("time_limit", 600.0),
         }

@@ -133,6 +133,15 @@ class ExecutionMetrics(BaseModel):
     agent_conversations: Optional[List[Dict[str, Any]]] = Field(
         None, description="Inter-agent message log for multi-agent patterns (multi-turn only)"
     )
+    guide_arm: Optional[str] = Field(
+        None, description="Property-guidance experiment arm (blind/declared/feedback/placebo)"
+    )
+    check_properties_count: Optional[int] = Field(
+        None, description="Number of check_properties or placebo check calls (guide only)"
+    )
+    property_trajectory: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Per-check eval snapshots for Reveal analysis (guide only)"
+    )
 
 
 # ============================================================================
@@ -160,6 +169,15 @@ class ValidityCheck(BaseModel):
     condition_b_semantic: bool = Field(
         ..., description="Condition (b): All properties satisfied"
     )
+
+
+class CommandTranscriptEntry(BaseModel):
+    """One command executed during a multi-turn session."""
+
+    node: str = Field(..., description="Router/node name")
+    command: str = Field(..., description="Shell command string")
+    command_type: str = Field(..., description="config or read")
+    success: bool = Field(..., description="Whether the command exited successfully")
 
 
 # ============================================================================
@@ -206,8 +224,15 @@ class BenchmarkResult(BaseModel):
     scoring: ScoringResult = Field(..., description="Scoring metrics")
     validity: ValidityCheck = Field(..., description="Validity check (Theorem 1)")
     metrics: ExecutionMetrics = Field(..., description="Execution timing metrics")
+    command_transcript: List[CommandTranscriptEntry] = Field(
+        default_factory=list,
+        description="Full ordered transcript of every executed command",
+    )
     execution_log: List[str] = Field(
-        default_factory=list, description="Complete execution log"
+        default_factory=list,
+        description=(
+            "Human-readable transcript lines: node | command_type | command | status"
+        ),
     )
     errors: List[str] = Field(
         default_factory=list, description="Errors encountered during execution"
@@ -217,6 +242,10 @@ class BenchmarkResult(BaseModel):
     )
     reasoning_trace: List[Dict[str, Any]] = Field(
         default_factory=list, description="Agent reasoning trace (multi-turn only)"
+    )
+    actions: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Full action list returned by the agent, including submit and status checks",
     )
 
 

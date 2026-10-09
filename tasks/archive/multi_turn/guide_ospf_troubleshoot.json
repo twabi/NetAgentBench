@@ -1,0 +1,128 @@
+{
+  "task_id": "guide_ospf_troubleshoot",
+  "description": "Troubleshoot a broken OSPF adjacency in a four-router ring. The network is pre-configured but R3 has a wrong OSPF area on the link to R2. Identify and fix the misconfiguration so all adjacencies are Full and end-to-end reachability is restored.\n\nIP Addressing Plan:\n- R1: eth1=10.0.12.1/30, eth2=10.0.14.1/30, lo=10.0.0.1/32\n- R2: eth1=10.0.12.2/30, eth2=10.0.23.2/30, lo=10.0.0.2/32\n- R3: eth1=10.0.23.3/30, eth2=10.0.34.3/30, lo=10.0.0.3/32\n- R4: eth1=10.0.34.4/30, eth2=10.0.14.4/30, lo=10.0.0.4/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "R1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R4", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["R1:eth1", "R2:eth1"]},
+      {"endpoints": ["R2:eth2", "R3:eth1"]},
+      {"endpoints": ["R3:eth2", "R4:eth1"]},
+      {"endpoints": ["R4:eth2", "R1:eth2"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "r2_r3_adjacency_full",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency between R2 and R3 is Full after the fix",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {"contains_text": "Full/"}
+        }
+      },
+      {
+        "id": "all_neighbors_full_r2",
+        "type": "ospf_configuration",
+        "description": "R2 has Full OSPF neighbors toward R1 and R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {"contains_all": ["10.0.0.1", "10.0.0.3"]}
+        }
+      },
+      {
+        "id": "r3_eth1_area0",
+        "type": "ospf_configuration",
+        "description": "R3 eth1 interface is in OSPF Area 0",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "vtysh -c 'show ip ospf interface eth1'",
+          "parser": "text",
+          "success_condition": {"contains_text": "Area 0"}
+        }
+      },
+      {
+        "id": "end_to_end_reachability",
+        "type": "reachability",
+        "description": "R1 can reach R4 loopback 10.0.0.4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 -W 2 10.0.0.4",
+          "parser": "text",
+          "success_condition": {"contains_text": "3 packets transmitted, 3 packets received"}
+        }
+      },
+      {
+        "id": "ospf_routes_on_r1",
+        "type": "route_exists",
+        "description": "R1 routing table contains OSPF routes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {"contains_text": "O>"}
+        }
+      }
+    ]
+  },
+  "preconfiguration": [
+    {
+      "node": "R1",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.1/32\n exit\n interface eth1\n  ip address 10.0.12.1/30\n exit\n interface eth2\n  ip address 10.0.14.1/30\n exit\n router ospf\n  ospf router-id 10.0.0.1\n  network 10.0.0.1/32 area 0\n  network 10.0.12.0/30 area 0\n  network 10.0.14.0/30 area 0'"
+    },
+    {
+      "node": "R2",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.2/32\n exit\n interface eth1\n  ip address 10.0.12.2/30\n exit\n interface eth2\n  ip address 10.0.23.2/30\n exit\n router ospf\n  ospf router-id 10.0.0.2\n  network 10.0.0.2/32 area 0\n  network 10.0.12.0/30 area 0\n  network 10.0.23.0/30 area 0'"
+    },
+    {
+      "node": "R3",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.3/32\n exit\n interface eth1\n  ip address 10.0.23.3/30\n exit\n interface eth2\n  ip address 10.0.34.3/30\n exit\n router ospf\n  ospf router-id 10.0.0.3\n  network 10.0.0.3/32 area 0\n  network 10.0.23.0/30 area 1\n  network 10.0.34.0/30 area 0'"
+    },
+    {
+      "node": "R4",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.4/32\n exit\n interface eth1\n  ip address 10.0.34.4/30\n exit\n interface eth2\n  ip address 10.0.14.4/30\n exit\n router ospf\n  ospf router-id 10.0.0.4\n  network 10.0.0.4/32 area 0\n  network 10.0.34.0/30 area 0\n  network 10.0.14.0/30 area 0'"
+    }
+  ],
+  "fault_verification": [
+    {
+      "id": "verify_broken_adjacency",
+      "type": "ospf_configuration",
+      "description": "Adjacency R2-R3 is not Full before agent acts",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "R2",
+        "command": "vtysh -c 'show ip ospf neighbor 10.0.0.3'",
+        "parser": "text",
+        "success_condition": {"not_contains_text": "Full"}
+      }
+    }
+  ],
+  "convergence": {"timeout_seconds": 45, "check_interval_seconds": 3},
+  "optimal_solution": {
+    "command_count": 8,
+    "description": "Fix R3 eth1 OSPF area from 1 to 0, verify adjacency and reachability"
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "10-20",
+    "expected_time_minutes": 15,
+    "experiment": "property_guidance"
+  }
+}

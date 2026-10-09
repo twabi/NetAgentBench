@@ -9,6 +9,7 @@ from dagent.core.providers.openai_provider import OpenAIProvider
 from dagent.core.providers.ollama_provider import OllamaProvider
 from dagent.core.providers.anthropic_provider import AnthropicProvider
 from dagent.core.providers.gemini_provider import GeminiProvider
+from dagent.core.providers.openrouter_provider import OpenRouterProvider
 
 
 class ModelProviderFactory:
@@ -16,7 +17,7 @@ class ModelProviderFactory:
     Factory for creating model providers based on provider name.
     """
 
-    SUPPORTED_PROVIDERS = ["openai", "ollama", "anthropic", "gemini"]
+    SUPPORTED_PROVIDERS = ["openai", "ollama", "anthropic", "gemini", "openrouter"]
 
     @staticmethod
     def create(
@@ -49,6 +50,8 @@ class ModelProviderFactory:
             return AnthropicProvider(model=model, api_key=api_key)
         elif provider == "gemini":
             return GeminiProvider(model=model, api_key=api_key)
+        elif provider == "openrouter":
+            return OpenRouterProvider(model=model, api_key=api_key)
         else:
             raise ValueError(
                 f"Unknown provider: {provider}. "

@@ -40,11 +40,11 @@ benchmark --help
 ## Quick Start
 
 ```bash
-# List catalogued single-turn tasks (multi-turn JSONs live in tasks/multi_turn/)
+# List catalogued single-turn tasks (multi-turn JSONs live in tasks/multi_turn_v2/)
 benchmark list-tasks
 
 # Primary: multi-turn evaluation (start dagent/similar first)
-benchmark run-task tasks/multi_turn/ccna_rip_routing_basic.json \
+benchmark run-task tasks/multi_turn_v2/ccna_rip_routing_basic.json \
   --dagent-endpoint http://localhost:8000 \
   --provider openai --model gpt-4o-mini
 
@@ -61,7 +61,7 @@ benchmark run-human reachability --limit 3
 | | Multi-turn | Single-turn |
 |--|------------|-------------|
 | **`benchmark` entrypoint** | **`run-task`** | **`run`**, **`run-llm`**, **`run-baseline`**, **`run-human`** |
-| Task location | [`tasks/multi_turn/`](../tasks/multi_turn/) | Repo `tasks/`, `tasks/sample/`, registered catalog |
+| Task location | [`tasks/multi_turn_v2/`](../tasks/multi_turn_v2/) | Repo `tasks/`, `tasks/archive/sample/`, registered catalog |
 | Paper track | [NetAgentBench (arXiv:2604.09678)](https://arxiv.org/abs/2604.09678) | auxiliary / regression |
 
 More context: [Research usage](RESEARCH_USAGE.md), [Agentic evaluation](AGENTIC_EVALUATION.md).
@@ -86,17 +86,55 @@ benchmark run-task <task_file> [OPTIONS]
 | `--context-length`, `--provider-host`, `--mcp-host` | Extended provider / networking hints. |
 | `--output-dir` | Session root under `results/` (script-dependent layout). |
 | `--wait-for-submit` | Pause for hand-injected agents. |
+| `--human` | Interactive human shell (solve the task yourself; no agent/MCP). |
 | `-v` | Verbose logging. |
 
 Examples:
 
 ```bash
-benchmark run-task tasks/multi_turn/ccie_bgp_dual_homing_expert.json \
+benchmark run-task tasks/multi_turn_v2/ccie_bgp_dual_homing_expert.json \
   --dagent-endpoint http://localhost:8000 \
   --provider openai --model gpt-4o \
   --agent-mode multi --structure debate \
   --turn-limit 100 --time-limit 1800
 ```
+
+### Human interactive mode
+
+Solve a multi-turn task yourself in a local REPL (no dagent, no MCP client):
+
+```bash
+benchmark run-task tasks/multi_turn_v2/ccna_rip_routing_basic.json --human \
+  --turn-limit 100 --time-limit 1800
+```
+
+You will be prompted for a **testee ID** (your name or handle). The benchmark provisions the lab, then starts an interactive shell.
+
+**Shell commands:**
+
+| Input | Action |
+|-------|--------|
+| `NODE - command` | Config command (counts as a turn) |
+| `NODE ? command` | Read/verify command (free) |
+| `show top` | Topology, links, and task description |
+| `nodes` | List node names |
+| `status` | Turns and time remaining |
+| `submit` | Finish and evaluate |
+| `quit` / `exit` | Abort without saving (confirmation required) |
+| `help` | Command reference |
+
+Example session:
+
+```
+> show top
+> R1 - ip addr add 10.1.1.1/30 dev eth1
+> R1 ? vtysh -c 'show ip route'
+> submit
+```
+
+Results are saved under `results/runs/` with `testee_type: human`. Quitting without `submit` tears down the lab and does not save a result.
+
+`--human` cannot be combined with `--dagent-endpoint`.
 
 ---
 
@@ -170,16 +208,16 @@ benchmark run <task_file> <submission_file> [OPTIONS]
 
 ```bash
 # Basic usage
-benchmark run tasks/bgp_basic.json submission.json
+benchmark run tasks/archive/bgp_basic.json submission.json
 
 # With verbose output
-benchmark run tasks/bgp_basic.json submission.json --verbose
+benchmark run tasks/archive/bgp_basic.json submission.json --verbose
 
 # Keep containers for debugging
-benchmark run tasks/bgp_basic.json submission.json --no-teardown
+benchmark run tasks/archive/bgp_basic.json submission.json --no-teardown
 
 # Custom output directory
-benchmark run tasks/bgp_basic.json submission.json --output-dir my_results/
+benchmark run tasks/archive/bgp_basic.json submission.json --output-dir my_results/
 ```
 
 ### Property-Based Execution

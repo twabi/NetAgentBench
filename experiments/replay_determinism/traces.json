@@ -1,0 +1,26 @@
+{
+  "repeats": 3,
+  "traces": [
+    {
+      "id": "success_rip",
+      "role": "success",
+      "task_id": "ccna_rip_routing_basic",
+      "run_json": "results/comparatives_all/runs/ccna_rip_routing_basic/openai_gpt5mini20250807_single_mt_20260217_104420_ead7fd3e.json",
+      "task_json": "tasks/multi_turn/ccna_rip_routing_basic.json"
+    },
+    {
+      "id": "collapse_ospf",
+      "role": "ospf_collapse",
+      "task_id": "ccnp_multiarea_ospf_intermediate",
+      "run_json": "results/comparatives_all/runs/ccnp_multiarea_ospf_intermediate/openai_gpt5mini20250807_single_mt_20260224_145126_c5c0daf4.json",
+      "task_json": "tasks/multi_turn/ccnp_multiarea_ospf_intermediate.json"
+    },
+    {
+      "id": "partial_rip",
+      "role": "partial",
+      "task_id": "ccna_rip_routing_basic",
+      "run_json": "results/comparatives_all/runs/ccna_rip_routing_basic/ollama_qwen3codernext:latest_single_mt_20260222_102601_003850db.json",
+      "task_json": "tasks/multi_turn/ccna_rip_routing_basic.json"
+    }
+  ]
+}

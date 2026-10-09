@@ -142,8 +142,17 @@ def _get_cmds(log: List) -> List[str]:
     """Extract bare commands from execution_log entries."""
     cmds = []
     for entry in log:
-        if isinstance(entry, str):
-            cmds.append(entry.split(' | ', 1)[-1].strip() if ' | ' in entry else entry.strip())
+        if not isinstance(entry, str):
+            continue
+        parts = entry.split(" | ", 3)
+        if (
+            len(parts) == 4
+            and parts[1] in ("config", "read")
+            and parts[3] in ("ok", "fail")
+        ):
+            cmds.append(parts[2].strip())
+            continue
+        cmds.append(entry.split(" | ", 1)[-1].strip() if " | " in entry else entry.strip())
     return cmds
 
 

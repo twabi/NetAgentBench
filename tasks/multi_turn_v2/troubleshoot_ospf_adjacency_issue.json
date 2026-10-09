@@ -1,0 +1,222 @@
+{
+  "task_id": "troubleshoot_ospf_adjacency_issue",
+  "description": "A four-router OSPF ring (R1-R2-R3-R4-R1) should run entirely in Area 0. One adjacency is not forming, and traffic is surviving only by going the long way around the ring. Restore the ring so that every adjacency is up and the direct path is used again.\n\nIP Addressing Plan:\n- R1: eth1=10.0.12.1/30, eth2=10.0.14.1/30, lo=10.0.0.1/32\n- R2: eth1=10.0.12.2/30, eth2=10.0.23.1/30, lo=10.0.0.2/32\n- R3: eth1=10.0.23.2/30, eth2=10.0.34.1/30, lo=10.0.0.3/32\n- R4: eth1=10.0.34.2/30, eth2=10.0.14.2/30, lo=10.0.0.4/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R4:eth2",
+          "R1:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "fault_corrected",
+        "type": "ospf_configuration",
+        "description": "R3's link to R2 (eth1) is back in the backbone area (Area 0)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "vtysh -c 'show ip ospf interface eth1'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "Area 0\\.0\\.0\\.0\\b",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "r2_r3_adjacency_full",
+        "type": "ospf_configuration",
+        "description": "The OSPF adjacency between R2 and R3 (router-id 10.0.0.3) is Full",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "^10\\.0\\.0\\.3\\s+\\d+\\s+Full/",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "r2_uses_restored_link",
+        "type": "route_exists",
+        "description": "R2 now reaches R3's loopback over the repaired direct link",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip route 10.0.0.3/32'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "Known via \"ospf\".*^\\s*\\*\\s*10\\.0\\.23\\.2, via eth2",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "topology_reconverged",
+        "type": "route_exists",
+        "description": "A router not adjacent to the fault (R1) has re-converged: it load-shares to R3 via R2 and R4",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip route 10.0.0.3/32'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*10\\.0\\.12\\.2, via eth1)(?=.*10\\.0\\.14\\.2, via eth2)",
+            "must_match": true
+          }
+        }
+      }
+    ]
+  },
+  "preconfiguration": [
+    {
+      "node": "R1",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.1/32\n exit\n interface eth1\n  ip address 10.0.12.1/30\n exit\n interface eth2\n  ip address 10.0.14.1/30\n exit\n router ospf\n  ospf router-id 10.0.0.1\n  network 10.0.0.1/32 area 0\n  network 10.0.12.0/30 area 0\n  network 10.0.14.0/30 area 0'"
+    },
+    {
+      "node": "R2",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.2/32\n exit\n interface eth1\n  ip address 10.0.12.2/30\n exit\n interface eth2\n  ip address 10.0.23.1/30\n exit\n router ospf\n  ospf router-id 10.0.0.2\n  network 10.0.0.2/32 area 0\n  network 10.0.12.0/30 area 0\n  network 10.0.23.0/30 area 0'"
+    },
+    {
+      "node": "R3",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.3/32\n exit\n interface eth1\n  ip address 10.0.23.2/30\n exit\n interface eth2\n  ip address 10.0.34.1/30\n exit\n router ospf\n  ospf router-id 10.0.0.3\n  network 10.0.0.3/32 area 0\n  network 10.0.23.0/30 area 1\n  network 10.0.34.0/30 area 0'"
+    },
+    {
+      "node": "R4",
+      "command": "vtysh -c 'conf t\n interface lo\n  ip address 10.0.0.4/32\n exit\n interface eth1\n  ip address 10.0.34.2/30\n exit\n interface eth2\n  ip address 10.0.14.2/30\n exit\n router ospf\n  ospf router-id 10.0.0.4\n  network 10.0.0.4/32 area 0\n  network 10.0.34.0/30 area 0\n  network 10.0.14.0/30 area 0'"
+    }
+  ],
+  "fault_verification": [
+    {
+      "id": "verify_ospf_running",
+      "type": "ospf_configuration",
+      "description": "R2 has a Full adjacency with R1 (OSPF is up)",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "R2",
+        "command": "vtysh -c 'show ip ospf neighbor'",
+        "parser": "regex",
+        "success_condition": {
+          "pattern": "^10\\.0\\.0\\.1\\s+\\d+\\s+Full/",
+          "must_match": true
+        }
+      }
+    },
+    {
+      "id": "verify_fault_injected",
+      "type": "ospf_configuration",
+      "description": "R3 eth1 is in Area 1 (fault present)",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "R3",
+        "command": "vtysh -c 'show ip ospf interface eth1'",
+        "parser": "regex",
+        "success_condition": {
+          "pattern": "Area 0\\.0\\.0\\.1\\b",
+          "must_match": true
+        }
+      }
+    },
+    {
+      "id": "verify_adjacency_missing",
+      "type": "ospf_configuration",
+      "description": "R2-R3 adjacency is not Full",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "R2",
+        "command": "vtysh -c 'show ip ospf neighbor'",
+        "parser": "regex",
+        "success_condition": {
+          "pattern": "^10\\.0\\.0\\.3\\s+\\d+\\s+Full/",
+          "must_match": false
+        }
+      }
+    },
+    {
+      "id": "verify_ring_otherwise_up",
+      "type": "reachability",
+      "description": "R1 reaches R4's loopback (rest of ring works)",
+      "evaluation": {
+        "method": "exec_and_parse",
+        "target_node": "R1",
+        "command": "ping -c 3 -W 2 -I 10.0.0.1 10.0.0.4",
+        "parser": "regex",
+        "success_condition": {
+          "pattern": "3 packets transmitted, 3 (?:packets )?received",
+          "must_match": true
+        }
+      }
+    }
+  ],
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 30,
+    "description": "Inspect neighbors and OSPF interfaces, find R3 eth1 in Area 1, move 10.0.23.0/30 on R3 into Area 0, verify the R2-R3 adjacency and the resulting routes."
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "25-45",
+    "expected_time_minutes": 35,
+    "citation": "CCNP troubleshooting scenarios and real-world MTTR data. ExamCollection CCNP practice: 'Identify and fix OSPF configuration issue within 10 minutes' is a standard timed challenge. Industry MTTR for configuration errors: 15 minutes to 4 hours (IoRiver Network Downtime Study). OSPF adjacency problems are among the most common routing issues (30min-8hr resolution time for routing problems - Network Defense Blog case studies).",
+    "literature_basis": "OSPF adjacency issues are a classic troubleshooting scenario in networking. Common causes documented in RFC 2328 (OSPF v2) and network engineering case studies include: area ID mismatch, MTU mismatch, authentication mismatch, network type mismatch. This scenario specifically uses area ID mismatch which is covered extensively in CCNP TSHOOT curriculum and CBT Nuggets CCNP troubleshooting course.",
+    "time_justification": "35 minutes represents realistic troubleshooting time. Fast resolution (expert): 10-15min. Average resolution: 30-60min. This aligns with MTTR data for configuration errors and CCNP timed practice scenarios."
+  },
+  "version": "v2"
+}

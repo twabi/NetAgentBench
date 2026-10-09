@@ -6,6 +6,13 @@ Run: poetry run uvicorn dagent.harness_main:app --host 0.0.0.0 --port 8000
 
 from fastapi import FastAPI
 
+try:  # read OPEN_ROUTER_API_KEY etc. from a local .env if python-dotenv is installed
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
 from dagent.web.router.benchmark import benchmark_router
 
 app = FastAPI(

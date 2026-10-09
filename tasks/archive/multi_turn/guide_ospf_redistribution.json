@@ -1,0 +1,93 @@
+{
+  "task_id": "guide_ospf_redistribution",
+  "description": "Configure OSPF Area 0 between R1, R2, and R3, then redistribute a static route from R3 into OSPF so R1 learns the external prefix. R3 serves stub network 192.168.10.0/24 via loopback lo.\n\nIP Addressing Plan:\n- R1: eth1=10.0.12.1/30, lo=10.0.0.1/32\n- R2: eth1=10.0.12.2/30, eth2=10.0.23.2/30, lo=10.0.0.2/32\n- R3: eth1=10.0.23.3/30, lo=10.0.0.3/32, lo1=192.168.10.1/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {"name": "R1", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R2", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"},
+      {"name": "R3", "type": "router", "image": "frrouting/frr:latest", "platform": "frr"}
+    ],
+    "links": [
+      {"endpoints": ["R1:eth1", "R2:eth1"]},
+      {"endpoints": ["R2:eth2", "R3:eth1"]}
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ospf_adjacency_r1_r2",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency is Full between R1 and R2 in Area 0",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {"contains_text": "Full/"}
+        }
+      },
+      {
+        "id": "ospf_adjacency_r2_r3",
+        "type": "ospf_configuration",
+        "description": "OSPF adjacency is Full between R2 and R3 in Area 0",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R2",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "text",
+          "success_condition": {"contains_text": "Full/"}
+        }
+      },
+      {
+        "id": "static_route_on_r3",
+        "type": "route_exists",
+        "description": "R3 has a static route for 192.168.10.0/24",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R3",
+          "command": "vtysh -c 'show ip route static'",
+          "parser": "text",
+          "success_condition": {"contains_text": "192.168.10"}
+        }
+      },
+      {
+        "id": "redistributed_external_route",
+        "type": "ospf_configuration",
+        "description": "R1 sees the redistributed 192.168.10.0/24 as an OSPF external route",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip route ospf'",
+          "parser": "text",
+          "success_condition": {"contains_text": "192.168.10"}
+        }
+      },
+      {
+        "id": "external_reachability",
+        "type": "reachability",
+        "description": "R1 can ping 192.168.10.1 on R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "ping -c 3 -W 2 192.168.10.1",
+          "parser": "text",
+          "success_condition": {"contains_text": "3 packets transmitted, 3 packets received"}
+        }
+      }
+    ]
+  },
+  "convergence": {"timeout_seconds": 60, "check_interval_seconds": 3},
+  "optimal_solution": {
+    "command_count": 35,
+    "description": "Configure OSPF area 0, add static route and loopback on R3, redistribute static into OSPF on R3"
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "25-35",
+    "expected_time_minutes": 25,
+    "experiment": "property_guidance"
+  }
+}

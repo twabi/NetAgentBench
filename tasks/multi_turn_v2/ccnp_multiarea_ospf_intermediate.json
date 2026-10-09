@@ -1,0 +1,193 @@
+{
+  "task_id": "ccnp_multiarea_ospf_intermediate",
+  "description": "Multi-area OSPF deployment across 5 routers. Area 0 (backbone) contains R1 and the backbone links of R2 and R3. R2 is the ABR for Area 1 (R2-R4 link and R4); R3 is the ABR for Area 2 (R3-R5 link and R5). Use router-ids 10.0.0.N for RN. Configure OSPF with the correct area assignments, summarize Area 1 as 10.1.0.0/16 at R2 and Area 2 as 10.2.0.0/16 at R3, and verify end-to-end reachability between the two non-backbone areas.\n\nIP Addressing Plan:\n- R1: eth1=10.0.12.1/30, eth2=10.0.13.1/30, lo=10.0.0.1/32\n- R2: eth1=10.0.12.2/30, eth2=10.1.24.1/30, lo=10.0.0.2/32\n- R3: eth1=10.0.13.2/30, eth2=10.2.35.1/30, lo=10.0.0.3/32\n- R4: eth1=10.1.24.2/30, lo=10.1.255.4/32\n- R5: eth1=10.2.35.2/30, lo=10.2.255.5/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {
+        "name": "R1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R3",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R4",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "R5",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "R1:eth1",
+          "R2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R1:eth2",
+          "R3:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R2:eth2",
+          "R4:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "R3:eth2",
+          "R5:eth1"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "backbone_adjacencies_full",
+        "type": "ospf_configuration",
+        "description": "R1 has Full adjacencies with both ABRs (R2 and R3) in Area 0",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*^10\\.0\\.0\\.2\\s+\\d+\\s+Full/)(?=.*^10\\.0\\.0\\.3\\s+\\d+\\s+Full/)",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "area1_adjacency_full",
+        "type": "ospf_configuration",
+        "description": "R4 has a Full adjacency with its ABR R2",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "^10\\.0\\.0\\.2\\s+\\d+\\s+Full/",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "area2_adjacency_full",
+        "type": "ospf_configuration",
+        "description": "R5 has a Full adjacency with its ABR R3",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R5",
+          "command": "vtysh -c 'show ip ospf neighbor'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "^10\\.0\\.0\\.3\\s+\\d+\\s+Full/",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "interarea_routes_in_backbone",
+        "type": "ospf_configuration",
+        "description": "R1 holds inter-area routes for both Area 1 and Area 2 prefixes",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf route'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*^N IA\\s+10\\.1\\.)(?=.*^N IA\\s+10\\.2\\.)",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "area1_to_area2_reachability",
+        "type": "reachability",
+        "description": "R4's loopback (Area 1) reaches R5's loopback (Area 2)",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R4",
+          "command": "ping -c 3 -W 2 -I 10.1.255.4 10.2.255.5",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "3 packets transmitted, 3 (?:packets )?received",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "area1_summarized",
+        "type": "ospf_configuration",
+        "description": "R2 advertises Area 1 into the backbone as the single summary 10.1.0.0/16",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf route'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*^N IA\\s+10\\.1\\.0\\.0/16)(?!.*^N IA\\s+10\\.1\\.24\\.0/30)",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "area2_summarized",
+        "type": "ospf_configuration",
+        "description": "R3 advertises Area 2 into the backbone as the single summary 10.2.0.0/16",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "R1",
+          "command": "vtysh -c 'show ip ospf route'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*^N IA\\s+10\\.2\\.0\\.0/16)(?!.*^N IA\\s+10\\.2\\.35\\.0/30)",
+            "must_match": true
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 60,
+    "check_interval_seconds": 3
+  },
+  "optimal_solution": {
+    "command_count": 55,
+    "description": "Configure IP addresses, enable OSPF process, assign interfaces to areas, configure area-range for summarization at ABRs, verify neighbor adjacencies"
+  },
+  "research_context": {
+    "complexity": "intermediate",
+    "expected_turns": "50-70",
+    "expected_time_minutes": 50,
+    "citation": "CCNP ENARSI training materials and practice scenarios. Multi-area OSPF configuration time: 30-90 minutes (Orhan Ergun CCNP course, Flackbox CCNP materials). CCNP exam preparation study suggests 3-6 months study time with 10-15 hours/week.",
+    "literature_basis": "Standard CCNP ENARSI hierarchical OSPF design pattern. Multi-area OSPF is a key topic in CCNP Enterprise certification (exam 300-410 ENARSI). Design based on RFC 2328 OSPF v2 area architecture and Cisco CCNP official cert guide.",
+    "time_justification": "50 minutes is mid-range for intermediate OSPF tasks. ExamCollection CCNP practice: multi-area OSPF scenarios target 40-60min. This accounts for area configuration, ABR setup, summarization, and verification."
+  },
+  "version": "v2"
+}

@@ -4,6 +4,7 @@ Benchmark API router for dagent.
 Provides endpoints for the benchmark controller to trigger agent execution.
 """
 
+import asyncio
 import logging
 from typing import Dict, Any, List, Optional
 
@@ -36,7 +37,7 @@ class SolveTaskRequest(BaseModel):
     
     # Agent configuration
     agent_mode: str = "single"        # "single" or "multi"
-    provider: str = "openai"          # "openai", "ollama", "anthropic", "gemini"
+    provider: str = "openai"          # "openai", "ollama", "anthropic", "gemini", "openrouter"
     model: Optional[str] = None       # e.g., "gpt-4o", "qwen2.5:7b"
     structure: str = "sequential"     # "sequential"
     context_length: Optional[int] = None
@@ -44,6 +45,9 @@ class SolveTaskRequest(BaseModel):
     # Provider-specific
     api_key: Optional[str] = None
     host: Optional[str] = None
+
+    # Property-guidance experiment arm (blind/declared/feedback/placebo)
+    feedback_arm: Optional[str] = None
 
 
 class GenerateTaskRequest(BaseModel):
@@ -127,6 +131,7 @@ async def solve_task(request: SolveTaskRequest) -> SolveTaskResponse:
             mcp_url=request.mcp_url,
             task_dict=task_dict,
             agent_config=agent_config,
+            feedback_arm=request.feedback_arm,
         )
         
         logger.info(f"Agent completed: success={result['success']}, turns={result['turns_used']}")

@@ -2,7 +2,7 @@
 
 ## Overview & supported providers
 
-**Operational note:** today's primary experiments call **`benchmark run-task`** ([CLI usage](CLI_USAGE.md)), which executes multi-turn workloads under [`tasks/multi_turn/`](../tasks/multi_turn/). Provider settings still apply via the detached **dagent**/agent runtime you operate alongside this repo; **`benchmark run-llm`** workflows below are legacy property batches.
+**Operational note:** today's primary experiments call **`benchmark run-task`** ([CLI usage](CLI_USAGE.md)), which executes multi-turn workloads under [`tasks/multi_turn_v2/`](../tasks/multi_turn_v2/). Provider settings still apply via the detached **dagent**/agent runtime you operate alongside this repo; **`benchmark run-llm`** workflows below are legacy property batches.
 
 - **OpenAI** — GPT-family models via API
 - **Anthropic** — Claude models

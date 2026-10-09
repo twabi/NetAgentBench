@@ -17,18 +17,18 @@ class TestSchemaValidation:
 
     @pytest.fixture
     def tasks_dir(self) -> Path:
-        """Path to tasks directory"""
-        return Path(__file__).parent.parent.parent / "tasks"
+        """Path to the archived single-turn tasks"""
+        return Path(__file__).parent.parent.parent / "tasks" / "archive"
 
     @pytest.fixture
     def solutions_dir(self) -> Path:
         """Path to solutions directory"""
-        return Path(__file__).parent.parent.parent / "tasks" / "solutions"
+        return Path(__file__).parent.parent.parent / "tasks" / "archive" / "solutions"
 
     @pytest.fixture
-    def schema_file(self, tasks_dir: Path) -> Path:
-        """Path to schema file"""
-        return tasks_dir / "schema.json"
+    def schema_file(self) -> Path:
+        """Path to schema file (stays in tasks/; the old tasks are in tasks/archive/)"""
+        return Path(__file__).parent.parent.parent / "tasks" / "schema.json"
 
     def test_schema_file_exists_and_valid(self, schema_file: Path):
         """Test that schema file exists and is valid JSON"""

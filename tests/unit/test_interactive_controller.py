@@ -427,3 +427,236 @@ class TestMCPServerAccess:
 
         controller = InteractiveBenchmarkController()
         assert controller.get_session() is None
+
+
+class TestInteractiveHumanMode:
+    """Tests for human interactive shell integration."""
+
+    @pytest.fixture
+    def mock_task(self):
+        from benchmark.models.task import (
+            ConvergenceConfig,
+            EvaluationProcedure,
+            IntentSpecification,
+            Node,
+            NodeType,
+            Platform,
+            Property,
+            PropertyType,
+            TaskDefinition,
+            TopologySpecification,
+        )
+
+        nodes = [Node(name="R1", type=NodeType.ROUTER)]
+        topology = TopologySpecification(nodes=nodes, links=[], interfaces=[])
+        eval_proc = EvaluationProcedure(
+            method="exec_and_parse",
+            target_node="R1",
+            command="test",
+            parser="text",
+            success_condition={},
+        )
+        properties = [
+            Property(
+                id="p1",
+                type=PropertyType.INTERFACE_UP,
+                description="Test",
+                evaluation=eval_proc,
+            )
+        ]
+        intent = IntentSpecification(properties=properties)
+        return TaskDefinition(
+            task_id="test_001",
+            description="Test task",
+            platform=Platform.FRR,
+            topology=topology,
+            intent=intent,
+            convergence=ConvergenceConfig(timeout_seconds=5),
+        )
+
+    @pytest.fixture
+    def mock_controller(self, mock_task):
+        from benchmark.interactive_controller import InteractiveBenchmarkController
+        from benchmark.models.results import PropertyEvaluationResult
+
+        mock_infra = Mock()
+        mock_infra.provision.return_value = "test_topo_001"
+        mock_infra.is_ready.return_value = True
+        mock_infra.teardown.return_value = True
+        mock_infra.get_node_container_name.return_value = "clab-test-R1"
+
+        mock_evaluator = Mock()
+        mock_evaluator.evaluate_all_properties.return_value = [
+            PropertyEvaluationResult(
+                property_id="p1",
+                satisfied=True,
+                observation_raw="success",
+                observation_parsed={"result": "success"},
+                evaluation_time_seconds=0.5,
+            )
+        ]
+
+        return InteractiveBenchmarkController(
+            infrastructure=mock_infra,
+            property_evaluator=mock_evaluator,
+        )
+
+    def test_human_mode_skips_mcp_server(self, mock_controller, mock_task):
+        from benchmark.session.models import CommandType, SubmitResult
+
+        submit = SubmitResult(
+            session_id="sess-1",
+            completed=True,
+            total_turns=2,
+            total_time=10.0,
+            approach=[("R1", "cmd")],
+            termination_reason="submitted",
+        )
+
+        with patch("benchmark.interactive_controller.InteractiveSession") as MockSession:
+            mock_session = Mock()
+            mock_session.start.return_value = Mock(
+                session_id="test_session",
+                nodes=["R1"],
+                topology_id="test_topo_001",
+            )
+            mock_session.get_approach.return_value = [("R1", "test command")]
+            mock_session.get_execution_log.return_value = [("R1", "test command", True)]
+            mock_session.get_command_transcript.return_value = [
+                ("R1", "test command", CommandType.CONFIG, True),
+            ]
+            mock_session._context = None
+            mock_session.get_session_status.return_value = Mock(turns_used=2)
+            mock_session.teardown.return_value = True
+            MockSession.return_value = mock_session
+
+            with patch("benchmark.human_shell.HumanShell") as MockShell:
+                MockShell.return_value.run.return_value = submit
+
+                result = mock_controller.run_interactive(
+                    task=mock_task,
+                    testee_id="alice",
+                    testee_type="human",
+                    interactive_human=True,
+                    wait_for_submit=False,
+                )
+
+        assert mock_controller.get_mcp_server() is None
+        assert result is not None
+        assert result.testee_type == "human"
+        assert result.metrics.turns_to_complete == 2
+
+    def test_human_mode_quit_returns_none(self, mock_controller, mock_task):
+        with patch("benchmark.interactive_controller.InteractiveSession") as MockSession:
+            mock_session = Mock()
+            mock_session.start.return_value = Mock(
+                session_id="test_session",
+                nodes=["R1"],
+                topology_id="test_topo_001",
+            )
+            mock_session.teardown.return_value = True
+            MockSession.return_value = mock_session
+
+            with patch("benchmark.human_shell.HumanShell") as MockShell:
+                MockShell.return_value.run.return_value = None
+
+                result = mock_controller.run_interactive(
+                    task=mock_task,
+                    testee_id="alice",
+                    testee_type="human",
+                    interactive_human=True,
+                    wait_for_submit=False,
+                )
+
+        assert result is None
+
+    def test_pre_eval_wait_uses_full_convergence_budget(self, mock_controller, mock_task):
+        """Final scoring waits the task's full convergence budget, not a 30s cap."""
+        mock_task.convergence.timeout_seconds = 120
+        with patch("benchmark.interactive_controller.InteractiveSession") as MockSession, patch(
+            "benchmark.interactive_controller.time.sleep"
+        ) as mock_sleep:
+            mock_session = Mock()
+            mock_session.start.return_value = Mock(
+                session_id="test_session",
+                nodes=["R1"],
+                topology_id="test_topo_001",
+            )
+            mock_session.is_active = False
+            mock_session.get_approach.return_value = []
+            mock_session.get_session_status.return_value = Mock(turns_used=0)
+            mock_session.teardown.return_value = True
+            MockSession.return_value = mock_session
+
+            mock_controller.run_interactive(
+                task=mock_task,
+                testee_id="test",
+                wait_for_submit=False,
+            )
+
+        waited = [call.args[0] for call in mock_sleep.call_args_list if call.args]
+        assert 120 in waited
+
+    def test_run_interactive_persists_agent_actions(self, mock_controller, mock_task):
+        """The action list returned by dagent is stored on the result."""
+        payload = {
+            "model_version": "openrouter:openai/gpt-6-luna",
+            "reasoning_trace": [],
+            "actions": [
+                {"action": "exec_command", "input": {"node": "R1", "command": "show ip route"}, "result": {"success": True}},
+                {"action": "submit", "input": {}, "result": {"success": True}},
+            ],
+            "token_usage": {"prompt_tokens": 1, "completion_tokens": 1},
+            "tool_usage": {"exec_command": 1},
+        }
+        mock_response = Mock()
+        mock_response.json.return_value = payload
+        mock_client = MagicMock()
+        mock_client.__enter__.return_value.post.return_value = mock_response
+
+        with patch("benchmark.interactive_controller.InteractiveSession") as MockSession, patch(
+            "benchmark.interactive_controller.time.sleep"
+        ), patch("httpx.Client", return_value=mock_client):
+            mock_session = Mock()
+            mock_session.start.return_value = Mock(
+                session_id="test_session",
+                nodes=["R1"],
+                topology_id="test_topo_001",
+            )
+            mock_session.is_active = False
+            mock_session.get_approach.return_value = []
+            mock_session.get_session_status.return_value = Mock(turns_used=1)
+            mock_session.get_command_transcript.return_value = []
+            mock_session.get_execution_log.return_value = []
+            mock_session.teardown.return_value = True
+            mock_session._context = None
+            MockSession.return_value = mock_session
+
+            result = mock_controller.run_interactive(
+                task=mock_task,
+                testee_id="openrouter_openaigpt6luna_single",
+                dagent_endpoint="http://localhost:8000",
+                wait_for_submit=False,
+            )
+
+        assert [a["action"] for a in result.actions] == ["exec_command", "submit"]
+
+
+class TestInferTerminationReason:
+    def test_time_limit_is_not_labeled_submitted(self):
+        from benchmark.interactive_controller import infer_termination_reason
+
+        actions = [
+            {"action": "exec_command", "result": {"success": True}},
+            {"action": "exec_command", "result": {"success": False, "error": "time_limit_exceeded"}},
+        ]
+        assert infer_termination_reason(actions, True, 24, []) == "time_limit_exceeded"
+
+    def test_submit_action_is_labeled_submitted(self):
+        from benchmark.interactive_controller import infer_termination_reason
+
+        actions = [
+            {"action": "exec_command", "result": {"success": True}},
+            {"action": "submit", "result": {"success": True}},
+        ]
+        assert infer_termination_reason(actions, True, 5, []) == "submitted"

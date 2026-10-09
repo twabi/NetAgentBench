@@ -1,0 +1,12 @@
+{
+  "repeats": 3,
+  "traces": [
+    {
+      "id": "ospf_fix_short",
+      "role": "ospf_success_short",
+      "task_id": "troubleshoot_ospf_adjacency_issue",
+      "run_json": "results/comparatives_all/runs/troubleshoot_ospf_adjacency_issue/openai_gpt5mini20250807_single_mt_20260217_152726_a747cce1.json",
+      "task_json": "tasks/multi_turn/troubleshoot_ospf_adjacency_issue.json"
+    }
+  ]
+}

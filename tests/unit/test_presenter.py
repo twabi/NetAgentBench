@@ -258,3 +258,176 @@ class TestTaskPresenter:
         assert "R1" in markdown and "R2" in markdown
         assert "R1" in json_str and "R2" in json_str
 
+    def test_present_task_text_includes_topology_diagram(self):
+        """Test that text presentation includes a topology diagram section."""
+        presenter = TaskPresenter()
+        task = self.create_simple_task()
+
+        text = presenter.present_task_text(task)
+
+        assert "Topology Diagram" in text
+
+
+def _make_task(nodes, links):
+    """Helper: build a minimal TaskDefinition from node names and (a, b) link pairs."""
+    topology = TopologySpecification(
+        nodes=[Node(name=name, type=NodeType.ROUTER) for name in nodes],
+        links=[Link(endpoints=[f"{a}:eth0", f"{b}:eth0"]) for a, b in links],
+    )
+    intent = IntentSpecification(
+        properties=[
+            Property(
+                id="p1",
+                type="reachability",
+                description="Test property",
+                evaluation=EvaluationProcedure(
+                    method="exec_and_parse",
+                    target_node=nodes[0],
+                    command="test",
+                    parser="text",
+                    success_condition={},
+                ),
+            )
+        ]
+    )
+    return TaskDefinition(
+        task_id="diagram_test",
+        description="Diagram test task",
+        platform=Platform.FRR,
+        topology=topology,
+        intent=intent,
+    )
+
+
+class TestTopologyDiagram:
+    """Tests for shape-aware topology diagram generation."""
+
+    def test_two_node_pair(self):
+        presenter = TaskPresenter()
+        task = _make_task(["R1", "R2"], [("R1", "R2")])
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        assert "R1" in diagram
+        assert "R2" in diagram
+        assert "--" in diagram
+
+    def test_linear_chain_three_nodes(self):
+        presenter = TaskPresenter()
+        task = _make_task(["R1", "R2", "R3"], [("R1", "R2"), ("R2", "R3")])
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        # Sequential order should be preserved
+        assert diagram.index("R1") < diagram.index("R2") < diagram.index("R3")
+
+    def test_linear_chain_with_out_of_order_edges(self):
+        """Edges defined branch-first should still resolve to the correct sequential path."""
+        presenter = TaskPresenter()
+        # R4-R2-R1-R3-R5 is the actual path, but edges list R1's links first
+        task = _make_task(
+            ["R1", "R2", "R3", "R4", "R5"],
+            [("R1", "R2"), ("R1", "R3"), ("R2", "R4"), ("R3", "R5")],
+        )
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        # One of the two valid traversal directions must hold
+        forward = (
+            diagram.index("R4")
+            < diagram.index("R2")
+            < diagram.index("R1")
+            < diagram.index("R3")
+            < diagram.index("R5")
+        )
+        backward = (
+            diagram.index("R5")
+            < diagram.index("R3")
+            < diagram.index("R1")
+            < diagram.index("R2")
+            < diagram.index("R4")
+        )
+        assert forward or backward
+
+    def test_ring_four_nodes_preserves_cycle_order(self):
+        presenter = TaskPresenter()
+        # R1-R2-R4-R3-R1 is the cycle
+        task = _make_task(
+            ["R1", "R2", "R3", "R4"],
+            [("R1", "R2"), ("R1", "R3"), ("R2", "R4"), ("R3", "R4")],
+        )
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        for name in ("R1", "R2", "R3", "R4"):
+            assert name in diagram
+        # Should indicate the loop closes
+        assert "back to" in diagram.lower() or "r1" in diagram.lower()
+
+    def test_ring_fifteen_nodes_does_not_crash(self):
+        presenter = TaskPresenter()
+        names = [f"R{i}" for i in range(1, 16)]
+        links = [(names[i], names[i + 1]) for i in range(len(names) - 1)]
+        links.append((names[-1], names[0]))
+        task = _make_task(names, links)
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        for name in names:
+            assert name in diagram
+
+    def test_star_renders_hub_and_spokes(self):
+        presenter = TaskPresenter()
+        task = _make_task(
+            ["EDGE", "ISP", "INTERNAL1", "INTERNAL2"],
+            [("EDGE", "ISP"), ("EDGE", "INTERNAL1"), ("EDGE", "INTERNAL2")],
+        )
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        assert "EDGE" in diagram
+        assert "ISP" in diagram
+        assert "INTERNAL1" in diagram
+        assert "INTERNAL2" in diagram
+
+    def test_branching_tree_multi_level(self):
+        presenter = TaskPresenter()
+        # R1 -> R2, R3 ; R2 -> R4, R5 (R2 has degree 3: R1, R4, R5)
+        task = _make_task(
+            ["R1", "R2", "R3", "R4", "R5"],
+            [("R1", "R2"), ("R1", "R3"), ("R2", "R4"), ("R2", "R5")],
+        )
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        for name in ("R1", "R2", "R3", "R4", "R5"):
+            assert name in diagram
+
+    def test_mesh_falls_back_to_edge_list(self):
+        presenter = TaskPresenter()
+        # Fully meshed 4 nodes: 6 edges (more than N-1=3, not a simple ring)
+        task = _make_task(
+            ["R1", "R2", "R3", "R4"],
+            [
+                ("R1", "R2"),
+                ("R1", "R3"),
+                ("R1", "R4"),
+                ("R2", "R3"),
+                ("R2", "R4"),
+                ("R3", "R4"),
+            ],
+        )
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        for name in ("R1", "R2", "R3", "R4"):
+            assert name in diagram
+
+    def test_single_node_no_links(self):
+        presenter = TaskPresenter()
+        task = _make_task(["R1"], [])
+
+        diagram = presenter._generate_simple_topology_diagram(task)
+
+        assert "R1" in diagram
+

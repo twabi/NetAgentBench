@@ -29,12 +29,12 @@ class TestEndToEndTaskExecution:
     @pytest.fixture
     def tasks_dir(self) -> Path:
         """Path to tasks directory"""
-        return Path(__file__).parent.parent.parent / "tasks"
+        return Path(__file__).parent.parent.parent / "tasks" / "archive"
 
     @pytest.fixture
     def solutions_dir(self) -> Path:
         """Path to solutions directory"""
-        return Path(__file__).parent.parent.parent / "tasks" / "solutions"
+        return Path(__file__).parent.parent.parent / "tasks" / "archive" / "solutions"
 
     def test_basic_reachability_end_to_end(self, tasks_dir: Path, solutions_dir: Path):
         """Test complete workflow for basic_reachability task with real infrastructure"""

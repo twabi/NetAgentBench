@@ -85,6 +85,31 @@ class BenchmarkMCPClient:
             return json.loads(text)
         return {"success": False, "error": "No response"}
 
+    def __getattr__(self, name: str):
+        """Proxy any unknown public attribute to a generic MCP tool call.
+
+        The agent dispatches actions by calling ``getattr(client, action)``. Only
+        a few tools have explicit methods above; arm-specific tools such as
+        ``check_properties`` (feedback) and ``check_syntactic_validity`` (placebo)
+        are exposed by the MCP server but have no wrapper here. This proxy makes
+        every advertised tool callable without hard-coding each one.
+        """
+        # Never proxy private/dunder lookups (also avoids recursion on _session).
+        if name.startswith("_"):
+            raise AttributeError(name)
+
+        async def _call(**kwargs) -> Dict[str, Any]:
+            result = await self._session.call_tool(name, kwargs)
+            if result.content and len(result.content) > 0:
+                text = result.content[0].text
+                try:
+                    return json.loads(text)
+                except (json.JSONDecodeError, TypeError):
+                    return {"success": True, "result": text}
+            return {"success": False, "error": "No response"}
+
+        return _call
+
     async def list_tools(self) -> List[Dict[str, Any]]:
         """List available tools."""
         result = await self._session.list_tools()

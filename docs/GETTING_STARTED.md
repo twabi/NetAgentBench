@@ -173,14 +173,14 @@ python -c "import benchmark; print('Installation successful!')"
 
 ## Quick start (choose a lane)
 
-- **Multi-turn (NetAgentBench-style):** start **[`agent_harness/`](../agent_harness/)** (`uvicorn dagent.harness_main:app`), then run `benchmark run-task tasks/multi_turn/<task>.json …` (details: [Research usage](RESEARCH_USAGE.md), [Agentic evaluation](AGENTIC_EVALUATION.md)).
+- **Multi-turn (NetAgentBench-style):** start **[`agent_harness/`](../agent_harness/)** (`uvicorn dagent.harness_main:app`), then run `benchmark run-task tasks/multi_turn_v2/<task>.json …` (details: [Research usage](RESEARCH_USAGE.md), [Agentic evaluation](AGENTIC_EVALUATION.md)).
 - **Single-turn (legacy classroom / regression):** craft a submission JSON and invoke `benchmark run <task> <submission>`.
 
 ### Multi-turn smoke test
 
 ```bash
 poetry shell
-benchmark run-task tasks/multi_turn/ccna_rip_routing_basic.json \
+benchmark run-task tasks/multi_turn_v2/ccna_rip_routing_basic.json \
   --dagent-endpoint http://localhost:8000 \
   --provider openai \
   --model gpt-4o-mini \

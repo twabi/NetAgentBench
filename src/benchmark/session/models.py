@@ -71,6 +71,10 @@ class SessionContext:
     executed_commands: List[Tuple[str, str, CommandType]] = field(default_factory=list)
     # Execution results: (node, command, success) for syntactic validity
     execution_results: List[Tuple[str, str, bool]] = field(default_factory=list)
+    # Property-guidance experiment tracking
+    property_check_count: int = 0
+    property_trajectory: List[dict] = field(default_factory=list)
+    log_property_snapshots: bool = False
 
     def get_approach(self) -> List[Tuple[str, str]]:
         """

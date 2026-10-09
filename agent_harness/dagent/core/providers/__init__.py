@@ -10,6 +10,7 @@ from dagent.core.providers.openai_provider import OpenAIProvider
 from dagent.core.providers.ollama_provider import OllamaProvider
 from dagent.core.providers.anthropic_provider import AnthropicProvider
 from dagent.core.providers.gemini_provider import GeminiProvider
+from dagent.core.providers.openrouter_provider import OpenRouterProvider
 
 __all__ = [
     "ModelProvider",
@@ -18,4 +19,5 @@ __all__ = [
     "OllamaProvider",
     "AnthropicProvider",
     "GeminiProvider",
+    "OpenRouterProvider",
 ]

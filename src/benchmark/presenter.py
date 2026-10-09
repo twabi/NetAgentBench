@@ -6,8 +6,9 @@ Provides multiple presentation formats:
 - Markdown: Formatted markdown with sections
 - JSON: Pretty-printed JSON
 """
+import io
 import json
-from typing import List
+from typing import Dict, List, Optional
 from benchmark.models.task import TaskDefinition, Property, Node, Link
 
 
@@ -69,7 +70,12 @@ class TaskPresenter:
             endpoints = " <--> ".join(link.endpoints)
             lines.append(f"  {i}. {endpoints}")
         lines.append("")
-        
+
+        # Topology diagram
+        lines.append("Topology Diagram:")
+        lines.append(self._generate_simple_topology_diagram(task))
+        lines.append("")
+
         # Intent / Properties
         lines.append("Success Criteria:")
         lines.append("-" * 40)
@@ -193,32 +199,155 @@ class TaskPresenter:
 
     def _generate_simple_topology_diagram(self, task: TaskDefinition) -> str:
         """
-        Generate a simple ASCII topology diagram.
-        
+        Generate a shape-aware topology diagram.
+
+        Detects common network shapes (single node, pair, linear chain,
+        ring, tree/star) and renders each accordingly. Falls back to a
+        flat edge list for anything else (e.g. mesh topologies).
+
         Args:
             task: TaskDefinition with topology
-        
+
         Returns:
-            Simple ASCII diagram
+            Text diagram of the topology
         """
-        # For simple cases, just list the nodes and links
-        # More sophisticated diagrams could be added later
-        
-        nodes = [node.name for node in task.topology.nodes]
-        
-        if len(nodes) == 2:
-            # Simple two-node case
-            return f"{nodes[0]} -------- {nodes[1]}"
-        elif len(nodes) == 3 and len(task.topology.links) == 2:
-            # Linear three-node case
-            return f"{nodes[0]} ----- {nodes[1]} ----- {nodes[2]}"
-        else:
-            # Generic case: just list connections
-            lines = []
-            for link in task.topology.links:
-                ep1, ep2 = link.endpoints[0], link.endpoints[1]
-                node1 = ep1.split(":")[0]
-                node2 = ep2.split(":")[0]
-                lines.append(f"{node1} <----> {node2}")
-            return "\n".join(lines)
+        node_names = [node.name for node in task.topology.nodes]
+        adjacency = self._build_adjacency(task.topology.links)
+        shape = self._classify_topology(node_names, adjacency)
+
+        if shape == "single":
+            return node_names[0]
+        if shape == "pair":
+            return f"{node_names[0]} -------- {node_names[1]}"
+        if shape == "linear":
+            order = self._trace_linear_order(node_names, adjacency)
+            return " ----- ".join(order)
+        if shape == "ring":
+            order = self._trace_ring_order(node_names, adjacency)
+            loop = " -- ".join(order)
+            return f"{loop} -- (back to {order[0]})"
+        if shape == "tree":
+            return self._render_tree(node_names, adjacency)
+
+        # Generic fallback: flat edge list
+        lines = []
+        for link in task.topology.links:
+            ep1, ep2 = link.endpoints[0], link.endpoints[1]
+            node1 = ep1.split(":")[0]
+            node2 = ep2.split(":")[0]
+            lines.append(f"{node1} <----> {node2}")
+        return "\n".join(lines)
+
+    def _build_adjacency(self, links: List[Link]) -> Dict[str, List[str]]:
+        """Build an ordered adjacency list from link endpoints (node:iface)."""
+        adjacency: Dict[str, List[str]] = {}
+        for link in links:
+            n1 = link.endpoints[0].split(":")[0]
+            n2 = link.endpoints[1].split(":")[0]
+            adjacency.setdefault(n1, []).append(n2)
+            adjacency.setdefault(n2, []).append(n1)
+        return adjacency
+
+    def _classify_topology(
+        self, node_names: List[str], adjacency: Dict[str, List[str]]
+    ) -> str:
+        """Classify a topology's shape from node names and adjacency lists."""
+        n = len(node_names)
+        if n <= 1:
+            return "single"
+        if n == 2:
+            return "pair"
+
+        num_edges = sum(len(neighbors) for neighbors in adjacency.values()) // 2
+        degrees = {name: len(adjacency.get(name, [])) for name in node_names}
+
+        if not self._is_connected(node_names, adjacency):
+            return "generic"
+
+        if num_edges == n and all(d == 2 for d in degrees.values()):
+            return "ring"
+
+        if num_edges == n - 1:
+            if all(d <= 2 for d in degrees.values()):
+                return "linear"
+            return "tree"
+
+        return "generic"
+
+    def _is_connected(
+        self, node_names: List[str], adjacency: Dict[str, List[str]]
+    ) -> bool:
+        """Check whether all nodes are reachable from the first node."""
+        if not node_names:
+            return True
+        visited = {node_names[0]}
+        stack = [node_names[0]]
+        while stack:
+            current = stack.pop()
+            for neighbor in adjacency.get(current, []):
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    stack.append(neighbor)
+        return len(visited) == len(node_names)
+
+    def _trace_linear_order(
+        self, node_names: List[str], adjacency: Dict[str, List[str]]
+    ) -> List[str]:
+        """Walk a linear chain from one endpoint (degree 1) to the other."""
+        start = next(
+            (name for name in node_names if len(adjacency.get(name, [])) == 1),
+            node_names[0],
+        )
+        order = [start]
+        prev: Optional[str] = None
+        current = start
+        while True:
+            candidates = [n for n in adjacency.get(current, []) if n != prev]
+            if not candidates:
+                break
+            next_node = candidates[0]
+            order.append(next_node)
+            prev, current = current, next_node
+        return order
+
+    def _trace_ring_order(
+        self, node_names: List[str], adjacency: Dict[str, List[str]]
+    ) -> List[str]:
+        """Walk a ring's cyclic order starting from the first node."""
+        start = node_names[0]
+        order = [start]
+        prev: Optional[str] = None
+        current = start
+        while True:
+            candidates = [n for n in adjacency.get(current, []) if n != prev]
+            next_node = candidates[0]
+            if next_node == start:
+                break
+            order.append(next_node)
+            prev, current = current, next_node
+        return order
+
+    def _render_tree(
+        self, node_names: List[str], adjacency: Dict[str, List[str]]
+    ) -> str:
+        """Render a tree/star topology using rich's box-drawing Tree."""
+        from rich.console import Console
+        from rich.tree import Tree
+
+        root = max(node_names, key=lambda name: len(adjacency.get(name, [])))
+
+        def add_children(branch: Tree, name: str, visited: set) -> None:
+            for child in adjacency.get(name, []):
+                if child in visited:
+                    continue
+                visited.add(child)
+                add_children(branch.add(child), child, visited)
+
+        tree = Tree(root)
+        add_children(tree, root, {root})
+
+        buffer = io.StringIO()
+        console = Console(file=buffer, width=80, force_terminal=False)
+        console.print(tree)
+        return buffer.getvalue().rstrip("\n")
 

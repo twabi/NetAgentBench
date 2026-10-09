@@ -1,0 +1,178 @@
+{
+  "task_id": "ccie_bgp_dual_homing_expert",
+  "description": "Build a dual-homed enterprise BGP network. EDGE1, EDGE2, and CORE are autonomous system 65100. EDGE1 has an established session with ISP1 (AS 65001), and EDGE2 has an established session with ISP2 (AS 65002).\n\nThe enterprise advertises only prefixes inside 10.0.0.0/8. ISP1 learns at least one such prefix from EDGE1 and learns nothing outside 10.0.0.0/8 from EDGE1. Routes that EDGE1 learns from ISP1 have local preference above 100. ISP2 receives an enterprise prefix inside 10.0.0.0/8 from EDGE2 whose AS path repeats an AS. The EDGE1 session with ISP1 has a hold time below 60 seconds.\n\nIP Addressing Plan:\n- EDGE1: eth1=203.0.113.2/30 (to ISP1), eth2=10.0.1.1/30 (to CORE), lo=10.0.0.1/32\n- EDGE2: eth1=198.51.100.2/30 (to ISP2), eth2=10.0.2.1/30 (to CORE), lo=10.0.0.2/32\n- ISP1: eth1=203.0.113.1/30, lo=1.1.1.1/32\n- ISP2: eth1=198.51.100.1/30, lo=2.2.2.2/32\n- CORE: eth1=10.0.1.2/30, eth2=10.0.2.2/30, lo=10.0.0.100/32",
+  "platform": "frr",
+  "evaluation_mode": "multi_turn",
+  "topology": {
+    "nodes": [
+      {
+        "name": "EDGE1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "EDGE2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "ISP1",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "ISP2",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      },
+      {
+        "name": "CORE",
+        "type": "router",
+        "image": "frrouting/frr:latest",
+        "platform": "frr"
+      }
+    ],
+    "links": [
+      {
+        "endpoints": [
+          "EDGE1:eth1",
+          "ISP1:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "EDGE2:eth1",
+          "ISP2:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "EDGE1:eth2",
+          "CORE:eth1"
+        ]
+      },
+      {
+        "endpoints": [
+          "EDGE2:eth2",
+          "CORE:eth2"
+        ]
+      }
+    ],
+    "interfaces": []
+  },
+  "intent": {
+    "properties": [
+      {
+        "id": "ebgp_isp1_established",
+        "type": "bgp_configuration",
+        "description": "eBGP session from EDGE1 to ISP1 (AS 65001) is Established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE1",
+          "command": "vtysh -c 'show ip bgp neighbors 203.0.113.1'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "remote AS 65001\\b.*BGP state = Established",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "ebgp_isp2_established",
+        "type": "bgp_configuration",
+        "description": "eBGP session from EDGE2 to ISP2 (AS 65002) is Established",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE2",
+          "command": "vtysh -c 'show ip bgp neighbors 198.51.100.1'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "remote AS 65002\\b.*BGP state = Established",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "outbound_filtering",
+        "type": "bgp_configuration",
+        "description": "ISP1 learns at least one enterprise (10/8) prefix from EDGE1 and nothing else from EDGE1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "ISP1",
+          "command": "vtysh -c 'show ip bgp'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\\A(?=.*^\\*\\S*\\s+10\\.\\d+\\.\\d+\\.\\d+/\\d+\\s+203\\.0\\.113\\.2\\s[^\\n]*\\s\\d+(?: \\d+)* [ie?]$)(?!.*^\\*\\S*\\s+(?!10\\.)\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+\\s+203\\.0\\.113\\.2\\s[^\\n]*\\s\\d+(?: \\d+)* [ie?]$)",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "primary_path_preference",
+        "type": "bgp_configuration",
+        "description": "EDGE1 assigns local-preference above the default (100) to routes learned from ISP1",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE1",
+          "command": "vtysh -c 'show ip bgp json'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "\"locPrf\":\\s*(?:10[1-9]|1[1-9]\\d|[2-9]\\d\\d|\\d{4,}),[^{}]*\"path\":\\s*\"65001\\b",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "as_path_prepending",
+        "type": "bgp_configuration",
+        "description": "ISP2 receives an enterprise prefix from EDGE2 with a prepended (repeated) AS path",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "ISP2",
+          "command": "vtysh -c 'show ip bgp'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "^\\*\\S*\\s+10\\.\\d+\\.\\d+\\.\\d+/\\d+\\s+198\\.51\\.100\\.2\\s[^\\n]*\\b(\\d+)(?: \\1\\b)+(?: \\d+)* [ie?]$",
+            "must_match": true
+          }
+        }
+      },
+      {
+        "id": "fast_failover_timers",
+        "type": "bgp_configuration",
+        "description": "The negotiated hold time on EDGE1's ISP1 session is below 60 seconds",
+        "evaluation": {
+          "method": "exec_and_parse",
+          "target_node": "EDGE1",
+          "command": "vtysh -c 'show ip bgp neighbors 203.0.113.1'",
+          "parser": "regex",
+          "success_condition": {
+            "pattern": "^\\s*Hold time is (?:[1-9]|[1-5]\\d)\\b",
+            "must_match": true
+          }
+        }
+      }
+    ]
+  },
+  "convergence": {
+    "timeout_seconds": 120,
+    "check_interval_seconds": 5
+  },
+  "optimal_solution": {
+    "command_count": 120,
+    "description": "Configure BGP ASN, establish eBGP peers with both ISPs, create prefix-lists for filtering, configure route-maps for local-pref and AS-PATH manipulation, tune BGP timers (keepalive 10s, holdtime 30s), verify peering and routing policy"
+  },
+  "research_context": {
+    "complexity": "expert",
+    "expected_turns": "100-140",
+    "expected_time_minutes": 120,
+    "citation": "CCIE Service Provider and Enterprise lab exam format (8+ hours total, this represents 1 major scenario). BGP convergence optimization research: default BGP hold time 180s can be reduced to 30s with BFD for sub-second detection (Noction BGP optimization whitepaper). Complex BGP deployments: hours to days for policy manipulation and traffic engineering (Catchpoint BGP analysis).",
+    "literature_basis": "Dual-homed BGP is a standard enterprise/SP scenario covered in CCIE R&S and SP labs. Design based on RFC 4271 (BGP-4), Cisco CCIE official cert guide, and common ISP multi-homing best practices. AS-PATH prepending and local-preference manipulation are standard BGP policy techniques documented in IETF RFCs and vendor best practice guides.",
+    "time_justification": "120 minutes (2 hours) represents realistic time for expert-level BGP configuration with policy optimization. CCIE candidates spend 12-24 months preparing, with individual lab scenarios taking 1-3 hours. This task is scoped as one complete BGP scenario within a larger CCIE-style lab."
+  },
+  "version": "v2"
+}

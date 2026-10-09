@@ -216,10 +216,22 @@ class SingleAgentPattern(BasePattern):
                 self._log_reasoning("thought", thought)
                 self._log_reasoning("action", f"{action}: {action_input}")
                 
-                # Check for finish
+                # Check for finish. Treat 'finish' as an implicit 'submit' so the
+                # benchmark session terminates cleanly (termination_reason=submitted)
+                # instead of being left active and reported as 'unknown'.
                 if action == "finish":
-                    self._logger.info("Agent signaled finish")
-                    break
+                    self._logger.info("Agent signaled finish; issuing implicit submit")
+                    submit_obs = await self._execute_action("submit", {})
+                    self._log_reasoning("action", "submit: {} (implicit on finish)")
+                    self._log_reasoning("observation", str(submit_obs))
+                    self._log_action("submit", {}, submit_obs)
+                    if conversation:
+                        for msg in messages[len(conversation.messages):]:
+                            conversation.add_message(msg)
+                    return self._make_result(
+                        success=bool(isinstance(submit_obs, dict) and submit_obs.get("success", False)),
+                        turns_used=turn,
+                    )
                 
                 # Execute action
                 observation = await self._execute_action(action, action_input)
@@ -298,33 +310,26 @@ class SingleAgentPattern(BasePattern):
         }
     
     def _format_task_prompt(self, task: Dict[str, Any]) -> str:
-        """Format the task as a prompt for the LLM."""
-        context = task.get("context", {})
-        
-        # Build a structured, readable prompt with all task information
+        """Show the end goal and the topology. Hide checkers, properties, and research notes."""
+        context = task.get("context") or {}
+        topology = context.get("topology")
+        topology_text = json.dumps(topology, indent=2) if topology else "(not specified)"
         prompt_parts = [
             f"Task ID: {task.get('task_id', 'unknown')}",
-            f"Description: {task.get('description', '')}",
+            "Goal:",
+            task.get("description", ""),
             "",
-            "=" * 60,
-            "COMPLETE TASK DEFINITION:",
-            "=" * 60,
-            json.dumps(context, indent=2),
+            "Topology:",
+            topology_text,
             "",
-            "=" * 60,
-            "INSTRUCTIONS:",
-            "=" * 60,
-            "1. Review the complete task definition above",
-            "2. The 'topology' section shows all nodes and their connections",
-            "3. The 'intent.properties' section defines what you must achieve",
-            "4. Each property has an 'evaluation' that shows how success is measured",
-            "5. The 'optimal_solution' provides hints about the expected approach",
-            "6. Use the available tools to configure the network (read network state and modify) and satisfy all properties",
-            "7. Consider calling 'get_session_status' early to understand your turn and time budget for planning",
-            "8. When done, verify your work through the tools, sending read commands to check the network state. If turn limit is not reached, you can continue to work on the task",
-            "9. When satisfied, call the 'submit' tool to complete the task",
+            "Instructions:",
+            "1. The goal is the end state the network must reach.",
+            "2. The topology lists the nodes and links.",
+            "3. Inspect the live network and configure it until that end state holds.",
+            "4. Consider calling 'get_session_status' early to see your turn and time budget.",
+            "5. Verify with read commands before you finish.",
+            "6. Call 'submit' when the goal is met.",
         ]
-        
         return "\n".join(prompt_parts)
     
     def _is_task_complete(self, action: str, observation: Dict[str, Any]) -> bool:

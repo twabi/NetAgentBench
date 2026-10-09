@@ -17,7 +17,7 @@ class TestMultiTurnTaskValidation:
     @pytest.fixture
     def multi_turn_dir(self) -> Path:
         """Path to multi-turn tasks directory"""
-        return Path(__file__).parent.parent.parent / "tasks" / "multi_turn"
+        return Path(__file__).parent.parent.parent / "tasks" / "archive" / "multi_turn"
 
     def test_small_campus_baseline_loads(self, multi_turn_dir: Path):
         """Test that small_campus_baseline.json loads without validation errors"""

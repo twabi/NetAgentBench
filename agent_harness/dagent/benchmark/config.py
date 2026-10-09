@@ -43,6 +43,7 @@ class BenchmarkAgentConfig:
     api_key: Optional[str] = None
     host: Optional[str] = None
     context_length: Optional[int] = None
+    feedback_arm: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict) -> "BenchmarkAgentConfig":
@@ -73,6 +74,7 @@ class BenchmarkAgentConfig:
             api_key=data.get("api_key"),
             host=data.get("host"),
             context_length=data.get("context_length"),
+            feedback_arm=data.get("feedback_arm"),
         )
 
     def to_dict(self) -> dict:
@@ -85,4 +87,5 @@ class BenchmarkAgentConfig:
             "api_key": self.api_key,
             "host": self.host,
             "context_length": self.context_length,
+            "feedback_arm": self.feedback_arm,
         }

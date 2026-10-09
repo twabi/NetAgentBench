@@ -7,7 +7,7 @@ This document describes how to use the benchmark for academic research: **multi-
 | | Multi-turn (primary) | Single-turn (legacy) |
 |--|--|--|
 | Goal | Bounded interactive episodes; rich traces for behavioral analysis. | One-shot evaluation of a frozen `Submission` JSON. |
-| Tasks | [`tasks/multi_turn/*.json`](../tasks/multi_turn/) | Root [`tasks/`](../tasks/), `tasks/sample/`. |
+| Tasks | [`tasks/multi_turn_v2/*.json`](../tasks/multi_turn_v2/) | Root [`tasks/`](../tasks/), `tasks/archive/sample/`. |
 | CLI | `benchmark run-task` + [`scripts/`](../scripts/) batch drivers | `benchmark run`, `benchmark run-llm`, etc. |
 | Paper | [arXiv:2604.09678](https://arxiv.org/abs/2604.09678) | Exploratory unless explicitly compared. |
 | Extra runtime | **Agent HTTP service** (e.g. **dagent**) at `--dagent-endpoint` | None beyond task execution. |
@@ -53,7 +53,7 @@ The benchmark system supports research on autonomous configuration agents. It em
 
 ```bash
 # Run a single benchmark
-benchmark run tasks/bgp_basic.json submission.json
+benchmark run tasks/archive/bgp_basic.json submission.json
 
 # Results saved to results/runs/bgp_basic/run_<timestamp>.json
 ```
@@ -62,9 +62,9 @@ benchmark run tasks/bgp_basic.json submission.json
 
 ```bash
 # Run multiple submissions for same task
-benchmark run tasks/bgp_basic.json submission1.json
-benchmark run tasks/bgp_basic.json submission2.json
-benchmark run tasks/bgp_basic.json submission3.json
+benchmark run tasks/archive/bgp_basic.json submission1.json
+benchmark run tasks/archive/bgp_basic.json submission2.json
+benchmark run tasks/archive/bgp_basic.json submission3.json
 
 # Or run multiple tasks
 benchmark run tasks/task1.json submission.json
@@ -285,12 +285,12 @@ benchmark list-tasks --property-type bgp_configuration
 ```bash
 # Run LLM submissions
 for submission in llm_submissions/*.json; do
-    benchmark run tasks/bgp_basic.json "$submission"
+    benchmark run tasks/archive/bgp_basic.json "$submission"
 done
 
 # Run human submissions
 for submission in human_submissions/*.json; do
-    benchmark run tasks/bgp_basic.json "$submission"
+    benchmark run tasks/archive/bgp_basic.json "$submission"
 done
 ```
 

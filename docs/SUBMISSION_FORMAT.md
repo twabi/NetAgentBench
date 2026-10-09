@@ -394,7 +394,7 @@ Common validation errors:
 benchmark run <task_file> <submission_file>
 
 # Example
-benchmark run tasks/bgp_basic.json my_submission.json
+benchmark run tasks/archive/bgp_basic.json my_submission.json
 ```
 
 ### Using Python API
@@ -406,7 +406,7 @@ from benchmark.models.submission import Submission
 import json
 
 # Load task
-with open('tasks/bgp_basic.json', 'r') as f:
+with open('tasks/archive/bgp_basic.json', 'r') as f:
     task_data = json.load(f)
 task = TaskDefinition.model_validate(task_data)
 

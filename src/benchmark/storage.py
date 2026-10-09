@@ -36,15 +36,19 @@ class ResultsStorage:
         └── {study_id}.json
     """
 
-    def __init__(self, base_dir: str = "results/"):
+    def __init__(self, base_dir: str = "results/", experiment: str = ""):
         """
         Initialize ResultsStorage with base directory.
-        
+
         Args:
             base_dir: Base directory for storing results (default: "results/")
+            experiment: Optional subfolder inserted between "runs/" and the task
+                directory (e.g. "reveal" → runs/reveal/{task_id}/). Leave empty
+                to keep the flat runs/{task_id}/ layout.
         """
         self.base_dir = Path(base_dir)
         self.base_dir.mkdir(parents=True, exist_ok=True)
+        self._experiment = experiment
 
     def save_result(self, result: BenchmarkResult) -> str:
         """
@@ -63,17 +67,23 @@ class ResultsStorage:
     def save_run(self, result: BenchmarkResult) -> str:
         """
         Save a benchmark result to disk.
-        
-        Creates directory structure: results/runs/{task_id}/{run_id}.json
-        
+
+        Creates directory structure:
+          - results/runs/{task_id}/{run_id}.json  (default)
+          - results/runs/{experiment}/{task_id}/{run_id}.json  (when experiment set)
+
         Args:
             result: BenchmarkResult to save
-            
+
         Returns:
             Absolute path to the saved file
         """
         # Create task directory
-        task_dir = self.base_dir / "runs" / result.task_id
+        runs_root = self.base_dir / "runs"
+        if self._experiment:
+            task_dir = runs_root / self._experiment / result.task_id
+        else:
+            task_dir = runs_root / result.task_id
         task_dir.mkdir(parents=True, exist_ok=True)
         
         # Create file path

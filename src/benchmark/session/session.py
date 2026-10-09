@@ -28,6 +28,9 @@ from benchmark.session.models import (
 # Setup logging
 logger = logging.getLogger(__name__)
 
+# Seconds to wait after vtysh first answers. Zebra can still reject config for a moment.
+SHELL_SETTLE_SECONDS = 3
+
 
 class SessionError(Exception):
     """Exception raised for session-related errors."""
@@ -73,6 +76,7 @@ class InteractiveSession:
         turn_limit: int = 50,
         time_limit: float = 600.0,
         convergence_timeout: int = 30,
+        log_property_snapshots: bool = False,
     ):
         """
         Initialize an interactive session.
@@ -89,6 +93,7 @@ class InteractiveSession:
         self.turn_limit = turn_limit
         self.time_limit = time_limit
         self.convergence_timeout = convergence_timeout
+        self.log_property_snapshots = log_property_snapshots
 
         # Session state
         self._context: Optional[SessionContext] = None
@@ -160,6 +165,9 @@ class InteractiveSession:
                 self.infrastructure.teardown(self._topology_id)
                 raise SessionError("Topology failed to become ready within timeout")
 
+        # Container "running" precedes zebra. Preconfiguration must not start until vtysh answers.
+        self._wait_for_shell()
+
         # 1. Apply Pre-configuration
         self._apply_preconfiguration()
 
@@ -184,10 +192,41 @@ class InteractiveSession:
             time_limit=self.time_limit,
             start_time=self._start_time,
             executed_commands=[],
+            log_property_snapshots=self.log_property_snapshots,
         )
 
         logger.info(f"Session {self._context.session_id} started successfully")
         return self._context
+
+    def _wait_for_shell(self, timeout: float = 90.0) -> None:
+        """Block until vtysh answers on every node."""
+        nodes = [node.name for node in self.task.topology.nodes]
+        probe = "vtysh -c 'show ip route'"
+        start = time.time()
+        while time.time() - start < timeout:
+            ready = True
+            for node in nodes:
+                container_name = self.infrastructure.get_node_container_name(
+                    self._topology_id, node
+                )
+                try:
+                    stdout, stderr, exit_code = self._executor.exec_on_node(
+                        container_name, probe, timeout=self.convergence_timeout
+                    )
+                except Exception:
+                    ready = False
+                    break
+                text = f"{stdout or ''}{stderr or ''}"
+                if exit_code != 0 or "not running" in text.lower():
+                    ready = False
+                    break
+            if ready:
+                if SHELL_SETTLE_SECONDS:
+                    time.sleep(SHELL_SETTLE_SECONDS)
+                return
+            time.sleep(2)
+        self.infrastructure.teardown(self._topology_id)
+        raise SessionError("vtysh not ready before pre-configuration")
 
     def _apply_preconfiguration(self):
         """Apply pre-configuration steps to the network."""
@@ -204,11 +243,17 @@ class InteractiveSession:
                 stdout, stderr, exit_code = self._executor.exec_on_node(
                     container_name, step.command, timeout=self.convergence_timeout
                 )
-                if exit_code != 0:
-                    logger.warning(
-                        f"Pre-configuration command failed on {step.node}: {step.command} (exit {exit_code})"
+                text = f"{stdout or ''}{stderr or ''}"
+                if exit_code != 0 and "not running" in text.lower():
+                    self._wait_for_shell()
+                    stdout, stderr, exit_code = self._executor.exec_on_node(
+                        container_name, step.command, timeout=self.convergence_timeout
                     )
-                    logger.debug(f"Stderr: {stderr}")
+                if exit_code != 0:
+                    raise SessionError(
+                        f"Pre-configuration command failed on {step.node} (exit {exit_code}): "
+                        f"{step.command}\n{stdout}{stderr}"
+                    )
                 else:
                     logger.info(f"Pre-configuration command succeeded on {step.node}")
                     logger.debug(f"Pre-config Output:\n{stdout}")
@@ -291,7 +336,7 @@ class InteractiveSession:
 
         Raises:
             SessionNotActiveError: If session is not active
-            TurnLimitExceededError: If turn limit exceeded (for CONFIG commands)
+            TurnLimitExceededError: If turn limit exceeded
             TimeLimitExceededError: If time limit exceeded
         """
         # Check session is active
@@ -302,12 +347,11 @@ class InteractiveSession:
                 )
             raise SessionNotActiveError("Session is not active")
 
-        # Check turn limit for config commands
-        if command_type == CommandType.CONFIG:
-            if self._turns_used >= self.turn_limit:
-                raise TurnLimitExceededError(
-                    f"Turn limit of {self.turn_limit} exceeded"
-                )
+        # Every command spends a turn. command_type is recorded, not priced.
+        if self._turns_used >= self.turn_limit:
+            raise TurnLimitExceededError(
+                f"Turn limit of {self.turn_limit} exceeded"
+            )
 
         # Validate node exists
         if node not in self._context.nodes:
@@ -336,17 +380,10 @@ class InteractiveSession:
             )
             success = exit_code == 0
             execution_time = time.time() - exec_start
-
-            # For CONFIG commands, wait for convergence
-            if command_type == CommandType.CONFIG and success:
-                convergence_start = time.time()
-                # Simple convergence: wait a short time for protocol stabilization
-                time.sleep(min(2.0, self.convergence_timeout / 10))
-                convergence_time = time.time() - convergence_start
-                convergence_status = ConvergenceStatus.CONVERGED
-            else:
-                convergence_time = 0.0
-                convergence_status = ConvergenceStatus.CONVERGED
+            # The convergence budget is waited once, at the end of the session.
+            # A per-command pause would price reads and hide the pre-convergence vector.
+            convergence_time = 0.0
+            convergence_status = ConvergenceStatus.CONVERGED
 
         except TimeoutError as e:
             execution_time = time.time() - exec_start
@@ -381,14 +418,27 @@ class InteractiveSession:
         # Track execution result for syntactic validity scoring
         self._context.execution_results.append((node, command, success))
 
-        # Increment turn counter for CONFIG commands only
-        if command_type == CommandType.CONFIG:
-            self._turns_used += 1
-            logger.debug(
-                f"Executed config command on {node}, turn {self._turns_used}/{self.turn_limit}"
-            )
-        else:
-            logger.debug(f"Executed read command on {node} (no turn increment)")
+        self._turns_used += 1
+        logger.debug(
+            f"Executed {command_type.value} command on {node}, "
+            f"turn {self._turns_used}/{self.turn_limit}"
+        )
+        # Immediate property vector after the command. The agent never sees it.
+        if self.log_property_snapshots and self._topology_id and self.task.intent.properties:
+            try:
+                snap = self._evaluator.evaluate_all_properties(
+                    infrastructure=self.infrastructure,
+                    topology_id=self._topology_id,
+                    properties=self.task.intent.properties,
+                )
+                self._context.property_trajectory.append({
+                    "turn": self._turns_used,
+                    "kind": "passive_reveal",
+                    "properties": {r.property_id: r.satisfied for r in snap},
+                    "completeness": sum(1 for r in snap if r.satisfied) / len(snap) if snap else 0.0,
+                })
+            except Exception as exc:
+                logger.debug(f"Passive reveal snapshot failed at turn {self._turns_used}: {exc}")
 
         return ExecResult(
             success=success,
@@ -505,6 +555,128 @@ class InteractiveSession:
             raise SessionNotActiveError("No session has been started")
 
         return self._context.execution_results
+
+    def get_command_transcript(self) -> List[Tuple[str, str, CommandType, bool]]:
+        """
+        Get the full ordered command transcript with types and outcomes.
+
+        Returns:
+            List of (node, command, command_type, success) tuples
+
+        Raises:
+            SessionNotActiveError: If no session has been started
+        """
+        if self._context is None:
+            raise SessionNotActiveError("No session has been started")
+
+        if len(self._context.executed_commands) != len(self._context.execution_results):
+            logger.warning(
+                "Session command history length mismatch: executed=%s results=%s",
+                len(self._context.executed_commands),
+                len(self._context.execution_results),
+            )
+
+        return [
+            (node, command, command_type, success)
+            for (node, command, command_type), (_, _, success) in zip(
+                self._context.executed_commands,
+                self._context.execution_results,
+            )
+        ]
+
+    def _increment_check_count(self) -> int:
+        """Increment and return the per-episode check tool call count."""
+        if self._context is None:
+            raise SessionNotActiveError("No session has been started")
+        self._context.property_check_count += 1
+        return self._context.property_check_count
+
+    def check_properties_live(self, cap: int) -> dict:
+        """
+        Evaluate all intent properties on live network state (Feedback arm).
+
+        Raises SessionNotActiveError if session not started.
+        Returns dict suitable for MCP check_properties tool.
+        """
+        from benchmark.guide.check_helpers import build_property_check_response
+        from benchmark.guide.arms import CHECK_PROPERTIES_CAP
+
+        if self._context is None or self._topology_id is None:
+            raise SessionNotActiveError("No active session")
+
+        check_index = self._increment_check_count()
+        effective_cap = cap or CHECK_PROPERTIES_CAP
+        if check_index > effective_cap:
+            return {
+                "success": False,
+                "error": "check_cap_exceeded",
+                "message": f"Maximum {effective_cap} check calls per episode",
+                "check_index": check_index,
+                "cap": effective_cap,
+            }
+
+        results = self._evaluator.evaluate_all_properties(
+            infrastructure=self.infrastructure,
+            topology_id=self._topology_id,
+            properties=self.task.intent.properties,
+        )
+        response = build_property_check_response(results, check_index, effective_cap)
+
+        if self._context.log_property_snapshots:
+            self._context.property_trajectory.append(
+                {
+                    "turn": self._turns_used,
+                    "check_index": check_index,
+                    "kind": "property_eval",
+                    "properties": response["properties"],
+                    "completeness": response["completeness"],
+                }
+            )
+
+        return response
+
+    def check_syntactic_validity_live(self, cap: int, window: int = 10) -> dict:
+        """
+        Return recent command success rate (Placebo arm).
+
+        Uses the same per-episode call cap as check_properties.
+        """
+        from benchmark.guide.check_helpers import build_syntactic_validity_response
+        from benchmark.guide.arms import CHECK_PROPERTIES_CAP
+
+        if self._context is None:
+            raise SessionNotActiveError("No active session")
+
+        check_index = self._increment_check_count()
+        effective_cap = cap or CHECK_PROPERTIES_CAP
+        if check_index > effective_cap:
+            return {
+                "success": False,
+                "error": "check_cap_exceeded",
+                "message": f"Maximum {effective_cap} check calls per episode",
+                "check_index": check_index,
+                "cap": effective_cap,
+            }
+
+        response = build_syntactic_validity_response(
+            self._context.execution_results,
+            check_index,
+            effective_cap,
+            window=window,
+        )
+
+        if self._context.log_property_snapshots:
+            self._context.property_trajectory.append(
+                {
+                    "turn": self._turns_used,
+                    "check_index": check_index,
+                    "kind": "syntactic_validity",
+                    "success_rate": response["success_rate"],
+                    "commands_checked": response["commands_checked"],
+                }
+            )
+
+        return response
 
     def teardown(self) -> bool:
         """

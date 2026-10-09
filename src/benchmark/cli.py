@@ -277,7 +277,7 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @main.command()
 @click.argument("task_file", type=click.Path(exists=True))
 @click.option("--dagent-endpoint", default=None, help="Dagent HTTP endpoint to trigger (e.g., http://localhost:8000)")
-@click.option("--provider", default="openai", help="LLM provider: openai, anthropic, gemini, ollama (default: openai)")
+@click.option("--provider", default="openai", help="LLM provider: openai, anthropic, gemini, ollama, openrouter (default: openai)")
 @click.option("--model", default=None, help="Model name (e.g., gpt-4o, gemini-2.0-flash, claude-3-5-sonnet)")
 @click.option("--agent-mode", type=click.Choice(["single", "multi"]), default="single", help="Agent mode: single (one agent) or multi (multi-agent)")
 @click.option("--structure", type=click.Choice(["sequential", "concurrent", "debate", "group_chat", "adaptive"]), default="sequential", help="Multi-agent structure (only for --agent-mode multi)")
@@ -289,7 +289,10 @@ def run(task_file, submission_file, verbose, no_teardown, output_dir):
 @click.option("--mcp-host", default="localhost", help="Host address for the local MCP server (e.g., your local IP if dagent is remote)")
 @click.option("--context-length", type=int, default=120000, help="Context window for Ollama models (default: 120000)")
 @click.option("--verbose", "-v", is_flag=True, help="Print each agent action as it executes")
-def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_host, context_length, agent_mode, structure, turn_limit, time_limit, output_dir, wait_for_submit, verbose):
+@click.option("--human", is_flag=True, help="Interactive human shell (solve task yourself)")
+@click.option("--feedback-arm", type=click.Choice(["blind", "declared", "feedback", "placebo"]), default=None, help="Property-guidance experiment arm (default: legacy behavior)")
+@click.option("--reveal-snapshots", is_flag=True, help="Log per-check property eval snapshots (Reveal subset)")
+def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_host, context_length, agent_mode, structure, turn_limit, time_limit, output_dir, wait_for_submit, verbose, human, feedback_arm, reveal_snapshots):
     """
     Run a single task file in multi-turn interactive mode.
     
@@ -317,75 +320,93 @@ def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_hos
         \\b
         # Wait for external agent (manual mode)
         benchmark run-task tasks/task.json --wait-for-submit
+
+        \\b
+        # Interactive human mode (solve the task yourself)
+        benchmark run-task tasks/multi_turn_v2/ccna_rip_routing_basic.json --human
     """
+    if human and dagent_endpoint:
+        raise click.ClickException("--human cannot be used with --dagent-endpoint")
+
     try:
         from benchmark.interactive_controller import InteractiveBenchmarkController
         from benchmark.storage import ResultsStorage
-        import asyncio
 
         # Load task
         with open(task_file, "r") as f:
             task_data = json.load(f)
         task = TaskDefinition(**task_data)
 
-        # Build testee_id based on provider/model/mode/structure
-        if dagent_endpoint:
+        # Build testee_id based on provider/model/mode/structure or human prompt
+        if human:
+            testee_id = click.prompt("Enter your testee ID", type=str).strip()
+            if not testee_id:
+                raise click.ClickException("Testee ID cannot be empty")
+            testee_type = "human"
+        elif dagent_endpoint:
             mode_suffix = "multi" if agent_mode == "multi" else "single"
-            # Include structure in testee_id for multi-agent runs
             if agent_mode == "multi":
                 mode_suffix = f"multi_{structure}"
             if model:
-                # Use model name for clearer identification  
-                testee_id = f"{provider}_{model.replace('-', '').replace('.', '')}_{mode_suffix}"
+                safe_model = (
+                    model.replace("-", "").replace(".", "").replace("/", "").replace(":", "")
+                )
+                testee_id = f"{provider}_{safe_model}_{mode_suffix}"
             else:
                 testee_id = f"{provider}_default_{mode_suffix}"
+            testee_type = "dagent"
         else:
             testee_id = "manual_agent"
+            testee_type = "manual"
 
-        click.echo(f"\n{'='*80}")
-        click.echo(f"Multi-Turn Task: {task.task_id}")
-        click.echo(f"{'='*80}")
-        click.echo(f"Description: {task.description}")
-        click.echo(f"Nodes: {len(task.topology.nodes)}")
-        click.echo(f"Properties: {len(task.intent.properties)}")
-        click.echo(f"Turn Limit: {turn_limit}")
-        click.echo(f"Time Limit: {time_limit}s")
-        if dagent_endpoint:
-            click.echo(f"Dagent Endpoint: {dagent_endpoint}")
-            click.echo(f"Provider: {provider}")
-            click.echo(f"Model: {model or '(default)'}")
-            click.echo(f"Agent Mode: {agent_mode}")
-            if agent_mode == "multi":
-                click.echo(f"Structure: {structure}")
-        else:
-            click.echo(f"Wait for Submit: {wait_for_submit}")
-        click.echo(f"{'='*80}\n")
+        if not human:
+            click.echo(f"\n{'='*80}")
+            click.echo(f"Multi-Turn Task: {task.task_id}")
+            click.echo(f"{'='*80}")
+            click.echo(f"Description: {task.description}")
+            click.echo(f"Nodes: {len(task.topology.nodes)}")
+            click.echo(f"Properties: {len(task.intent.properties)}")
+            click.echo(f"Turn Limit: {turn_limit}")
+            click.echo(f"Time Limit: {time_limit}s")
+            if dagent_endpoint:
+                click.echo(f"Dagent Endpoint: {dagent_endpoint}")
+                click.echo(f"Provider: {provider}")
+                click.echo(f"Model: {model or '(default)'}")
+                click.echo(f"Agent Mode: {agent_mode}")
+                if agent_mode == "multi":
+                    click.echo(f"Structure: {structure}")
+            else:
+                click.echo(f"Wait for Submit: {wait_for_submit}")
+            click.echo(f"{'='*80}\n")
 
         controller = InteractiveBenchmarkController()
         storage = ResultsStorage(base_dir=output_dir) if output_dir else ResultsStorage()
 
-        # Run async controller
-        async def run():
-            return controller.run_interactive(
-                task=task,
-                testee_id=testee_id,
-                testee_type="dagent" if dagent_endpoint else "manual",
-                model_name=model,
-                turn_limit=turn_limit,
-                time_limit=time_limit,
-                wait_for_submit=wait_for_submit,
-                dagent_endpoint=dagent_endpoint,
-                dagent_provider=provider,
-                dagent_model=model,
-                dagent_host=provider_host,
-                dagent_mode=agent_mode,
-                dagent_structure=structure,
-                context_length=context_length,
-                mcp_host=mcp_host,
-                verbose=verbose,
-            )
-        
-        result = asyncio.run(run())
+        result = controller.run_interactive(
+            task=task,
+            testee_id=testee_id,
+            testee_type=testee_type,
+            model_name=model,
+            turn_limit=turn_limit,
+            time_limit=time_limit,
+            wait_for_submit=wait_for_submit if not human else False,
+            dagent_endpoint=dagent_endpoint,
+            dagent_provider=provider,
+            dagent_model=model,
+            dagent_host=provider_host,
+            dagent_mode=agent_mode,
+            dagent_structure=structure,
+            context_length=context_length,
+            mcp_host=mcp_host,
+            verbose=verbose,
+            interactive_human=human,
+            feedback_arm=feedback_arm,
+            reveal_snapshots=reveal_snapshots,
+        )
+
+        if result is None:
+            click.echo("\nSession aborted. No results saved.")
+            return
 
         storage.save_result(result)
 
@@ -401,15 +422,21 @@ def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_hos
             logger.debug(f"Leaderboard update skipped: {lb_err}")
 
         # Display summary
-        click.echo(f"\n{'='*80}")
-        click.echo("Multi-Turn Result")
-        click.echo(f"{'='*80}")
-        click.echo(f"Task: {result.task_id}")
-        click.echo(f"Success: {result.success}")
-        click.echo(f"Final Score: {result.scoring.final_score:.3f}")
-        click.echo(f"Run ID: {result.run_id}")
-        click.echo(f"Provision Time: {result.metrics.infrastructure_provision_time:.2f}s")
-        click.echo(f"Total Time: {result.metrics.total_time:.2f}s")
+        if human:
+            from benchmark.human_shell import render_results
+
+            render_results(result)
+        else:
+            click.echo(f"\n{'='*80}")
+            click.echo("Multi-Turn Result")
+            click.echo(f"{'='*80}")
+            click.echo(f"Task: {result.task_id}")
+            click.echo(f"Success: {result.success}")
+            click.echo(f"Final Score: {result.scoring.final_score:.3f}")
+            click.echo(f"Run ID: {result.run_id}")
+            click.echo(f"Provision Time: {result.metrics.infrastructure_provision_time:.2f}s")
+            click.echo(f"Total Time: {result.metrics.total_time:.2f}s")
+
         click.echo(f"\nResults saved to: {storage.base_dir / 'runs' / result.run_id}.json")
 
         if not result.success:
@@ -420,6 +447,110 @@ def run_task(task_file, dagent_endpoint, provider, model, provider_host, mcp_hos
         click.echo(f"Error: {e}", err=True)
         import traceback
         traceback.print_exc()
+        sys.exit(1)
+
+
+@main.command("reveal-sweep")
+@click.option("--dagent-endpoint", required=True, help="Dagent HTTP endpoint")
+@click.option("--provider-host", help="Host URL for Ollama provider")
+@click.option("--mcp-host", default="localhost", help="MCP server bind host for dagent")
+@click.option("--output-dir", type=click.Path(), help="Results output directory")
+@click.option("--turn-limit", type=int, default=50)
+@click.option("--time-limit", type=float, default=600.0)
+@click.option("--dry-run", is_flag=True, help="Run 1 episode per task (3 total) for validation")
+@click.option(
+    "--confirm",
+    is_flag=True,
+    help="Required for full run (30 episodes). Without this, only --dry-run is allowed.",
+)
+@click.option("--verbose", "-v", is_flag=True)
+def reveal_sweep(
+    dagent_endpoint,
+    provider_host,
+    mcp_host,
+    output_dir,
+    turn_limit,
+    time_limit,
+    dry_run,
+    confirm,
+    verbose,
+):
+    """
+    Run the Reveal experiment: passive property-trajectory logging.
+
+    Full run: 1 model (gpt-5.6-terra) x 3 tasks x 10 repeats = 30 episodes.
+    Agent is always Blind (no oracle tools). The harness evaluates all declared
+    properties silently after each config command and writes the trajectory to
+    the result JSON for offline analysis.
+
+    Use --dry-run first (3 episodes). Full run requires --confirm.
+    """
+    import json
+    from benchmark.guide.sweep import (
+        DEFAULT_REPEATS,
+        dry_run_episodes,
+        enumerate_episodes,
+        grid_size,
+        sweep_summary,
+    )
+    from benchmark.interactive_controller import InteractiveBenchmarkController
+    from benchmark.storage import ResultsStorage
+
+    tasks_dir = Path(__file__).resolve().parent.parent.parent / "tasks" / "multi_turn"
+
+    if dry_run:
+        episodes = dry_run_episodes(tasks_dir)
+        click.echo("DRY RUN: 1 episode per task (3 total), gpt-5.6-terra, blind arm")
+    elif confirm:
+        episodes = list(enumerate_episodes(tasks_dir))
+        click.echo(f"FULL RUN: {grid_size()} episodes (--confirm acknowledged)")
+    else:
+        raise click.ClickException(
+            "Full run requires --confirm. Use --dry-run for cheap validation first."
+        )
+
+    summary = sweep_summary(episodes)
+    click.echo(json.dumps(summary, indent=2))
+
+    controller = InteractiveBenchmarkController()
+    storage = ResultsStorage(base_dir=output_dir, experiment="reveal") if output_dir else ResultsStorage(experiment="reveal")
+    completed = 0
+    failed = 0
+
+    for ep in episodes:
+        click.echo(
+            f"\n[{completed + failed + 1}/{len(episodes)}] "
+            f"{ep.task_id} | blind | {ep.provider}:{ep.model} | r{ep.repeat}"
+        )
+        with open(ep.task_file) as f:
+            task = TaskDefinition(**json.load(f))
+
+        result = controller.run_interactive(
+            task=task,
+            testee_id=ep.testee_id(),
+            testee_type="dagent",
+            model_name=ep.model,
+            turn_limit=turn_limit,
+            time_limit=time_limit,
+            dagent_endpoint=dagent_endpoint,
+            dagent_provider=ep.provider,
+            dagent_model=ep.model,
+            dagent_host=provider_host,
+            feedback_arm=ep.feedback_arm,
+            reveal_snapshots=ep.reveal_snapshots,
+            mcp_host=mcp_host,
+            verbose=verbose,
+        )
+        if result is None:
+            failed += 1
+            continue
+        storage.save_result(result)
+        completed += 1
+        if not result.success:
+            failed += 1
+
+    click.echo(f"\nSweep complete: {completed} saved, {failed} failed/unsuccessful")
+    if failed:
         sys.exit(1)
 
 

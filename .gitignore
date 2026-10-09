@@ -82,3 +82,10 @@ scripts/rerun_plan.json
 
 *.pid
 .cursor-hooks/
+
+experiments/*
+!experiments/replay_v2/
+!experiments/replay_determinism/
+!experiments/rq2_intent_resolution/
+experiments/**/out/
+experiments_reports/

@@ -10,6 +10,16 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, MagicMock, patch
 
 
+@pytest.fixture(autouse=True)
+def _vtysh_ready(monkeypatch):
+    """Session start probes vtysh. Unit tests should not docker-exec or wait out the settle."""
+    monkeypatch.setattr("benchmark.session.session.SHELL_SETTLE_SECONDS", 0)
+    monkeypatch.setattr(
+        "benchmark.executor.command.CommandExecutor.exec_on_node",
+        lambda self, *_a, **_k: ("", "", 0),
+    )
+
+
 class TestInteractiveSessionInitialization:
     """Test InteractiveSession initialization."""
 
@@ -274,10 +284,117 @@ class TestInteractiveSessionLifecycle:
 
         session.start()
 
-        # Check executor was called for preconfig
-        assert session._executor.exec_on_node.call_count == 2
-        session._executor.exec_on_node.assert_any_call("clab-R1", "conf t", timeout=30)
-        session._executor.exec_on_node.assert_any_call("clab-R1", "interface lo", timeout=30)
+        commands = [call.args[1] for call in session._executor.exec_on_node.call_args_list]
+        assert commands[0] == "vtysh -c 'show ip route'"
+        assert commands[1:] == ["conf t", "interface lo"]
+
+    def test_start_raises_when_preconfiguration_fails(self):
+        """A failed preconfiguration must abort the session, not continue from a changed fault."""
+        from benchmark.session.session import InteractiveSession, SessionError
+        from benchmark.models.task import (
+            TaskDefinition,
+            TopologySpecification,
+            Node,
+            NodeType,
+            IntentSpecification,
+            Platform,
+            PreconfigurationStep,
+            Property,
+            PropertyType,
+            EvaluationProcedure,
+        )
+
+        nodes = [Node(name="R1", type=NodeType.ROUTER)]
+        topology = TopologySpecification(nodes=nodes, links=[], interfaces=[])
+        eval_proc = EvaluationProcedure(
+            method="exec_and_parse", target_node="R1", command="test", parser="text", success_condition={}
+        )
+        prop = Property(
+            id="p1", type=PropertyType.INTERFACE_UP, description="Test", evaluation=eval_proc
+        )
+        task = TaskDefinition(
+            task_id="test_preconfig_fail",
+            description="Test",
+            platform=Platform.FRR,
+            topology=topology,
+            intent=IntentSpecification(properties=[prop]),
+            preconfiguration=[PreconfigurationStep(node="R1", command="router ospf")],
+        )
+
+        mock_infra = Mock()
+        mock_infra.provision.return_value = "topo1"
+        mock_infra.is_ready.return_value = True
+        mock_infra.get_node_container_name.return_value = "clab-R1"
+
+        session = InteractiveSession(task, infrastructure=mock_infra)
+        session._executor = Mock()
+
+        def exec_on_node(container, command, timeout=None):
+            if "show ip route" in command:
+                return ("", "", 0)
+            return ("", "Unknown command", 1)
+
+        session._executor.exec_on_node.side_effect = exec_on_node
+
+        with pytest.raises(SessionError, match="Pre-configuration command failed"):
+            session.start()
+        assert session.is_active is False
+
+    def test_start_waits_for_vtysh_before_preconfiguration(self, monkeypatch):
+        """Containers report ready before zebra accepts vtysh. Preconfiguration must wait."""
+        from benchmark.session.session import InteractiveSession
+        from benchmark.models.task import (
+            TaskDefinition,
+            TopologySpecification,
+            Node,
+            NodeType,
+            IntentSpecification,
+            Platform,
+            PreconfigurationStep,
+            Property,
+            PropertyType,
+            EvaluationProcedure,
+        )
+
+        monkeypatch.setattr("benchmark.session.session.time.sleep", lambda *_a, **_k: None)
+        nodes = [Node(name="R1", type=NodeType.ROUTER)]
+        topology = TopologySpecification(nodes=nodes, links=[], interfaces=[])
+        eval_proc = EvaluationProcedure(
+            method="exec_and_parse", target_node="R1", command="test", parser="text", success_condition={}
+        )
+        prop = Property(
+            id="p1", type=PropertyType.INTERFACE_UP, description="Test", evaluation=eval_proc
+        )
+        task = TaskDefinition(
+            task_id="test_shell_wait",
+            description="Test",
+            platform=Platform.FRR,
+            topology=topology,
+            intent=IntentSpecification(properties=[prop]),
+            preconfiguration=[PreconfigurationStep(node="R1", command="router ospf")],
+        )
+        mock_infra = Mock()
+        mock_infra.provision.return_value = "topo1"
+        mock_infra.is_ready.return_value = True
+        mock_infra.get_node_container_name.return_value = "clab-R1"
+
+        calls = []
+
+        def exec_on_node(container, command, timeout=None):
+            calls.append(command)
+            if command.startswith("vtysh") and len(calls) == 1:
+                return ("zebra is not running\n", "", 1)
+            return ("", "", 0)
+
+        session = InteractiveSession(task, infrastructure=mock_infra)
+        session._executor = Mock()
+        session._executor.exec_on_node.side_effect = exec_on_node
+
+        session.start()
+
+        assert calls[0] == "vtysh -c 'show ip route'"
+        assert calls[-1] == "router ospf"
+        assert session.is_active is True
 
     def test_start_fails_if_fault_not_verified(self):
         """Test start() fails if fault verification property is not satisfied."""
@@ -456,14 +573,14 @@ class TestExecCommand:
         status_after = active_session.get_session_status()
         assert status_after.turns_used == 1
 
-    def test_exec_read_command_no_turn_increment(self, active_session):
-        """Test READ command does NOT increment turn counter."""
+    def test_exec_read_command_increments_turn(self, active_session):
+        """Every command spends a turn, including a read."""
         from benchmark.session.models import CommandType
 
         active_session.exec_command("R1", "show version", CommandType.READ)
 
         status = active_session.get_session_status()
-        assert status.turns_used == 0
+        assert status.turns_used == 1
 
     def test_exec_command_returns_result(self, active_session):
         """Test exec_command returns ExecResult."""
@@ -494,6 +611,25 @@ class TestExecCommand:
 
         assert result.success is False
         assert "Unknown node" in result.error_message
+
+    def test_read_command_appends_property_snapshot(self, active_session):
+        """A read writes a trajectory entry, same as a config command."""
+        from types import SimpleNamespace
+        from benchmark.session.models import CommandType
+
+        active_session.log_property_snapshots = True
+        active_session._evaluator = Mock()
+        active_session._evaluator.evaluate_all_properties.return_value = [
+            SimpleNamespace(property_id="p1", satisfied=True)
+        ]
+
+        active_session.exec_command("R1", "show version", CommandType.READ)
+        active_session.exec_command("R1", "router rip", CommandType.CONFIG)
+
+        trajectory = active_session._context.property_trajectory
+        assert [entry["turn"] for entry in trajectory] == [1, 2]
+        assert [entry["kind"] for entry in trajectory] == ["passive_reveal", "passive_reveal"]
+        assert trajectory[0]["properties"] == {"p1": True}
 
 
 class TestTurnLimitEnforcement:
@@ -567,18 +703,17 @@ class TestTurnLimitEnforcement:
         with pytest.raises(TurnLimitExceededError):
             limited_session.exec_command("R1", "cmd4", CommandType.CONFIG)
 
-    def test_read_commands_dont_count_toward_limit(self, limited_session):
-        """Test READ commands don't count toward turn limit."""
+    def test_read_commands_count_toward_limit(self, limited_session):
+        """A read past K raises the same turn-limit error as a config command."""
+        from benchmark.session.session import TurnLimitExceededError
         from benchmark.session.models import CommandType
 
-        # Use all turns with CONFIG
-        limited_session.exec_command("R1", "cmd1", CommandType.CONFIG)
-        limited_session.exec_command("R1", "cmd2", CommandType.CONFIG)
-        limited_session.exec_command("R1", "cmd3", CommandType.CONFIG)
+        limited_session.exec_command("R1", "show1", CommandType.READ)
+        limited_session.exec_command("R1", "show2", CommandType.READ)
+        limited_session.exec_command("R1", "show3", CommandType.READ)
 
-        # READ should still work
-        result = limited_session.exec_command("R1", "show status", CommandType.READ)
-        assert result.success is True
+        with pytest.raises(TurnLimitExceededError):
+            limited_session.exec_command("R1", "show4", CommandType.READ)
 
 
 class TestTimeLimitEnforcement:
